@@ -13,7 +13,7 @@ import { DEFAULT_SETTINGS } from "./data/validation";
 import { readSettings, writeSettings } from "./data/storage";
 import type { Exercise, ScheduledCardio, UserSettings, WorkoutPlan, WorkoutSession } from "./domain/models";
 import { ActiveWorkoutBanner, LiveWorkout, WorkoutHistoryView } from "./features/training/TrainingView";
-import { createSessionSnapshot, recordSetInSnapshot, removeRecordedSet, closeSession, type RecordTarget, type SetInput } from "./features/training/sessionDomain";
+import { createSessionSnapshot, recordSetWithRest, removeRecordedSet, closeSession, pauseRest, continueRest, adjustRest, skipRest, type RecordTarget, type SetInput } from "./features/training/sessionDomain";
 import { startStoredWorkout, getActiveWorkout, mutateStoredWorkout } from "./data/storage";
 import { savePlanWithExercises, deleteEntity } from "./data/storage";
 import PlanEditor from "./features/program/PlanEditor";
@@ -192,7 +192,19 @@ export default function App(){
   };
   const updateRealSet=async(target:RecordTarget,data:SetInput)=>{
     if(!activeWorkout)throw new Error("Não existe treino aberto.");
-    await mutateStoredWorkout(activeWorkout.id,session=>recordSetInSnapshot(session,target,data));
+    await mutateStoredWorkout(activeWorkout.id,session=>recordSetWithRest(session,target,data,settings.defaultRestSeconds));
+    await reloadTraining();
+  };
+  const changeRealRest=async(action:"pause"|"continue"|"plus"|"minus"|"skip")=>{
+    if(!activeWorkout)throw new Error("Não existe treino aberto.");
+    await mutateStoredWorkout(activeWorkout.id,session=>{
+      const now=new Date();
+      if(action==="pause")return pauseRest(session,now);
+      if(action==="continue")return continueRest(session,now);
+      if(action==="plus")return adjustRest(session,15,now);
+      if(action==="minus")return adjustRest(session,-15,now);
+      return skipRest(session);
+    });
     await reloadTraining();
   };
   const removeRealSet=async(target:RecordTarget)=>{
@@ -327,7 +339,8 @@ export default function App(){
         {screen==="live"&&activeWorkout&&<LiveWorkout
           session={activeWorkout} history={workoutHistory} units={settings.units} onBack={()=>go("workouts")}
           onRecord={updateRealSet} onRemove={removeRealSet}
-          onFinish={()=>endRealWorkout("completed")} onAbandon={()=>endRealWorkout("abandoned")}/>}
+          onFinish={()=>endRealWorkout("completed")} onAbandon={()=>endRealWorkout("abandoned")}
+          onRestAction={changeRealRest}/>}
         {screen==="live"&&!activeWorkout&&<div className="empty-state"><Info/><h3>Nenhuma sessão aberta</h3><button type="button" onClick={()=>go("workouts")}>Voltar aos treinos</button></div>}
         {screen==="history"&&<WorkoutHistoryView history={workoutHistory} onBack={()=>go("workouts")}/>}
         {screen==="library"&&<>
