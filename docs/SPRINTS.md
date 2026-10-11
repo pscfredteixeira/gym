@@ -181,3 +181,14 @@ O estúdio de cards permanece como prévia com **dados fictícios** e não é ex
 - [x] Não substituir imagens já salvas nem preencher imagens aleatórias automaticamente.
 - [x] Testes de parser de licenças, persistência e integridade das fichas.
 - [ ] Validar acesso à API Commons e visualização das fotos no Safari do iPhone.
+
+## Atualização de instalação iPhone — PWA básica
+
+- [x] Ícone GYM laranja e grafite, arquivo Apple touch PNG de 180 × 180.
+- [x] Ícones PWA em PNG 192 × 192 e 512 × 512; manifesto com base e escopo `/gym/`.
+- [x] Cabeçalhos Apple para abrir pela Tela de Início sem barra do Safari.
+- [x] Publicação dos novos arquivos por Pages/Actions e Pages/branch.
+- [x] Testes automatizados dos ícones e da publicação pública.
+- [ ] Validar manualmente a instalação e abertura no iPhone do usuário.
+
+Esta melhoria antecipa a **instalabilidade**; o cache offline completo e atualizações offline permanecem na Sprint 11. Veja `docs/INSTALL_IPHONE.md`.

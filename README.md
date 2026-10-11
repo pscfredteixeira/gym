@@ -182,3 +182,7 @@ As fotografias obtidas no Commons mantêm `imageUrl`, `imageSourceUrl`, `imageAu
 **Dependências:** o Commons e seu servidor de imagens precisam estar acessíveis. A busca pode falhar por indisponibilidade, bloqueio do Safari ou ausência de fotos relevantes com licença aberta. A imagem de um link escolhido depende da conectividade futura do servidor. Para uso em publicações ou materiais externos, deve-se respeitar a licença individual, especialmente os termos ShareAlike de CC BY-SA.
 
 **Teste:** Abra Exercícios > Puxada neutra; confira se aparece "Foto ainda não cadastrada" e a área "Encontrar foto demonstrativa". Se a API estiver acessível, escolha uma opção verificando máquina/pegada e toque **Usar foto**. Volte para Treinar > PULL e confira a miniatura. Faça backup pelo Perfil e verifique se a imagem permanece após reabrir. Se já havia foto na sua ficha, ela não foi apagada pela mudança.
+
+## Instalação na Tela de Início do iPhone
+
+O GYM já inclui ícone próprio em PNG (180 × 180 para iPhone, mais versões PWA 192 × 192 e 512 × 512), manifesto e modo standalone. No **Safari**, abrir a URL pública, tocar em **Compartilhar → Adicionar à Tela de Início** e confirmar o nome GYM. Veja o [guia completo](docs/INSTALL_IPHONE.md), incluindo o cuidado importante de fazer backup dos treinos antes de instalar ou substituir um atalho antigo. **Instalável não significa offline**: o cache offline será tratado na Sprint 11.
