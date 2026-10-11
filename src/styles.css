@@ -591,3 +591,94 @@ input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-ou
 .editor-planned-weight{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid #35383c;padding-top:11px;margin-top:2px;font-size:11px!important;line-height:1.5;}
 .editor-set-fields .editor-planned-weight input{margin:0;width:145px;max-width:45%;font-size:16px;text-align:right;padding-right:11px;}
 .program-exercise-rest{margin-top:10px;padding:9px 2px 0;border-top:1px solid #34363a;color:#b3b6ba;font-size:11px;line-height:1.55;}
+
+
+/* Sprint 04 — real strength training and immutable session history */
+.active-training-banner{display:flex;align-items:center;gap:12px;width:100%;min-height:92px;border:1px solid #7d553d;background:linear-gradient(115deg,#342419,#221c19);border-radius:15px;padding:14px;text-align:left;color:#fff;margin-bottom:14px}
+.active-training-icon{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;color:#ff9c61;background:#4c2c1c;flex:0 0 auto}
+.active-training-banner>span:nth-child(2){flex:1;min-width:0}
+.active-training-banner small{font-size:9px;font-weight:850;color:#ffb486;letter-spacing:1px;display:block}
+.active-training-banner strong{font-size:15px;line-height:1.2;display:block;margin-top:4px}
+.active-training-banner em{font-size:11px;color:#dec9ba;font-style:normal;display:block;line-height:1.5;margin-top:5px}
+.active-training-banner>svg{color:#ffa76c;flex:0 0 auto}
+.history-link{display:flex;justify-content:space-between;align-items:center;width:100%;min-height:48px;border-radius:11px;background:var(--panel);color:#e5e5e5;border:1px solid var(--line);padding:10px 14px;gap:10px;font-size:12px;font-weight:770;margin:0 0 20px}
+.history-link svg:first-child{color:var(--orange)}
+.history-link svg:last-child{margin-left:auto;color:var(--orange)}
+.live-heading{padding:7px 0 17px}
+.live-heading h1{font-size:clamp(30px,7vw,44px);font-weight:880;letter-spacing:-1.6px;line-height:1.08;margin:12px 0 16px}
+.live-summary{display:flex;gap:18px;flex-wrap:wrap;margin:8px 0 16px}
+.live-summary span{display:flex;align-items:center;gap:7px;color:#d8d9da;font-size:12px;font-weight:760}
+.live-summary svg{color:var(--orange)}
+.live-heading .progress-track{margin:0 0 2px}
+.live-exercise-nav{display:flex;gap:8px;overflow-x:auto;scroll-snap-type:x proximity;scrollbar-width:thin;padding:4px 1px 15px;margin:2px -1px 12px}
+.live-exercise-nav button{flex:0 0 140px;min-height:82px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:6px;text-align:left;border:1px solid var(--line);border-radius:13px;background:var(--panel);color:#e1e2e3;padding:11px}
+.live-exercise-nav button.active{border-color:var(--orange);background:#33241c}
+.live-exercise-nav strong{color:var(--orange);font-size:11px}
+.live-exercise-nav span{font-size:12px;font-weight:770;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.live-exercise-nav small{font-size:11px;color:var(--muted)}
+.live-exercise-heading{margin:8px 0 20px}
+.live-exercise-heading h2{font-size:clamp(22px,6vw,30px);font-weight:850;letter-spacing:-.7px;line-height:1.25;margin:9px 0 8px}
+.live-exercise-heading>p{font-size:12px;color:var(--muted);margin:0;line-height:1.65}
+.live-exercise-heading .live-prescription-note{color:#f5bd96;margin-top:6px}
+.last-performance{display:flex;gap:10px;padding:13px;background:#253026;border:1px solid #45624a;border-radius:11px;margin-bottom:17px}
+.last-performance>svg{flex:0 0 auto;color:#91d09a;margin-top:1px}
+.last-performance>div{min-width:0}
+.last-performance strong{display:block;font-size:12px;color:#def2de}
+.last-performance span{display:block;font-size:12px;color:#d0dfd0;line-height:1.6;margin-top:5px}
+.last-performance small{display:block;color:#a9bbaa;margin-top:7px;font-size:11px;line-height:1.5}
+.last-performance.empty{background:var(--panel);border-color:var(--line);color:var(--muted);font-size:12px;line-height:1.6}
+.last-performance.empty>svg{color:var(--orange)}
+.live-sets{display:grid;gap:13px}
+.live-set{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:16px}
+.live-set.completed{border-color:#547459}
+.live-set-head{display:flex;align-items:flex-start;gap:11px}
+.live-set-check{display:grid;place-items:center;border-radius:10px;width:35px;height:35px;flex:0 0 auto;background:#423020;color:#ffb384;font-size:12px;font-weight:850}
+.live-set-check.done{background:#2b4b32;color:#95e8a2}
+.live-set-head>div{flex:1;min-width:0}
+.live-set-head strong{display:block;font-size:15px;line-height:1.2}
+.live-set-head small{display:block;font-size:11px;color:var(--muted);line-height:1.55;margin-top:6px}
+.live-saved{display:inline-flex;align-items:center;gap:3px;font-size:10px;white-space:nowrap;font-weight:800;color:#9ce1a2}
+.live-set-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:19px}
+.live-set-fields label{font-size:10px;color:#c7c9cc;font-weight:760;min-width:0;line-height:1.4}
+.live-set-fields input{display:block;width:100%;min-width:0;min-height:52px;padding:10px 8px;margin-top:7px;text-align:center;background:#101214;border:1px solid #42464a;border-radius:10px;color:var(--text);font-weight:830;font-size:clamp(16px,4.5vw,23px)}
+.live-set-actions{display:flex;align-items:center;gap:9px;margin-top:16px}
+.live-save-series{display:flex;align-items:center;justify-content:center;gap:9px;flex:1;min-height:48px;border:0;background:var(--orange);color:#291409;border-radius:10px;font-size:13px;font-weight:850;padding:9px}
+.live-remove-series{display:grid;place-items:center;flex:0 0 auto;width:48px;height:48px;border:1px solid #70463f;border-radius:10px;color:#f2a49a;background:#30201e}
+.live-navigation{display:flex;gap:10px;justify-content:space-between;margin:23px 0 10px}
+.live-navigation button{display:flex;align-items:center;justify-content:center;gap:7px;flex:1;border:1px solid var(--line);color:#ececee;background:var(--panel-2);border-radius:12px;min-height:49px;font-size:12px;font-weight:760}
+.live-tip{font-size:12px;color:var(--muted);line-height:1.65;margin:11px 0 20px}
+.live-ending{margin-top:27px}
+.live-ending .section-head{margin-bottom:12px}
+.live-abandon{width:100%;display:flex;align-items:center;justify-content:center;gap:8px;min-height:48px;color:#eba89c;font-size:12px;font-weight:750;margin-top:10px;border:0;background:none}
+.history-heading{margin:20px 0}
+.history-heading h1{font-size:42px;letter-spacing:-1.5px;font-weight:880;margin:10px 0}
+.history-heading p{font-size:13px;color:var(--muted);margin:0;line-height:1.6}
+.history-totals{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:22px}
+.history-totals>span{border:1px solid var(--line);border-radius:13px;padding:18px;background:var(--panel)}
+.history-totals strong{font-size:35px;line-height:1.1;display:block;font-weight:880;letter-spacing:-1px}
+.history-totals small{color:var(--muted);font-size:11px;margin-top:7px;display:block}
+.history-list{display:grid;gap:12px}
+.history-item{border:1px solid var(--line);border-radius:14px;background:var(--panel);overflow:hidden}
+.history-item>button{width:100%;display:flex;align-items:center;gap:12px;text-align:left;padding:14px;border:0;background:none;color:var(--text);min-height:83px}
+.history-status{display:grid;place-items:center;color:#f3bd8c;background:#403024;width:39px;height:39px;border-radius:11px;flex:0 0 auto}
+.history-status.done{color:#92daa4;background:#223d2a}
+.history-item>button>span:nth-child(2){flex:1;min-width:0}
+.history-item>button strong{display:block;font-size:14px;line-height:1.4}
+.history-item>button small{display:block;font-size:11px;color:var(--muted);line-height:1.4;margin-top:5px}
+.history-item>button em{display:block;font-size:11px;color:#d9b49d;font-style:normal;margin-top:3px}
+.history-item>button>svg{color:var(--muted);flex:0 0 auto;transition:transform .15s ease}
+.history-item>button>svg.rotate{transform:rotate(180deg)}
+.history-details{border-top:1px solid var(--line);padding:3px 17px 14px}
+.history-details>div{padding:12px 0;border-bottom:1px solid #303235}
+.history-details>div:last-child{border-bottom:0}
+.history-details strong{font-size:13px;line-height:1.3}
+.history-details p{font-size:11px;line-height:1.7;color:#c4c5c8;margin:7px 0 0}
+@media(max-width:380px){
+ .live-set{padding:12px}
+ .live-set-fields{gap:6px}
+ .live-set-fields label{font-size:9px}
+ .live-set-fields input{font-size:17px;padding:9px 3px}
+ .live-set-head strong{font-size:14px}
+ .active-training-banner{padding:11px;gap:9px}
+ .active-training-icon{height:42px;width:42px}
+}
