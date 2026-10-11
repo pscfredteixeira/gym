@@ -342,6 +342,7 @@ export default function App(){
           catalog={catalogExercises}
           status={programStatus}
           onEdit={()=>{if(selectedPlan)editPlan(selectedPlan.id);}}
+          onViewExercise={id=>openExerciseInfo(id,"program")}
           units={settings.units}
         />}
         {screen==="live"&&activeWorkout&&<LiveWorkout
