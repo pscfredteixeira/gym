@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Activity, ArrowRight, BarChart3, CalendarDays, CheckCircle2, Clock3, Dumbbell, Footprints, Info, TrendingUp } from "lucide-react";
+import { Activity, ArrowRight, BarChart3, CalendarDays, CheckCircle2, Clock3, Dumbbell, Footprints, TrendingUp } from "lucide-react";
 import type { CardioSession, UserSettings, WorkoutSession } from "../../domain/models";
 import { Notice } from "../../components/ui";
 import { paceLabel } from "../cardio/cardioDomain";
