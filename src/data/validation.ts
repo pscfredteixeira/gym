@@ -118,6 +118,7 @@ export function validateGymBackup(value: unknown): GymBackup {
     importBatches: validatedList(value.importBatches,"importações",batch),
     settings: validateSettings(value.settings),
   };
+  for (const item of output.workoutSessions) validateWorkoutSession(item);
   return output;
 }
 

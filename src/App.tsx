@@ -271,7 +271,6 @@ export default function App(){
     else if(exerciseIndex<exercises.length-1){setExerciseIndex(v=>v+1);setSetIndex(0);}
     setRestLeft(sessionEx.rest);setRestRunning(true);go("rest");
   };
-  const startDemo=()=>{setExerciseIndex(0);setSetIndex(0);go("session");};
   const resetDemo=()=>{
     if(!window.confirm("Reiniciar apenas os valores desta prévia? Nenhum dado real será apagado."))return;
     setCompleted({});setWeight({});setReps({});setExerciseIndex(0);setSetIndex(0);setRunDistance(3.2);setRunMinutes(20);setExportStatus("");go("home");
