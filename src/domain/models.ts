@@ -13,6 +13,10 @@ export interface Exercise {
   secondaryMuscles?: string[];
   equipment?: string;
   imageUrl?: string;
+  /** Optional attribution for a Commons image. */
+  imageSourceUrl?: string;
+  imageAuthor?: string;
+  imageLicense?: string;
   instructions?: string[];
   isCustom: boolean;
 }

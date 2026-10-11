@@ -67,7 +67,10 @@ const planned = (v: unknown) => record(v) && id(v.id) && typed(v.kind,["warmup",
   optional(v.targetRirMax,n=>number(n)&&(n as number)<=10 && (v.targetRir===undefined || (n as number)>=(v.targetRir as number)));
 const exercise = (v: unknown) => record(v) && id(v.id) && text(v.name,200) && text(v.primaryMuscle,120) &&
   typeof v.isCustom === "boolean" && optional(v.secondaryMuscles,strings) && optional(v.equipment,n=>text(n,100)) &&
-  optional(v.imageUrl,isExerciseImageUrl) && optional(v.instructions,strings);
+  optional(v.imageUrl,isExerciseImageUrl) &&
+  optional(v.imageSourceUrl,n=>typeof n==="string" && n.length<=2000 && /^https:\/\/commons\.wikimedia\.org\/wiki\/File:/.test(n)) &&
+  optional(v.imageAuthor,n=>text(n,200)) &&
+  optional(v.imageLicense,n=>text(n,90)) && optional(v.instructions,strings);
 const planExercise = (v: unknown) => record(v) && id(v.id) && id(v.exerciseId) && count(v.order) &&
   count(v.restSeconds) && Array.isArray(v.sets) && v.sets.every(planned) && optional(v.notes,n=>text(n,3000));
 const plan = (v: unknown) => record(v) && id(v.id) && text(v.name,200) && iso(v.createdAt) && iso(v.updatedAt) &&
