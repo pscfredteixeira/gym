@@ -61,3 +61,5 @@ jobs:
       - name: Deploy to Pages
         id: deployment
         uses: actions/deploy-pages@v4
+      - name: Verificar o endereço público e assets compilados
+        run: node scripts/check-deploy.mjs
