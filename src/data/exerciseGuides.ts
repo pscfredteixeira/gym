@@ -9,7 +9,7 @@ export interface ExerciseGuide {
   focus: string;
   alternatives: readonly string[];
 }
-type Row = readonly [string, string, string, string, string, string, string, string];
+type Row = readonly [string, string, string, string, string, string, string, string, string];
 const rows: Row[] = [
 ["Supino inclinado com halteres","Ajuste o banco em inclinação moderada; apoie cabeça e costas.","Abaixe os halteres com controle até uma amplitude confortável para os ombros.","Empurre para cima sem bater os halteres no topo.","Não arquear demais a lombar para levantar mais peso.","Evite abrir os cotovelos a 90° do tronco se causar desconforto.","Peitoral superior; deltoide anterior e tríceps auxiliam.","Chest press convergente","Supino reto na máquina"],
 ["Chest press convergente","Ajuste a altura do assento para que as pegadas fiquem próximas da linha do peito.","Mantenha escápulas apoiadas e empurre acompanhando a trajetória da máquina.","Volte devagar sem deixar a pilha bater.","Evite elevar os ombros na fase de empurrar.","Não encurte demais a volta só para aumentar a carga.","Peitoral; deltoide anterior e tríceps auxiliam.","Supino reto na máquina","Supino inclinado com halteres"],
