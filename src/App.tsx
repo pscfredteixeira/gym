@@ -11,10 +11,13 @@ import { exercises, mockWeights, mockReps, photos } from "./data/demo";
 import ProfilePanel, { type StorageState } from "./features/profile/ProfilePanel";
 import { DEFAULT_SETTINGS } from "./data/validation";
 import { readSettings, writeSettings } from "./data/storage";
-import type { UserSettings } from "./domain/models";
+import type { Exercise, UserSettings, WorkoutPlan } from "./domain/models";
+import { PROGRAM_DAYS, PROGRAM_NAME, buildProgramCatalog, planId, seriesCount } from "./data/program1010";
+import { ProgramOverview, ProgramDayDetail, ProgramLibrary, type ProgramStatus } from "./features/program/ProgramView";
+import { ensureProgramCatalog, listEntities } from "./data/storage";
 
 type Tab = "home" | "workouts" | "library" | "progress" | "profile";
-type Screen = Tab | "exercise" | "session" | "rest" | "run" | "share";
+type Screen = Tab | "exercise" | "session" | "rest" | "run" | "share" | "program";
 type ShareKind = "strength" | "run";
 type ShareFormat = "story" | "feed" | "square";
 type ShareStyle = "ember" | "minimal";
@@ -151,6 +154,28 @@ export default function App(){
     await writeSettings(settings);
   };
   const [day,setDay]=useState(todayIndex);
+  const [programStatus,setProgramStatus]=useState<ProgramStatus>("loading");
+  const [savedPlans,setSavedPlans]=useState<WorkoutPlan[]>([]);
+  const [catalogExercises,setCatalogExercises]=useState<Exercise[]>([]);
+
+  const loadProgram=async(install:boolean)=>{
+    setProgramStatus("loading");
+    try {
+      if(install) await ensureProgramCatalog(buildProgramCatalog(new Date().toISOString()));
+      const [plans,catalog] = await Promise.all([
+        listEntities<WorkoutPlan>("plans"),listEntities<Exercise>("exercises")
+      ]);
+      setSavedPlans(plans);
+      setCatalogExercises(catalog);
+      const allPresent=PROGRAM_DAYS.filter(d=>d.exercises.length>0).every(d=>plans.some(p=>p.id===planId(d.id)));
+      setProgramStatus(allPresent?"ready":"not_installed");
+    }catch{
+      setProgramStatus("error");
+    }
+  };
+  useEffect(()=>{void loadProgram(true);},[]);
+  const openProgram=(index:number)=>{setDay(index);go("program");};
+  const selectedDay=PROGRAM_DAYS[day];
 
   useEffect(()=>{
     if(screen!=="rest" || !restRunning || restLeft<=0) return;
@@ -183,41 +208,44 @@ export default function App(){
     if(kind==="weight")setWeight(prev=>({...prev,[currentKey]:Math.min(500,Math.max(0,(prev[currentKey]??mockWeights[sessionEx.id])+delta))}));
     else setReps(prev=>({...prev,[currentKey]:Math.min(100,Math.max(0,(prev[currentKey]??mockReps[sessionEx.id])+delta))}));
   };
-  const tab=navItems.find(n=>n.screen===screen)?.screen??(screen==="run"?"workouts":screen==="share"?"progress":"workouts");
+  const tab=navItems.find(n=>n.screen===screen)?.screen??(screen==="run"||screen==="program"?"workouts":screen==="share"?"progress":"workouts");
   return <div className={"gym-app"+(settings.largeText?" large-text":"")+(settings.reducedMotion?" reduced-motion":"")}>
     <div className="desktop-rail" aria-hidden="true"><span>GYM</span><i/><small>MOVE WITH PURPOSE</small></div>
     <div className="app-column">
       <header className="app-header">
         <button className="logo" type="button" onClick={()=>go("home")} aria-label="GYM, voltar ao início">GYM<span>.</span></button>
-        <div className="header-actions"><DemoLabel compact/><button type="button" className="header-avatar" onClick={()=>go("profile")} aria-label="Abrir perfil"><UserRound size={20}/></button></div>
+        <div className="header-actions">{["home","workouts","program"].includes(screen)?<span className="program-header-tag">10/10</span>:<DemoLabel compact/>}<button type="button" className="header-avatar" onClick={()=>go("profile")} aria-label="Abrir perfil"><UserRound size={20}/></button></div>
       </header>
       <main className="app-main" id="main-content">
         {screen==="home"&&<>
           <section className="greeting"><p className="eyebrow">SEU ESPAÇO DE MOVIMENTO</p><div className="heading-line"><h1>Vamos treinar<span className="orange">.</span></h1><span className="date-mark"><CalendarDays size={15}/> HOJE</span></div><p>Um passo de cada vez. Seu ritmo, suas conquistas.</p></section>
           <div className="week-strip" aria-label="Escolha um dia da semana">{weekDates.map(({name,day:calendarDay},i)=><button type="button" key={name} onClick={()=>setDay(i)} className={day===i?"day-item selected":"day-item"} aria-pressed={day===i}><span>{name.toUpperCase()}</span><strong>{calendarDay}</strong><i/></button>)}</div>
-          <section className="hero-card"><Photo src={photos.hero} alt="Atleta treinando com barra em academia" className="hero-photo"/><div className="hero-shade"/><div className="hero-info"><div className="topchip"><Flame size={13}/> TREINO DE DEMONSTRAÇÃO</div><div className="hero-lower"><p>FORÇA / DIA A</p><h2>Costas &<br/>bíceps<span>.</span></h2><div className="hero-stats"><span><Dumbbell size={14}/> 5 exercícios</span><span><Clock3 size={14}/> ~55 min</span></div><button type="button" className="hero-cta" onClick={startDemo}>Começar prévia <ArrowRight size={20}/></button></div></div></section>
+          <section className="hero-card"><Photo src={photos.hero} alt="Ambiente de academia" className="hero-photo"/><div className="hero-shade"/><div className="hero-info"><div className="topchip"><Flame size={13}/> {PROGRAM_NAME.toUpperCase()} · VERSÃO 2.0</div><div className="hero-lower"><p>{selectedDay.weekday.toUpperCase()} / {selectedDay.exercises.length?"MUSCULAÇÃO":"RECUPERAÇÃO"}</p><h2>{selectedDay.title}<span>.</span></h2><div className="hero-stats">{selectedDay.exercises.length?<><span><Dumbbell size={14}/>{selectedDay.exercises.length} exercícios</span><span><CheckCircle2 size={14}/>{seriesCount(selectedDay)} séries efetivas</span></>:<span><Activity size={14}/> Descanso / recuperação</span>}{selectedDay.cardio&&<span><Footprints size={14}/>{selectedDay.cardio.label}{selectedDay.cardio.minutes?" · "+selectedDay.cardio.minutes+" min":""}</span>}</div><button type="button" className="hero-cta" onClick={()=>openProgram(day)}>Ver programação do dia <ArrowRight size={20}/></button></div></div></section>
           <SectionHead title="Seu espaço" aside="Explorar treinos" onClick={()=>go("workouts")}/>
           <div className="home-cards"><button className="feature-mini" type="button" onClick={()=>go("run")}><div className="feature-icon"><Footprints size={24}/></div><small>CARDIO</small><h3>Corrida & esteira</h3><p>Ritmo, distância e tempo</p><ArrowUpRight className="corner-arrow" size={18}/></button><button className="feature-mini" type="button" onClick={()=>go("progress")}><div className="feature-icon"><TrendingUp size={24}/></div><small>RESULTADOS</small><h3>Sua evolução</h3><p>Gráficos e recordes</p><ArrowUpRight className="corner-arrow" size={18}/></button></div>
-          <div className="callout-line"><Sparkles size={18}/><span>O visual já é navegável. Seus registros reais entrarão nas próximas sprints.</span></div>
+          <div className="callout-line"><Sparkles size={18}/><span>{programStatus==="ready"?"Programa 10/10 cadastrado no armazenamento local. O registro das séries será ativado na Sprint 04.":programStatus==="loading"?"Preparando o Programa 10/10...":"A ficha pode ser consultada, mas ainda não foi confirmada no armazenamento local."}</span></div>
         </>}
-        {screen==="workouts"&&<>
-          <Titlebar eyebrow="SEUS TREINOS" title="Treinar." right={<button className="round-control" type="button" onClick={()=>go("library")} aria-label="Abrir exercícios"><BookOpen size={20}/></button>}/>
-          <p className="screen-lead">Escolha uma atividade para explorar a experiência.</p>
-          <div className="segment-label">MUSCULAÇÃO <span>FICHA DE EXEMPLO</span></div>
-          <div className="workout-feature"><Photo src={photos.hero} alt="Atleta com barra durante treino de força"/><div className="workout-feature-overlay"><span className="small-overline">TREINO A · COSTAS</span><h2>Costas & bíceps</h2><div className="light-meta"><span><Dumbbell size={15}/> 5 exercícios</span><span><TimerReset size={15}/> ~55 min</span></div></div></div>
-          <div className="exercise-list">{exercises.map((ex,i)=><button type="button" key={ex.id} className="exercise-row" onClick={()=>openExercise(i)}><WorkoutThumbnail exerciseIndex={i}/><span className="exercise-row-copy"><strong>{ex.name}</strong><small>{ex.sets} séries · {ex.reps} repetições</small></span><ChevronRight size={18} className="muted-icon"/></button>)}</div>
-          <PrimaryButton onClick={startDemo}>Explorar treino <Play size={18} fill="currentColor"/></PrimaryButton>
-          <SectionHead title="Cardio" aside="Ver corrida" onClick={()=>go("run")}/>
-          <button type="button" onClick={()=>go("run")} className="cardio-list-card"><Photo src={photos.running} alt="Pessoa correndo em esteira"/><div><small>ESTEIRA / CORRIDA EXTERNA</small><strong>Uma corrida no seu ritmo</strong><span>Tempo, distância e ritmo</span></div><ChevronRight size={20}/></button>
-        </>}
+        {screen==="workouts"&&<ProgramOverview status={programStatus} onOpen={openProgram} onInstall={()=>{void loadProgram(true);}}/>}
+        {screen==="program"&&<ProgramDayDetail
+          day={selectedDay}
+          onBack={()=>go("workouts")}
+          onPreview={startDemo}
+          onCardio={()=>go("run")}
+          plan={savedPlans.find(plan=>plan.id===planId(selectedDay.id))}
+          catalog={catalogExercises}
+          status={programStatus}
+        />}
         {screen==="library"&&<>
           <Titlebar eyebrow="CONHECIMENTO EM MOVIMENTO" title="Exercícios." right={<button type="button" className="round-control" onClick={()=>{setLibraryFilter("Todos");setSearch("");}} aria-label="Limpar filtros"><SlidersHorizontal size={19}/></button>}/>
-          <p className="screen-lead">Encontre movimentos e veja como serão organizadas as orientações.</p>
+          <p className="screen-lead">Consulte os exercícios do seu Programa 10/10 e seus dias de treinamento.</p>
+          <ProgramLibrary onOpen={openProgram}/>
+          <details className="demo-library-disclosure"><summary>Biblioteca visual experimental <span>5 exemplos fictícios</span></summary>
           <label className="search-box"><Search size={20}/><input type="search" placeholder="Buscar exercício" value={search} onChange={e=>setSearch(e.target.value)} aria-label="Buscar exercício"/></label>
           <div className="filter-row" aria-label="Filtrar por grupo muscular">{["Todos","Costas","Braços"].map(item=><button type="button" key={item} className={libraryFilter===item?"filter-chip active":"filter-chip"} onClick={()=>setLibraryFilter(item)} aria-pressed={libraryFilter===item}>{item}</button>)}</div>
           <SectionHead title="Biblioteca" aside={filtered.length+" movimentos"}/>
           {filtered.length===0?<div className="empty-state"><Search size={27}/><h3>Nenhum exercício encontrado</h3><p>Tente buscar por outro nome ou limpar os filtros.</p><PrimaryButton secondary onClick={()=>{setSearch("");setLibraryFilter("Todos")}}>Limpar busca</PrimaryButton></div>:<div className="library-grid">{filtered.map(ex=>{const i=exercises.findIndex(e=>e.id===ex.id);return <button type="button" className="library-card" key={ex.id} onClick={()=>openExercise(i)}><WorkoutThumbnail exerciseIndex={i}/><div><span className="library-muscle">{ex.muscle.toUpperCase()}</span><h3>{ex.name}</h3><p>{ex.equipment}</p></div><ChevronRight size={18}/></button>})}</div>}
-          <Notice>Fotografias ilustrativas. Na biblioteca definitiva, cada movimento terá demonstração visual própria.</Notice>
+          <Notice>As imagens desta seção são exemplos da interface. As fotografias de execução dos exercícios reais serão preparadas na Sprint 06.</Notice>
+          </details>
         </>}
         {screen==="exercise"&&<>
           <BackHeader label="EXERCÍCIO" onBack={()=>go("library")} action={<button type="button" className="round-control" onClick={()=>go("workouts")} aria-label="Ir para ficha"><Dumbbell size={19}/></button>}/>
@@ -286,7 +314,7 @@ export default function App(){
           storageState={storageState}
           storageError={storageError}
           flushSettings={flushSettings}
-          onRestored={value=>{setSettings(value);setStorageError("");setStorageState("saved");}}
+          onRestored={value=>{setSettings(value);setStorageError("");setStorageState("saved");void loadProgram(false);}}
           onResetDemo={resetDemo}
         />}
       </main>
