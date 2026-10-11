@@ -1085,3 +1085,36 @@ input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-ou
  .real-progress-weeks{gap:5px;padding:11px 7px}
  .real-progress-week>small{font-size:8px}
 }
+
+
+/* Real exercise-photo discovery: explicit Commons licenses and source attribution */
+.gym-commons-picker{display:grid;gap:11px;padding:15px;background:var(--panel);border:1px solid #755037;border-radius:14px;margin:13px 0 22px}
+.gym-commons-heading{display:flex;align-items:flex-start;gap:11px}
+.gym-commons-heading>svg{color:#ffac79;flex:0 0 auto;margin-top:2px}
+.gym-commons-heading>div{min-width:0;flex:1}
+.gym-commons-heading strong{display:block;font-size:15px;font-weight:840;line-height:1.4}
+.gym-commons-heading p{font-size:12px;line-height:1.6;margin:5px 0 0;color:#c3b8b0}
+.gym-commons-loading,.gym-commons-empty{display:flex;align-items:center;gap:11px;padding:13px;color:#ddd1cb;border:1px solid #53463f;background:#292523;border-radius:9px;font-size:12px;line-height:1.6}
+.gym-commons-loading svg{animation:gym-pulse 1.3s linear infinite;color:var(--orange)}
+@keyframes gym-pulse{to{transform:rotate(360deg)}}
+.gym-commons-empty{flex-wrap:wrap}
+.gym-commons-empty span{flex:1;min-width:120px}
+.gym-commons-empty button{display:flex;align-items:center;justify-content:center;gap:5px;border:1px solid #9b6948;color:#ffd0ae;background:#3d2c22;border-radius:9px;min-height:44px;padding:8px 12px;font-weight:750}
+.gym-commons-warning{font-size:11px;line-height:1.5;color:#f0c9ae;background:#3c2a20;padding:9px 11px;border-radius:8px;margin:0}
+.gym-commons-results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.gym-commons-photo{display:flex;flex-direction:column;gap:8px;min-width:0;border-radius:11px;border:1px solid #515358;background:#1c1f22;padding:8px}
+.gym-commons-photo-preview{height:135px;background:#111315;border-radius:8px;overflow:hidden;display:grid;place-items:center}
+.gym-commons-photo-preview img{height:100%;width:100%;object-fit:contain}
+.gym-commons-photo-details{flex:1;min-width:0}
+.gym-commons-photo-details strong{font-size:11px;line-height:1.45;font-weight:800;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.gym-commons-photo-details span{display:block;font-size:10px;line-height:1.4;color:#b6b5b5;margin-top:6px;overflow-wrap:anywhere}
+.gym-commons-photo-details a{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:#ffc09c;margin-top:8px;line-height:1.4}
+.gym-commons-use{min-height:47px;display:flex;align-items:center;justify-content:center;gap:7px;font-size:12px;font-weight:820;border:0;border-radius:8px;background:var(--orange);color:#251308}
+.gym-commons-use:disabled{opacity:.5}
+.gym-commons-credit-note{font-size:10px;color:var(--muted);line-height:1.65;margin:0}
+.gym-exercise-photo.has-photo:has(.gym-exercise-photo-attribution){overflow:visible;margin-bottom:73px}
+.gym-exercise-photo-attribution{position:absolute;top:100%;left:-1px;right:-1px;padding:8px 11px;min-height:65px;display:flex;flex-direction:column;justify-content:center;gap:3px;background:#232527;border:1px solid #52483e;border-radius:0 0 11px 11px;color:#c6c8c9;font-size:10px;line-height:1.4}
+.gym-exercise-photo-attribution span{max-height:36px;overflow:hidden}
+.gym-exercise-photo-attribution a{font-size:11px;color:#ffad79;text-decoration:underline}
+@media(max-width:370px){.gym-commons-picker{padding:11px}.gym-commons-photo-preview{height:107px}.gym-commons-results{gap:7px}.gym-commons-photo{padding:6px}.gym-commons-photo-details span{font-size:9px}}
+@media(prefers-reduced-motion:reduce){.gym-commons-loading svg{animation:none}}
