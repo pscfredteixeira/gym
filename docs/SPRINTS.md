@@ -169,3 +169,15 @@ Não usar fotos de bases cujo próprio mantenedor desconheça a licença.
 - [ ] Validação manual da aba Evolução no Safari do iPhone pelo usuário.
 
 O estúdio de cards permanece como prévia com **dados fictícios** e não é exportação de treinos reais.
+
+
+## Correção das fotografias (após Sprint 08)
+
+- [x] Esclarecer que a coleção original de 31 exercícios não tinha fotografias pré-carregadas.
+- [x] Indicar "SEM FOTO" claramente na biblioteca e nas fichas.
+- [x] Adicionar sugestões externas com licenças CC BY, CC BY-SA, CC0 ou domínio público.
+- [x] Incluir confirmação de correspondência técnica antes de vincular uma foto.
+- [x] Preservar autor, licença e link da fonte junto do exercício no backup.
+- [x] Não substituir imagens já salvas nem preencher imagens aleatórias automaticamente.
+- [x] Testes de parser de licenças, persistência e integridade das fichas.
+- [ ] Validar acesso à API Commons e visualização das fotos no Safari do iPhone.

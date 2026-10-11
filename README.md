@@ -167,3 +167,18 @@ A página de corrida registra **atividades reais informadas manualmente**: estei
 ## Sprint 08 — Evolução real
 
 A aba **Evolução** agora exibe treinos concluídos, séries, progressão da maior carga por exercício, volume de treino, cardio registrado e constância nas últimas seis semanas. Filtros de 30/90/180 dias ou todo o histórico; sem inventar dados quando o banco estiver vazio. Veja [docs/SPRINT08_PROGRESS.md](docs/SPRINT08_PROGRESS.md).
+
+
+## Atualização: escolha de fotografias demonstrativas com licença aberta
+
+O Programa 10/10 foi inicialmente cadastrado sem fotos. Exibir um ícone ou "SEM FOTO" não significa que o carregamento de uma imagem previamente fornecida falhou; significa, em geral, que nenhuma imagem foi ainda associada àquele exercício.
+
+Agora, em **Exercícios > toque no exercício > Encontrar foto demonstrativa**, o GYM consulta a API oficial do **Wikimedia Commons** para apresentar miniaturas candidatas de imagens que declararam licença **CC BY, CC BY-SA, CC0 ou domínio público**. Os termos de busca em inglês são específicos para cada um dos 31 movimentos do programa. A página traz imagem, título, licença, créditos e link para o arquivo original.
+
+**A pesquisa é uma lista de candidatos, não uma certificação técnica.** O mesmo termo de busca pode retornar uma máquina parecida, uma posição inadequada ou outro tipo de exercício. O usuário verifica se a foto realmente corresponde ao movimento e confirma **Usar foto**. Só então a imagem aparece na biblioteca, na ficha e durante o treino. Não atribuímos fotos arbitrárias automaticamente. Caso não haja opções, continua possível carregar uma imagem da galeria do iPhone ou indicar um link HTTPS próprio.
+
+As fotografias obtidas no Commons mantêm `imageUrl`, `imageSourceUrl`, `imageAuthor` e `imageLicense` no IndexedDB e no backup JSON. O detalhe do exercício exibe a licença e o link de fonte. Imagens da galeria continuam locais e privadas, sem serem enviadas ao Commons.
+
+**Dependências:** o Commons e seu servidor de imagens precisam estar acessíveis. A busca pode falhar por indisponibilidade, bloqueio do Safari ou ausência de fotos relevantes com licença aberta. A imagem de um link escolhido depende da conectividade futura do servidor. Para uso em publicações ou materiais externos, deve-se respeitar a licença individual, especialmente os termos ShareAlike de CC BY-SA.
+
+**Teste:** Abra Exercícios > Puxada neutra; confira se aparece "Foto ainda não cadastrada" e a área "Encontrar foto demonstrativa". Se a API estiver acessível, escolha uma opção verificando máquina/pegada e toque **Usar foto**. Volte para Treinar > PULL e confira a miniatura. Faça backup pelo Perfil e verifique se a imagem permanece após reabrir. Se já havia foto na sua ficha, ela não foi apagada pela mudança.
