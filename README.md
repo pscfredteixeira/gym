@@ -102,3 +102,35 @@ Regras de segurança: edição nunca escreve na store `workoutSessions`; dados a
 6. Conferir que o histórico não ganhou sessões falsas após editar fichas.
 
 **Não é Sprint 04:** a tela de execução fictícia permanece identificada como simulação; registro de séries reais, carga efetivamente usada e cronômetro associado a uma sessão ainda não foram implementados.
+
+
+## Sprint 04 — Musculação com registros reais
+
+O GYM já permite iniciar, registrar, retomar, concluir e consultar sessões **reais** de musculação, armazenadas apenas no IndexedDB deste navegador. A prévia ilustrativa de exercícios continua separada e não cria resultados reais.
+
+### Como testar no Safari
+
+1. Abra **Treinar > PULL (ou outro dia) > Iniciar treino real**.
+2. No primeiro exercício, informe uma carga e repetições; o RIR é opcional. Toque **Salvar série**. O contador de progresso só aumenta após gravação confirmada.
+3. Feche a aba do Safari, abra novamente o GYM e toque no aviso **Treino em andamento**. A série já registrada deve aparecer.
+4. Edite os valores dessa série e toque **Atualizar registro**; ela deve ser atualizada, não duplicada. Também é possível **desfazer o registro** mediante confirmação.
+5. Navegue para outro exercício, registre mais uma série e finalize. O sistema permite encerrar uma sessão incompleta após confirmação; séries sem registro continuam vazias.
+6. Abra **Histórico de musculação**, expanda a sessão e confira nome, data, duração, exercícios e resultados.
+7. Na área **Perfil**, exporte um backup JSON e verifique que contém os registros. Faça backup antes de experimentar a restauração, que substitui todos os dados locais.
+
+### Integridade
+
+- Ao iniciar uma sessão, são copiados: nome da ficha, nome de cada exercício, ordem, séries planejadas, RIR, carga de referência e descanso planejado.
+- Editar a ficha original **não modifica** a sessão iniciada ou concluída.
+- Somente uma sessão pode estar aberta por instalação de navegador. Outra aba não pode iniciar uma segunda sessão simultaneamente.
+- Cada série tem uma ligação única com a série planejada; salvar novamente atualiza o mesmo registro.
+- Séries sem registro não são marcadas como concluídas.
+- **Finalizar** exige pelo menos uma série salva. **Encerrar como interrompido** guarda a sessão no histórico.
+- Cargas são guardadas canonicamente em kg, mesmo quando exibidas em libras; repetições e RIR são digitados pelo usuário, nunca inferidos.
+- Registros e ajustes entram no backup JSON, ainda no esquema v1 e sem modificar arquivos antigos válidos.
+- O cronômetro avançado de descanso/alertas e o modo academia otimizado ficam para a Sprint 05. Não há promessa de notificações em segundo plano no iPhone.
+- Esta é uma PWA web, **não** uma sincronização automática com HealthKit ou Apple Watch.
+
+### Testes
+
+`npm test` executa testes isolados de snapshot, proteção contra múltiplas sessões, persistência no IndexedDB, gravação/edição/desfazer série, histórico, fim de treino e restauração com arquivos malformados. `npm run build` e o workflow de publicação verificam TypeScript e carregamento público do site.

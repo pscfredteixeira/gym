@@ -82,3 +82,19 @@ A Sprint 01 entregou uma prévia navegável com dez telas, biblioteca demonstrat
 - [ ] Validação manual no Safari do iPhone pelo usuário, antes de iniciar a Sprint 04.
 
 Observação: a interface de execução da Sprint 01 ainda apresenta valores simulados e NÃO registra séries reais. Não misturar a simulação com dados salvos.
+
+## Sprint 04 — implementação
+
+- [x] Snapshot das fichas e séries no momento de iniciar uma sessão real.
+- [x] Persistência de uma sessão em andamento e retomada após reabrir o navegador.
+- [x] Bloqueio transacional de duas sessões em andamento no mesmo banco.
+- [x] Registro, edição e remoção de carga, repetições e RIR por série.
+- [x] Suporte a séries de aquecimento e efetivas, navegação e exercícios pulados.
+- [x] Finalização (com ao menos uma série), encerramento como interrompido.
+- [x] Histórico consultável, sem modificar registros antigos ao editar a ficha.
+- [x] Backup com histórico e validação de referência das séries.
+- [x] Testes automatizados de domínio e persistência.
+- [x] Compilação e publicação automatizadas.
+- [ ] Aceite manual no Safari do iPhone: iniciar, registrar, fechar e retomar, concluir e consultar histórico.
+
+A Sprint 05 deverá acrescentar descanso por relógio real, comandos rápidos e aprimoramento do modo academia. Não incluir dados fictícios nas estatísticas reais.
