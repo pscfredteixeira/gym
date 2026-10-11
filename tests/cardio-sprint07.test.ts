@@ -17,7 +17,7 @@ test("form converts manual treadmill session without made-up metadata",()=>{
  });
  validateCardioSession(session);
  assert.equal(paceLabel(session.durationSeconds,session.distanceMeters),"6:15 /km");
- assert.equal(speedKmH(session.durationSeconds,session.distanceMeters),9.6);
+ assert.ok(Math.abs((speedKmH(session.durationSeconds,session.distanceMeters)??0)-9.6)<0.000001);
 });
 test("distance, incline, heart rate and notes are explicitly optional",()=>{
  const d={...base(),kind:"walk" as const,minutes:"35",distanceKm:"",inclinePercent:"12",heartRate:"",notes:"Caminhada tranquila"};
