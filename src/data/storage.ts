@@ -232,3 +232,47 @@ export async function mutateStoredWorkout(
     tx.onerror=()=>{};
   });
 }
+
+
+/** Cardio writes are validated before committing. Imported records are read-only. */
+export async function saveManualCardio(value:CardioSession):Promise<void> {
+  const { validateCardioSession }=await import("./validation.ts");
+  validateCardioSession(value);
+  if(value.source!=="manual")throw new Error("Este formulário só pode salvar atividades manuais.");
+  const db=await openDb();
+  await new Promise<void>((resolve,reject)=>{
+    const tx=db.transaction("cardioSessions","readwrite");
+    let failure:Error|undefined;
+    const store=tx.objectStore("cardioSessions");
+    const request=store.get(value.id);
+    request.onsuccess=()=>{
+      const existing=request.result as CardioSession|undefined;
+      if(existing?.source==="health_import"){
+        failure=new Error("Uma atividade importada não pode ser modificada manualmente.");
+        tx.abort();return;
+      }
+      store.put(value);
+    };
+    tx.oncomplete=()=>resolve();
+    tx.onabort=()=>reject(failure??tx.error??new Error("Não foi possível salvar o cardio."));
+    tx.onerror=()=>{};
+  });
+}
+export async function deleteManualCardio(id:string):Promise<void> {
+  const db=await openDb();
+  await new Promise<void>((resolve,reject)=>{
+    const tx=db.transaction("cardioSessions","readwrite");
+    let failure:Error|undefined;
+    const store=tx.objectStore("cardioSessions");
+    const request=store.get(id);
+    request.onsuccess=()=>{
+      const existing=request.result as CardioSession|undefined;
+      if(!existing){failure=new Error("Atividade não encontrada.");tx.abort();return;}
+      if(existing.source!=="manual"){failure=new Error("Atividades importadas não podem ser apagadas neste formulário.");tx.abort();return;}
+      store.delete(id);
+    };
+    tx.oncomplete=()=>resolve();
+    tx.onabort=()=>reject(failure??tx.error??new Error("Não foi possível excluir esta atividade."));
+    tx.onerror=()=>{};
+  });
+}
