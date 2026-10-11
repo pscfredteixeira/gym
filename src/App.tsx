@@ -13,6 +13,7 @@ import { DEFAULT_SETTINGS } from "./data/validation";
 import { readSettings, writeSettings, saveEntity, saveManualCardio, deleteManualCardio } from "./data/storage";
 import type { CardioSession, Exercise, ScheduledCardio, UserSettings, WorkoutPlan, WorkoutSession } from "./domain/models";
 import CardioView, { CardioHighlights } from "./features/cardio/CardioView";
+import ProgressView from "./features/progress/ProgressView";
 import { ActiveWorkoutBanner, LiveWorkout, WorkoutHistoryView } from "./features/training/TrainingView";
 import { ExerciseLibrary, ExerciseDetails } from "./features/library/ExerciseLibrary";
 import { isExerciseImageUrl } from "./features/library/exerciseImages";
@@ -103,7 +104,6 @@ export default function App(){
   const [reps,setReps]=useState<Record<string,number>>({});
   const [restLeft,setRestLeft]=useState(90);
   const [restRunning,setRestRunning]=useState(false);
-  const [period,setPeriod]=useState("3 meses");
   const [runMinutes,setRunMinutes]=useState(20);
   const [runDistance,setRunDistance]=useState(3.2);
   const [shareKind,setShareKind]=useState<ShareKind>("strength");
@@ -415,20 +415,10 @@ export default function App(){
             note:selectedDay.cardio.note??""
           }:undefined}
           onBack={()=>go("workouts")} onSave={saveCardio} onDelete={removeCardio}/>}
-        {screen==="progress"&&<>
-          <Titlebar eyebrow="TUDO COMEÇA COM CONSTÂNCIA" title="Evolução." right={<button type="button" className="round-control" onClick={()=>viewShare("strength")} aria-label="Criar card"><Share2 size={19}/></button>}/>
-          <p className="screen-lead">Um lugar para enxergar cada pequena conquista.</p>
-          <CardioHighlights sessions={cardioHistory} onOpen={()=>go("run")}/>
-          <button type="button" className="cardio-progress-entry" onClick={()=>go("run")}><Footprints size={17}/> Registrar corrida ou caminhada <ArrowRight size={17}/></button>
-          {cardioError&&<div className="editor-error" role="alert">{cardioError}</div>}
-          <SectionHead title="Gráficos de interface (demonstração)"/>
-          <div className="data-warning"><Info size={16}/> GRÁFICOS ILUSTRATIVOS — NÃO SÃO SEUS RESULTADOS</div>
-          <div className="progress-summary"><div><span>SESSÕES DE EXEMPLO</span><strong>12</strong><small><TrendingUp size={14}/> em três meses</small></div><div><span>CARGA ILUSTRATIVA</span><strong>42 <em>kg</em></strong><small><TrendingUp size={14}/> puxada alta</small></div></div>
-          <div className="chart-panel"><div className="chart-head"><div><span className="eyebrow">PROGRESSÃO DE CARGA</span><h2>Puxada alta</h2></div><MoreHorizontal size={23}/></div><div className="periods">{["1 mês","3 meses","6 meses"].map(item=><button type="button" key={item} className={period===item?"active":""} onClick={()=>setPeriod(item)}>{item}</button>)}</div><div className="chart-shell"><div className="chart-y"><span>50</span><span>40</span><span>30</span><span>20</span></div><svg viewBox="0 0 310 190" aria-label="Gráfico ilustrativo de aumento de cargas"><defs><linearGradient id="area-gym" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#ff712c" stopOpacity=".28"/><stop offset="100%" stopColor="#ff712c" stopOpacity="0"/></linearGradient></defs>{[28,70,112,154].map(n=><line key={n} x1="0" x2="310" y1={n} y2={n} stroke="#393a3f" strokeWidth="1" strokeDasharray="2 7"/>)}<polygon points={period==="1 mês"?"0,150 60,141 120,125 180,111 240,92 310,83 310,190 0,190":period==="3 meses"?"0,169 62,150 124,139 186,115 248,100 310,74 310,190 0,190":"0,180 62,170 124,150 186,126 248,98 310,66 310,190 0,190"} fill="url(#area-gym)"/><polyline points={period==="1 mês"?"0,150 60,141 120,125 180,111 240,92 310,83":period==="3 meses"?"0,169 62,150 124,139 186,115 248,100 310,74":"0,180 62,170 124,150 186,126 248,98 310,66"} fill="none" stroke="#ff712c" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/><circle cx="310" cy={period==="1 mês"?83:period==="3 meses"?74:66} r="7" fill="#ff712c" stroke="#101113" strokeWidth="3"/></svg></div><div className="chart-x"><span>INÍCIO</span><span>PERÍODO ILUSTRATIVO</span><span>AGORA</span></div></div>
-          <SectionHead title="O que você vai acompanhar"/>
-          <div className="metric-grid"><div><Dumbbell/><strong>Cargas</strong><span>Progressão exercício a exercício</span></div><div><Activity/><strong>Volume</strong><span>Séries e repetições ao longo do tempo</span></div><div><Footprints/><strong>Corridas</strong><span>Ritmo, duração e distância</span></div><div><CalendarDays/><strong>Consistência</strong><span>Frequência semanal de atividade</span></div></div>
-          <PrimaryButton onClick={()=>viewShare("strength")}>Testar card de progresso <Share2 size={18}/></PrimaryButton>
-        </>}
+        {screen==="progress"&&<ProgressView
+          workouts={workoutHistory} cardio={cardioHistory} units={settings.units}
+          onOpenStrength={()=>go("history")} onOpenCardio={()=>go("run")}
+          onOpenSharePreview={()=>viewShare("strength")}/>}
         {screen==="share"&&<>
           <BackHeader label="ESTÚDIO DE CARDS" onBack={()=>go("progress")} action={<button className="round-control" type="button" aria-label="Fechar" onClick={()=>go("home")}><X size={19}/></button>}/>
           <div className="studio-heading"><span className="eyebrow">COMPARTILHE SEU MOVIMENTO</span><h1>Seu treino.<br/>Seu estilo<span className="orange">.</span></h1><p>Teste os modelos de publicação com valores fictícios.</p></div>
