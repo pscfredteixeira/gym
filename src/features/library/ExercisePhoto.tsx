@@ -11,7 +11,7 @@ export function ExercisePhoto({exercise,compact=false}:{
   const src=exercise.imageUrl;
   const show=Boolean(src)&&!failed;
   if(compact)return <span className="gym-exercise-thumbnail">
-    {show?<img src={src} loading="lazy" alt={"Foto de "+exercise.name} onError={()=>setFailed(true)}/>:<ImageIcon size={22} aria-hidden="true"/>}
+    {show?<img src={src} loading="lazy" alt={"Foto de "+exercise.name} onError={()=>setFailed(true)}/>:<><ImageIcon size={20} aria-hidden="true"/><span className="gym-thumb-missing-label">SEM FOTO</span></>}
   </span>;
   return <div className={"gym-exercise-photo "+(show?"has-photo":"empty")}>
     {show?<img src={src} alt={"Imagem demonstrativa cadastrada para "+exercise.name} onError={()=>setFailed(true)}/>:
