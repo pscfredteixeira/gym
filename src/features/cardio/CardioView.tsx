@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
-import { Activity, ArrowLeft, ArrowRight, Check, Clock3, Footprints, HeartPulse, Info, Pause, Play, Plus, RotateCcw, Save, Trash2, TrendingUp, X } from "lucide-react";
+import { Activity, ArrowRight, Check, Clock3, Footprints, Info, Pause, Play, RotateCcw, Save, Trash2, TrendingUp, X } from "lucide-react";
 import type { CardioKind, CardioSession, ScheduledCardio } from "../../domain/models";
 import { BackHeader, Notice, PrimaryButton, SectionHead } from "../../components/ui";
-import { blankCardioDraft, cardioNames, cardioTitle, cardioTotals, cardioWeek, formatDuration, paceLabel, parseCardioDraft, speedKmH, toDraft, type CardioDraft } from "./cardioDomain";
+import { blankCardioDraft, cardioNames, cardioTitle, cardioTotals, cardioWeek, formatDuration, paceLabel, parseCardioDraft, toDraft, type CardioDraft } from "./cardioDomain";
 
 type StopwatchState={ elapsedMs:number; since?:number };
 const TIMER_KEY="gym-cardio-stopwatch-v1";
