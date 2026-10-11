@@ -101,10 +101,10 @@ jobs:
           timeout 65 "$BROWSER" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --virtual-time-budget=18000 --dump-dom "https://pscfredteixeira.github.io/gym/?tab=library&browser_check=${GITHUB_SHA}" > /tmp/gym-atlas.html 2> /tmp/gym-atlas.log || {
             tail -n 40 /tmp/gym-atlas.log; exit 1
           }
-          if ! grep -q "Conheça cada" /tmp/gym-atlas.html || ! grep -q "Puxada neutra" /tmp/gym-atlas.html; then
-            echo "::error::A biblioteca não renderizou os exercícios do Programa 10/10"
+          if ! grep -q "Conheça cada" /tmp/gym-atlas.html || ! grep -q "Buscar exercícios" /tmp/gym-atlas.html; then
+            echo "::error::A tela da biblioteca não renderizou a busca e o conteúdo principal"
             head -c 2500 /tmp/gym-atlas.html || true
             tail -n 55 /tmp/gym-atlas.log || true
             exit 1
           fi
-          echo "PASSOU: biblioteca e exercícios reais disponíveis no GitHub Pages"
+          echo "PASSOU: tela da biblioteca renderizada no GitHub Pages; catálogo persistido é coberto pelos testes IndexedDB"
