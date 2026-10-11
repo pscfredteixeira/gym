@@ -171,3 +171,64 @@ export async function savePlanWithExercises(plan:WorkoutPlan, additions:Exercise
     }catch(error){reject(error);}
   });
 }
+
+
+/** Sprint 04 — every session write is a committed IndexedDB transaction.
+ * Unique active session is enforced inside a single readwrite transaction. */
+export async function startStoredWorkout(session:WorkoutSession):Promise<WorkoutSession>{
+  const { validateWorkoutSession } = await import("./validation.ts");
+  validateWorkoutSession(session);
+  if(session.status!=="in_progress")throw new Error("A sessão precisa estar em andamento.");
+  const db=await openDb();
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction("workoutSessions","readwrite");
+    const store=tx.objectStore("workoutSessions");
+    let problem:Error|null=null;
+    const fail=(message:string)=>{problem=new Error(message);tx.abort();};
+    const request=store.getAll();
+    request.onsuccess=()=>{
+      if(request.result.some((item:WorkoutSession)=>item.status==="in_progress")) {
+        fail("Você já tem um treino em andamento. Retome ou encerre antes de começar outro.");
+      } else store.add(session);
+    };
+    tx.oncomplete=()=>resolve(session);
+    tx.onabort=()=>reject(problem??tx.error??new Error("Não foi possível iniciar este treino."));
+    tx.onerror=()=>{}; // onabort rejects
+  });
+}
+export async function getActiveWorkout():Promise<WorkoutSession|undefined> {
+  const all=await listEntities<WorkoutSession>("workoutSessions");
+  return all.filter(s=>s.status==="in_progress").sort((a,b)=>b.startedAt.localeCompare(a.startedAt))[0];
+}
+export async function mutateStoredWorkout(
+  id:string,
+  transform:(value:WorkoutSession)=>WorkoutSession
+):Promise<WorkoutSession>{
+  const { validateWorkoutSession } = await import("./validation.ts");
+  const db=await openDb();
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction("workoutSessions","readwrite");
+    const store=tx.objectStore("workoutSessions");
+    let result:WorkoutSession|undefined;
+    let failure:Error|undefined;
+    const abort=(err:unknown)=>{
+      failure=err instanceof Error?err:new Error("Erro ao atualizar o treino.");
+      tx.abort();
+    };
+    const request=store.get(id);
+    request.onsuccess=()=>{
+      try{
+        const original=request.result as WorkoutSession|undefined;
+        if(!original)throw new Error("Sessão não encontrada. Recarregue o histórico.");
+        if(original.status!=="in_progress")throw new Error("Este treino já foi encerrado.");
+        result=transform(original);
+        if(result.id!==id)throw new Error("Identificador de sessão alterado indevidamente.");
+        validateWorkoutSession(result);
+        store.put(result);
+      }catch(error){abort(error);}
+    };
+    tx.oncomplete=()=>resolve(result!);
+    tx.onabort=()=>reject(failure??tx.error??new Error("Falha ao atualizar. Seus dados anteriores foram mantidos."));
+    tx.onerror=()=>{};
+  });
+}
