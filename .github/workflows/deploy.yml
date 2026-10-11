@@ -108,3 +108,23 @@ jobs:
             exit 1
           fi
           echo "PASSOU: tela da biblioteca renderizada no GitHub Pages; catálogo persistido é coberto pelos testes IndexedDB"
+
+      - name: Testar registro real de cardio no navegador
+        shell: bash
+        run: |
+          set -euo pipefail
+          BROWSER="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$BROWSER" ]; then
+            echo "::error::Navegador não encontrado"
+            exit 1
+          fi
+          timeout 65 "$BROWSER" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --virtual-time-budget=18000 --dump-dom "https://pscfredteixeira.github.io/gym/?tab=cardio&browser_check=${GITHUB_SHA}" > /tmp/gym-cardio.html 2> /tmp/gym-cardio.log || {
+            tail -n 40 /tmp/gym-cardio.log; exit 1
+          }
+          if ! grep -q "Seu ritmo" /tmp/gym-cardio.html || ! grep -q "Registrar atividade" /tmp/gym-cardio.html; then
+            echo "::error::A tela de cardio não renderizou o formulário real"
+            head -c 2200 /tmp/gym-cardio.html || true
+            tail -n 40 /tmp/gym-cardio.log || true
+            exit 1
+          fi
+          echo "PASSOU: tela de cardio e formulário real renderizados no GitHub Pages"
