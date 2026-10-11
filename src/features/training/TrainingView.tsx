@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, ArrowRight, Check, CheckCircle2, ChevronDown, CirclePlay, Clock3, Dumbbell, Info, Save, Trash2, TrendingUp, X, Pause, Play, SkipForward, Timer, List, Minus, Plus } from "lucide-react";
-import type { WorkoutSession, CompletedSet, UserSettings } from "../../domain/models";
+import type { Exercise, WorkoutSession, CompletedSet, UserSettings } from "../../domain/models";
 import { countCompleted, countPlanned, getPreviousPerformance, workoutDuration, restView, nextPlannedSet, type RecordTarget, type SetInput } from "./sessionDomain";
+import { ExercisePhoto } from "../library/ExercisePhoto";
 import { BackHeader, Notice, PrimaryButton, SectionHead } from "../../components/ui";
 
 const fmtDate=(v:string)=>new Date(v).toLocaleDateString("pt-BR",{day:"2-digit",month:"short",year:"numeric"});
@@ -51,9 +52,9 @@ function RestControls({
 }
 
 export function LiveWorkout({
-  session,history,units,onBack,onRecord,onRemove,onFinish,onAbandon,onRestAction
+  session,history,units,catalog,onBack,onRecord,onRemove,onFinish,onAbandon,onRestAction
 }:{
-  session:WorkoutSession;history:WorkoutSession[];units:UserSettings["units"];
+  session:WorkoutSession;history:WorkoutSession[];units:UserSettings["units"];catalog:Exercise[];
   onBack:()=>void;
   onRecord:(target:RecordTarget,data:SetInput)=>Promise<void>;
   onRemove:(target:RecordTarget)=>Promise<void>;
@@ -168,7 +169,7 @@ export function LiveWorkout({
       })}
     </div>
     <div className="live-exercise-heading"><span className="eyebrow">EXERCÍCIO {exerciseIndex+1} / {session.exercises.length}</span>
-      <h2>{ex.exerciseNameSnapshot}</h2>
+      <div className="gym-live-exercise-title"><ExercisePhoto compact exercise={{name:ex.exerciseNameSnapshot,imageUrl:catalog.find(item=>item.id===ex.exerciseId)?.imageUrl}}/><h2>{ex.exerciseNameSnapshot}</h2></div>
       <p>{ex.plannedSetsSnapshot.length} séries planejadas · {ex.restSecondsSnapshot?"Descanso "+ex.restSecondsSnapshot+"s":"Descanso padrão do Perfil"}</p>
       {ex.notes&&<p className="live-prescription-note">{ex.notes}</p>}
     </div>

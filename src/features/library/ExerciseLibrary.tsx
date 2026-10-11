@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { ArrowRight, BookOpen, ChevronRight, Dumbbell, Info, ListFilter, RotateCcw, Search, ShieldCheck, X } from "lucide-react";
 import type { Exercise, WorkoutPlan } from "../../domain/models";
 import { BackHeader, Notice, SectionHead } from "../../components/ui";
+import { ExercisePhoto, ExercisePhotoEditor } from "./ExercisePhoto";
 import { guideFor, matchingAlternatives, searchExercises, usedInPlans } from "../../data/exerciseGuides";
 
 const MUSCLES=["Todos","Dorsais","Costas superiores","Peito","Ombros","Trapézio","Bíceps","Tríceps","Quadríceps","Posterior de coxa","Panturrilhas","Abdômen"];
@@ -102,7 +103,7 @@ export function ExerciseLibrary({catalog,plans,onOpen}:{catalog:Exercise[];plans
       const used=usedInPlans(ex.id,plans);
       const guided=!!guideFor(ex);
       return <button type="button" className="atlas-exercise-card" key={ex.id} onClick={()=>onOpen(ex.id)}>
-        <ExerciseIcon muscle={ex.primaryMuscle}/>
+        <ExercisePhoto exercise={ex} compact/>
         <span className="atlas-exercise-name"><strong>{ex.name}</strong><small>{ex.primaryMuscle} · {ex.equipment??"Equipamento não informado"}</small>
           <em>{guided?"Guia de execução e alternativas":ex.isCustom?"Exercício personalizado":"Sem guia técnico publicado"}{used.length?" · Na ficha: "+used[0]:""}</em></span>
         <ChevronRight size={19}/>
@@ -112,11 +113,12 @@ export function ExerciseLibrary({catalog,plans,onOpen}:{catalog:Exercise[];plans
   </div>;
 }
 export function ExerciseDetails({
-  exercise,catalog,plans,onBack,onOpen,onReplace
+  exercise,catalog,plans,onBack,onOpen,onReplace,onSaveImage
 }:{
   exercise:Exercise|undefined;catalog:Exercise[];plans:WorkoutPlan[];
   onBack:()=>void;onOpen:(id:string)=>void;
   onReplace:(planId:string,rowId:string,replacement:Exercise)=>Promise<void>;
+  onSaveImage:(exerciseId:string,imageUrl:string|undefined)=>Promise<void>;
 }){
   const [selectedPlan,setSelectedPlan]=useState("");
   const [selectedRow,setSelectedRow]=useState("");
@@ -144,6 +146,8 @@ export function ExerciseDetails({
       <h1>{exercise.name}<span>.</span></h1>
       <div className="atlas-tags"><span>{exercise.primaryMuscle}</span><span>{exercise.equipment??"Equipamento a definir"}</span></div>
     </div>
+    <ExercisePhoto exercise={exercise}/>
+    <ExercisePhotoEditor exercise={exercise} onSave={imageUrl=>onSaveImage(exercise.id,imageUrl)}/>
     <MuscleMap primaryMuscle={exercise.primaryMuscle}/>
     <SectionHead title="Como executar" aside={guide?"3 etapas":"Guia indisponível"}/>
     {guide?<div className="atlas-steps">{guide.execution.map((step,i)=><div key={step}><span>{String(i+1).padStart(2,"0")}</span><p>{step}</p></div>)}</div>:

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
 import { Camera, Check, Image as ImageIcon, Link as LinkIcon, Trash2, Upload } from "lucide-react";
 import type { Exercise } from "../../domain/models";
 import { isExerciseImageUrl, prepareExercisePhoto } from "./exerciseImages";
@@ -7,6 +7,7 @@ export function ExercisePhoto({exercise,compact=false}:{
   exercise:Pick<Exercise,"name"|"imageUrl">;compact?:boolean
 }) {
   const [failed,setFailed]=useState(false);
+  useEffect(()=>setFailed(false),[exercise.imageUrl]);
   const src=exercise.imageUrl;
   const show=Boolean(src)&&!failed;
   if(compact)return <span className="gym-exercise-thumbnail">
@@ -39,7 +40,7 @@ export function ExercisePhotoEditor({exercise,onSave}:{
     }catch(err){setError(err instanceof Error?err.message:"Não foi possível salvar a imagem no iPhone.");}
     finally{setBusy(false);}
   };
-  const choose=async(event:React.ChangeEvent<HTMLInputElement>)=>{
+  const choose=async(event:ChangeEvent<HTMLInputElement>)=>{
     const input=event.currentTarget,file=input.files?.[0];
     input.value="";
     if(!file)return;

@@ -14,6 +14,7 @@ import { readSettings, writeSettings } from "./data/storage";
 import type { Exercise, ScheduledCardio, UserSettings, WorkoutPlan, WorkoutSession } from "./domain/models";
 import { ActiveWorkoutBanner, LiveWorkout, WorkoutHistoryView } from "./features/training/TrainingView";
 import { ExerciseLibrary, ExerciseDetails } from "./features/library/ExerciseLibrary";
+import { isExerciseImageUrl } from "./features/library/exerciseImages";
 import { createSessionSnapshot, recordSetWithRest, removeRecordedSet, closeSession, pauseRest, continueRest, adjustRest, skipRest, type RecordTarget, type SetInput } from "./features/training/sessionDomain";
 import { startStoredWorkout, getActiveWorkout, mutateStoredWorkout } from "./data/storage";
 import { savePlanWithExercises, deleteEntity } from "./data/storage";
@@ -267,6 +268,14 @@ export default function App(){
   const openExerciseInfo=(id:string,from:"library"|"program"="library")=>{
     setSelectedLibraryId(id);setLibraryReturn(from);go("exercise-info");
   };
+  const saveExerciseImage=async(id:string,imageUrl:string|undefined)=>{
+    if(imageUrl!==undefined&&!isExerciseImageUrl(imageUrl))
+      throw new Error("Imagem inválida ou maior que o limite de armazenamento.");
+    const exercise=catalogExercises.find(item=>item.id===id);
+    if(!exercise)throw new Error("Este exercício não foi encontrado.");
+    await saveEntity("exercises",{...exercise,imageUrl});
+    setCatalogExercises(items=>items.map(item=>item.id===id?{...item,imageUrl}:item));
+  };
   const replaceExerciseInPlan=async(planId:string,rowId:string,replacement:Exercise)=>{
     const plan=savedPlans.find(p=>p.id===planId);
     if(!plan)throw new Error("Ficha não encontrada no dispositivo.");
@@ -346,7 +355,7 @@ export default function App(){
           units={settings.units}
         />}
         {screen==="live"&&activeWorkout&&<LiveWorkout
-          session={activeWorkout} history={workoutHistory} units={settings.units} onBack={()=>go("workouts")}
+          session={activeWorkout} history={workoutHistory} units={settings.units} catalog={catalogExercises} onBack={()=>go("workouts")}
           onRecord={updateRealSet} onRemove={removeRealSet}
           onFinish={()=>endRealWorkout("completed")} onAbandon={()=>endRealWorkout("abandoned")}
           onRestAction={changeRealRest}/>}
@@ -360,7 +369,8 @@ export default function App(){
           catalog={catalogExercises} plans={savedPlans}
           onBack={()=>go(libraryReturn)}
           onOpen={id=>openExerciseInfo(id,libraryReturn)}
-          onReplace={replaceExerciseInPlan}/>}
+          onReplace={replaceExerciseInPlan}
+          onSaveImage={saveExerciseImage}/>}
         {screen==="session"&&<>
           <BackHeader label="MODO ACADEMIA · DEMONSTRAÇÃO" onBack={()=>go("workouts")} action={<span className="session-progress">{completedCount}/{plannedTotal}</span>}/>
           <div className="session-top"><p className="eyebrow">TREINO A / COSTAS & BÍCEPS</p><h1>Em movimento<span className="orange">.</span></h1><div className="progress-track"><span style={{width:progressPct+"%"}}/></div><p>{progressPct}% da ficha demonstrativa marcada</p></div>

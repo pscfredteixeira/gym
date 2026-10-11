@@ -4,6 +4,7 @@ import {
   PROGRAM_DAYS, PROGRAM_FOCUS, PROGRAM_NAME, PROGRAM_PRIORITIES, PROGRAM_SUBTITLE,
   type ProgramDay, exerciseId, repsLabel, rirLabel
 } from "../../data/program1010";
+import { ExercisePhoto } from "../library/ExercisePhoto";
 import { BackHeader, Notice, PrimaryButton, SectionHead } from "../../components/ui";
 
 export type ProgramStatus = "loading" | "ready" | "error" | "not_installed";
@@ -83,6 +84,7 @@ export function ProgramDayDetail({
     return {
       key:item.id,
       exerciseId:item.exerciseId,
+      photoUrl:catalogMap.get(item.exerciseId)?.imageUrl,
       name:catalogMap.get(item.exerciseId)?.name??matched?.name??"Exercício personalizado",
       sets:item.sets.map(s=>({
         key:s.id,min:s.minReps,max:s.maxReps,rirMin:s.targetRir,rirMax:s.targetRirMax??s.targetRir,kind:s.kind,plannedWeight:s.targetWeightKg
@@ -90,7 +92,7 @@ export function ProgramDayDetail({
       note:item.notes,rest:item.restSeconds
     };
   })??day.exercises.map((item,index)=>({
-    key:String(index),exerciseId:exerciseId(item.name),name:item.name,
+    key:String(index),exerciseId:exerciseId(item.name),photoUrl:catalogMap.get(exerciseId(item.name))?.imageUrl,name:item.name,
     sets:item.ranges.map(([min,max],i)=>({key:String(i),min,max,rirMin:item.rir[0],rirMax:item.rir[1],kind:"working" as const,plannedWeight:undefined as number|undefined})),
     note:item.note,rest:0
   }));
@@ -107,7 +109,7 @@ export function ProgramDayDetail({
       <div className="program-day-summary"><span><Dumbbell size={17}/>{rows.length} exercícios</span><span><CircleCheck size={17}/>{total} séries efetivas</span></div>
       <SectionHead title="Exercícios" aside="Séries e RIR previstos"/>
       <div className="program-exercise-list">{rows.map((row,i)=><article className="program-exercise" key={row.key}>
-        <div className="program-exercise-heading"><span className="program-order">{String(i+1).padStart(2,"0")}</span><div><h2>{row.name}</h2><span>{row.sets.filter(s=>s.kind==="working").length} séries efetivas</span></div></div><button type="button" className="program-exercise-guide" onClick={()=>onViewExercise(row.exerciseId)}><BookOpen size={16}/> Ver execução e alternativas <ArrowRight size={16}/></button>
+        <div className="program-exercise-heading"><span className="program-order">{String(i+1).padStart(2,"0")}</span><ExercisePhoto compact exercise={{name:row.name,imageUrl:row.photoUrl}}/><div><h2>{row.name}</h2><span>{row.sets.filter(s=>s.kind==="working").length} séries efetivas</span></div></div><button type="button" className="program-exercise-guide" onClick={()=>onViewExercise(row.exerciseId)}><BookOpen size={16}/> Ver execução e alternativas <ArrowRight size={16}/></button>
         <div className="program-sets">{row.sets.map((set,index)=><div className="program-set" key={set.key}>
           <span>{set.kind==="warmup"?"AQUEC. ":"SÉRIE "}{index+1}</span>
           <strong>{repsLabel(set.min,set.max)} <small>reps</small></strong>
