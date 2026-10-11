@@ -59,17 +59,20 @@ export function ProgramOverview({
 }
 
 export function ProgramDayDetail({
-  day,onBack,onPreview,onCardio,plan,catalog,status,onEdit,units
+  day,onBack,onStart,onResume,onCardio,plan,catalog,status,onEdit,units,activeWorkout,trainingError
 }:{
   day:ProgramDay;
   onBack:()=>void;
-  onPreview:()=>void;
+  onStart:()=>void;
+  onResume:()=>void;
   onCardio:()=>void;
   plan:WorkoutPlan|undefined;
   catalog:Exercise[];
   status:ProgramStatus;
   onEdit:()=>void;
   units:"metric"|"imperial";
+  activeWorkout:boolean;
+  trainingError?:string;
 }) {
   const catalogMap = new Map(catalog.map(e=>[e.id,e]));
   const source = day.exercises.map(x=>[exerciseId(x.name),x] as const);
@@ -122,9 +125,12 @@ export function ProgramDayDetail({
     {!rows.length&&<div className="program-rest"><Activity size={32}/><h2>Dia de recuperação</h2><p>{day.note??"Recuperação priorizada. Não há séries de musculação programadas."}</p></div>}
     <Notice>
       {status==="ready"?"Ficha salva neste navegador.": "Ficha visível como referência, sem confirmação de salvamento."}
-      {" "}O registro de séries reais será habilitado na Sprint 04; a tela atual é para consultar o planejamento.
+      {" "}Ao iniciar, a sessão registra uma cópia da ficha, preservada mesmo se você editar os exercícios depois.
     </Notice>
-    {rows.length>0&&<div className="program-preview-action"><PrimaryButton secondary onClick={onPreview}>Experimentar registro fictício <ArrowRight size={17}/></PrimaryButton><small>A simulação não utiliza nem altera sua ficha real.</small></div>}
+    {trainingError&&<div className="editor-error" role="alert">{trainingError}</div>}
+    {rows.length>0&&<div className="program-preview-action"><PrimaryButton onClick={activeWorkout?onResume:onStart}>
+      {activeWorkout?"Retomar treino em andamento":"Iniciar treino real"} <ArrowRight size={17}/>
+    </PrimaryButton><small>{activeWorkout?"Há uma sessão aberta; conclua ou interrompa antes de iniciar outra.":"Suas séries, cargas e repetições serão salvas no histórico."}</small></div>}
   </>;
 }
 
