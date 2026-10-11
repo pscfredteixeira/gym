@@ -1,4 +1,4 @@
-import { Activity, ArrowRight, ChevronRight, CircleCheck, Dumbbell, Footprints, RotateCcw, Pencil, CalendarRange, Plus } from "lucide-react";
+import { Activity, ArrowRight, ChevronRight, CircleCheck, Dumbbell, Footprints, RotateCcw, Pencil, CalendarRange, Plus, BookOpen } from "lucide-react";
 import type { Exercise, WorkoutPlan } from "../../domain/models";
 import {
   PROGRAM_DAYS, PROGRAM_FOCUS, PROGRAM_NAME, PROGRAM_PRIORITIES, PROGRAM_SUBTITLE,
@@ -59,7 +59,7 @@ export function ProgramOverview({
 }
 
 export function ProgramDayDetail({
-  day,onBack,onStart,onResume,onCardio,plan,catalog,status,onEdit,units,activeWorkout,trainingError
+  day,onBack,onStart,onResume,onCardio,plan,catalog,status,onEdit,onViewExercise,units,activeWorkout,trainingError
 }:{
   day:ProgramDay;
   onBack:()=>void;
@@ -70,6 +70,7 @@ export function ProgramDayDetail({
   catalog:Exercise[];
   status:ProgramStatus;
   onEdit:()=>void;
+  onViewExercise:(id:string)=>void;
   units:"metric"|"imperial";
   activeWorkout:boolean;
   trainingError?:string;
@@ -81,6 +82,7 @@ export function ProgramDayDetail({
     const matched=defaultById.get(item.exerciseId);
     return {
       key:item.id,
+      exerciseId:item.exerciseId,
       name:catalogMap.get(item.exerciseId)?.name??matched?.name??"Exercício personalizado",
       sets:item.sets.map(s=>({
         key:s.id,min:s.minReps,max:s.maxReps,rirMin:s.targetRir,rirMax:s.targetRirMax??s.targetRir,kind:s.kind,plannedWeight:s.targetWeightKg
@@ -88,7 +90,7 @@ export function ProgramDayDetail({
       note:item.notes,rest:item.restSeconds
     };
   })??day.exercises.map((item,index)=>({
-    key:String(index),name:item.name,
+    key:String(index),exerciseId:exerciseId(item.name),name:item.name,
     sets:item.ranges.map(([min,max],i)=>({key:String(i),min,max,rirMin:item.rir[0],rirMax:item.rir[1],kind:"working" as const,plannedWeight:undefined as number|undefined})),
     note:item.note,rest:0
   }));
@@ -105,7 +107,7 @@ export function ProgramDayDetail({
       <div className="program-day-summary"><span><Dumbbell size={17}/>{rows.length} exercícios</span><span><CircleCheck size={17}/>{total} séries efetivas</span></div>
       <SectionHead title="Exercícios" aside="Séries e RIR previstos"/>
       <div className="program-exercise-list">{rows.map((row,i)=><article className="program-exercise" key={row.key}>
-        <div className="program-exercise-heading"><span className="program-order">{String(i+1).padStart(2,"0")}</span><div><h2>{row.name}</h2><span>{row.sets.filter(s=>s.kind==="working").length} séries efetivas</span></div></div>
+        <div className="program-exercise-heading"><span className="program-order">{String(i+1).padStart(2,"0")}</span><div><h2>{row.name}</h2><span>{row.sets.filter(s=>s.kind==="working").length} séries efetivas</span></div></div><button type="button" className="program-exercise-guide" onClick={()=>onViewExercise(row.exerciseId)}><BookOpen size={16}/> Ver execução e alternativas <ArrowRight size={16}/></button>
         <div className="program-sets">{row.sets.map((set,index)=><div className="program-set" key={set.key}>
           <span>{set.kind==="warmup"?"AQUEC. ":"SÉRIE "}{index+1}</span>
           <strong>{repsLabel(set.min,set.max)} <small>reps</small></strong>
