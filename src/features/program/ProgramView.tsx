@@ -1,8 +1,8 @@
-import { Activity, ArrowRight, ChevronRight, CircleCheck, Dumbbell, Footprints, Info, RotateCcw } from "lucide-react";
+import { Activity, ArrowRight, ChevronRight, CircleCheck, Dumbbell, Footprints, RotateCcw } from "lucide-react";
 import type { Exercise, WorkoutPlan } from "../../domain/models";
 import {
   PROGRAM_DAYS, PROGRAM_FOCUS, PROGRAM_NAME, PROGRAM_PRIORITIES, PROGRAM_SUBTITLE,
-  type ProgramDay, exerciseId, planId, repsLabel, rirLabel, seriesCount, totalWeeklySets
+  type ProgramDay, exerciseId, repsLabel, rirLabel, seriesCount, totalWeeklySets
 } from "../../data/program1010";
 import { BackHeader, Notice, PrimaryButton, SectionHead } from "../../components/ui";
 

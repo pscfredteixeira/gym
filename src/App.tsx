@@ -4,7 +4,7 @@ import {
   CalendarDays, Check, CheckCircle2, ChevronLeft, ChevronRight, Clock3,
   Dumbbell, Flame, Footprints, House, Info, Minus, MoreHorizontal,
   Pause, Play, Plus, RotateCcw, Search, Share2, ShieldCheck,
-  SlidersHorizontal, Sparkles, TimerReset, TrendingUp, UserRound, X
+  SlidersHorizontal, Sparkles, TrendingUp, UserRound, X
 } from "lucide-react";
 import { DemoLabel, Photo, Titlebar, SectionHead, BackHeader, PrimaryButton, Notice } from "./components/ui";
 import { exercises, mockWeights, mockReps, photos } from "./data/demo";
