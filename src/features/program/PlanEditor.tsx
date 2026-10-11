@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { guideFor, matchingAlternatives } from "../../data/exerciseGuides";
 import { ArrowDown, ArrowUp, Check, ChevronDown, Copy, Dumbbell, Info, Plus, Save, Search, Trash2, X } from "lucide-react";
 import type { Exercise, PlannedSet, WorkoutPlan } from "../../domain/models";
 import { validateWorkoutPlan } from "../../data/validation";
@@ -102,6 +103,19 @@ export default function PlanEditor({initial,catalog,units,onSave,onDelete,onCanc
               <button type="button" title="Mover para baixo" aria-label={"Mover "+(ex?.name??"exercício")+" para baixo"} disabled={index===draft.exercises.length-1} onClick={()=>update(moveRow(draft,index,1))}><ArrowDown size={17}/></button>
             </div>
           </div>
+          {ex&&<details className="editor-exercise-help"><summary><Dumbbell size={16}/> Técnica e alternativas <ChevronDown size={16}/></summary>
+            {guideFor(ex)?<div className="editor-exercise-tips">
+              <strong>Como executar</strong>
+              <ol>{guideFor(ex)!.execution.map(step=><li key={step}>{step}</li>)}</ol>
+              <strong>Evite</strong>
+              <ul>{guideFor(ex)!.avoid.map(tip=><li key={tip}>{tip}</li>)}</ul>
+            </div>:<p className="editor-exercise-help-empty">Ainda não há orientação específica publicada para este exercício.</p>}
+            {matchingAlternatives(ex,allExercises).length>0&&<div className="editor-alt-list"><strong>Substituições possíveis</strong>
+              {matchingAlternatives(ex,allExercises).map(alt=><button type="button" key={alt.id}
+                onClick={()=>update(replaceExercise(draft,index,alt.id))}>{alt.name}<ArrowDown size={14}/></button>)}
+              <small>A troca ainda precisa ser salva em “Salvar alterações”. Séries, repetições e descanso permanecem iguais.</small>
+            </div>}
+          </details>}
           <div className="editor-replace"><label htmlFor={"replace-"+item.id}>Trocar exercício</label><div className="editor-select"><select id={"replace-"+item.id} value={item.exerciseId} onChange={e=>update(replaceExercise(draft,index,e.target.value))}>{!ex&&<option value={item.exerciseId}>Não encontrado</option>}{allExercises.map(option=><option key={option.id} value={option.id}>{option.name}</option>)}</select><ChevronDown size={16}/></div></div>
           <div className="editor-series-label"><span>SÉRIES</span><span>REPS / RIR</span></div>
           {item.sets.map((set,seriesIndex)=><div className="editor-set" key={set.id}>
