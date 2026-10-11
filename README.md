@@ -75,3 +75,9 @@ Ver [escopo](docs/PRODUCT.md), [arquitetura](docs/ARCHITECTURE.md), [modelo](doc
 5. Usar **Atualizar contagens** para conferir os registros reais. Os exemplos da prévia não entram nas contagens.
 
 O armazenamento pertence a cada navegador/instalação. Abrir uma aba privada ou outro dispositivo não reproduz automaticamente os mesmos dados. Nunca confiar exclusivamente no cache do navegador; guardar backups periodicamente.
+
+## Programa 10/10
+
+O planejamento semanal de segunda a domingo agora está pré-cadastrado: PUSH, PULL, LEGS, descanso, UPPER, LOWER + BÍCEPS, descanso, com 66 séries efetivas e cardio especificado. Visualizar em **Hoje** e **Treinar**; os dias sem musculação apresentam recuperação. As prescrições e faixas de RIR ficam salvas em IndexedDB sem sobrescrever dados existentes. Consulte [docs/PROGRAMA-10-10.md](docs/PROGRAMA-10-10.md).
+
+Atenção: a ficha está disponível para consulta e backup, não para registrar séries reais ainda. As páginas de execução anteriores permanecem simulações. Idade, altura e peso corporal não estão armazenados neste repositório público.

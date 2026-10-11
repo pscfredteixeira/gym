@@ -59,3 +59,12 @@ A Sprint 01 entregou uma prévia navegável com dez telas, biblioteca demonstrat
 - [ ] Confirmar manualmente no Safari do iPhone: fechar/abrir, backup em Arquivos e restauração.
 
 **Registros de treino ainda não estão disponíveis**: dados demonstrativos permanecem separados dos dados reais.
+
+## Atualização incremental — Programa 10/10
+
+- [x] Importar as cinco fichas e sete dias da semana com repetições e RIR precisos.
+- [x] Preservar 66 séries efetivas totais e os cardio/resto opcionais.
+- [x] Cadastro local idempotente no IndexedDB (sem sobrescrita de dados).
+- [x] Visualização em Hoje / Treinar / Exercícios e backup contendo o programa.
+- [ ] Sprint 03: edição da ficha e adaptação personalizada.
+- [ ] Sprint 04: execução e salvamento de séries reais.
