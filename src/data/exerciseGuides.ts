@@ -55,7 +55,7 @@ export function guideFor(exercise:Exercise):ExerciseGuide|undefined{
 export function matchingAlternatives(exercise:Exercise,catalog:Exercise[]):Exercise[]{
  const guide=guideFor(exercise);
  const byId=new Map(catalog.map(item=>[item.id,item]));
- const explicit=(guide?.alternatives??[]).map(id=>byId.get(id)).filter((x):x is Exercise=>Boolean(x)&&x.id!==exercise.id);
+ const explicit=(guide?.alternatives??[]).map(id=>byId.get(id)).filter((x):x is Exercise=>x!==undefined&&x.id!==exercise.id);
  const rest=catalog.filter(candidate=>candidate.id!==exercise.id&&candidate.primaryMuscle===exercise.primaryMuscle&&!explicit.some(item=>item.id===candidate.id));
  return [...explicit,...rest].slice(0,8);
 }

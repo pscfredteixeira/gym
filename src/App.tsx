@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Activity, ArrowDownToLine, ArrowRight, ArrowUpRight, BarChart3, BookOpen,
   CalendarDays, Check, CheckCircle2, ChevronLeft, ChevronRight, Clock3,
   Dumbbell, Flame, Footprints, House, Info, Minus, MoreHorizontal,
-  Pause, Play, Plus, RotateCcw, Search, Share2, ShieldCheck,
-  SlidersHorizontal, Sparkles, TrendingUp, UserRound, X
+  Pause, Play, Plus, RotateCcw, Share2, ShieldCheck,
+  Sparkles, TrendingUp, UserRound, X
 } from "lucide-react";
 import { DemoLabel, Photo, Titlebar, SectionHead, BackHeader, PrimaryButton, Notice } from "./components/ui";
 import { exercises, mockWeights, mockReps, photos } from "./data/demo";
@@ -21,7 +21,7 @@ import PlanEditor from "./features/program/PlanEditor";
 import ScheduleEditor from "./features/program/ScheduleEditor";
 import { configuredPlanIds, resolveSchedule } from "./features/program/programSchedule";
 import { PROGRAM_DAYS, PROGRAM_NAME, buildProgramCatalog, planId } from "./data/program1010";
-import { ProgramOverview, ProgramDayDetail, ProgramLibrary, type ProgramStatus } from "./features/program/ProgramView";
+import { ProgramOverview, ProgramDayDetail, type ProgramStatus } from "./features/program/ProgramView";
 import { ensureProgramCatalog, listEntities } from "./data/storage";
 
 type Tab = "home" | "workouts" | "library" | "progress" | "profile";

@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
-import { ArrowLeft, ArrowRight, BookOpen, ChevronRight, Dumbbell, Info, ListFilter, RotateCcw, Search, ShieldCheck, Sparkles, X } from "lucide-react";
+import { ArrowRight, BookOpen, ChevronRight, Dumbbell, Info, ListFilter, RotateCcw, Search, ShieldCheck, X } from "lucide-react";
 import type { Exercise, WorkoutPlan } from "../../domain/models";
 import { BackHeader, Notice, SectionHead } from "../../components/ui";
-import { guideFor, matchingAlternatives, normalized, searchExercises, usedInPlans } from "../../data/exerciseGuides";
+import { guideFor, matchingAlternatives, searchExercises, usedInPlans } from "../../data/exerciseGuides";
 
 const MUSCLES=["Todos","Dorsais","Costas superiores","Peito","Ombros","Trapézio","Bíceps","Tríceps","Quadríceps","Posterior de coxa","Panturrilhas","Abdômen"];
 type Zone = "chest"|"lats"|"upper"|"shoulder"|"trap"|"biceps"|"triceps"|"quads"|"hamstrings"|"calves"|"abs";
