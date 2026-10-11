@@ -17,25 +17,6 @@ export function estimateExercisePhotoSize(dataUrl:string):number {
   return Math.floor((dataUrl.length-comma-1)*3/4);
 }
 
-async function imageFromFile(file:File):Promise<HTMLImageElement> {
-  const source=URL.createObjectURL(file);
-  try {
-    const picture=new Image();
-    picture.decoding="async";
-    picture.src=source;
-    await new Promise<void>((resolve,reject)=>{
-      picture.onload=()=>resolve();
-      picture.onerror=()=>reject(new Error("O iPhone não conseguiu abrir esta imagem. Tente uma foto JPG ou PNG."));
-    });
-    if(!picture.naturalWidth||!picture.naturalHeight)
-      throw new Error("Não foi possível ler as dimensões desta foto.");
-    return picture;
-  } finally {
-    // Revoke after caller consumes image? decode() retains the decoded pixels on modern WebKit.
-    // Source is instead revoked by the caller after drawing: see prepareExercisePhoto.
-  }
-}
-
 export async function prepareExercisePhoto(file:File):Promise<string> {
   if(!file.type.startsWith("image/"))
     throw new Error("Selecione uma imagem da sua galeria (JPG, PNG ou HEIC compatível).");
