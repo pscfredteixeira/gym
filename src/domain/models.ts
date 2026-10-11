@@ -1,0 +1,114 @@
+/** Tipos iniciais. Persistência/validação entram na Sprint 02. */
+export type Id = string;
+export type LocalDate = string; // YYYY-MM-DD — não converter pelo timezone ao exibir.
+export type IsoInstant = string; // instante ISO em UTC.
+export type SetKind = "warmup" | "working";
+export type SessionStatus = "in_progress" | "completed" | "abandoned";
+export type CardioKind = "treadmill" | "outdoor_run" | "other";
+
+export interface Exercise {
+  id: Id;
+  name: string;
+  primaryMuscle: string;
+  secondaryMuscles?: string[];
+  equipment?: string;
+  imageUrl?: string;
+  instructions?: string[];
+  isCustom: boolean;
+}
+
+export interface PlannedSet {
+  id: Id;
+  kind: SetKind;
+  minReps: number;
+  maxReps: number;
+  targetWeightKg?: number;
+  targetRir?: number;
+}
+
+export interface PlanExercise {
+  id: Id;
+  exerciseId: Id;
+  order: number;
+  restSeconds: number;
+  sets: PlannedSet[];
+  notes?: string;
+}
+
+export interface WorkoutPlan {
+  id: Id;
+  name: string;
+  exercises: PlanExercise[];
+  createdAt: IsoInstant;
+  updatedAt: IsoInstant;
+}
+
+export interface CompletedSet {
+  id: Id;
+  kind: SetKind;
+  weightKg: number;
+  reps: number;
+  rir?: number;
+  completedAt: IsoInstant;
+}
+
+export interface SessionExercise {
+  id: Id;
+  exerciseId: Id;
+  exerciseNameSnapshot: string;
+  order: number;
+  plannedSetsSnapshot: PlannedSet[];
+  sets: CompletedSet[];
+  notes?: string;
+}
+
+export interface WorkoutSession {
+  id: Id;
+  planId?: Id;
+  planNameSnapshot?: string;
+  localDate: LocalDate;
+  startedAt: IsoInstant;
+  endedAt?: IsoInstant;
+  status: SessionStatus;
+  exercises: SessionExercise[];
+}
+
+export interface CardioSession {
+  id: Id;
+  kind: CardioKind;
+  localDate: LocalDate;
+  startedAt?: IsoInstant;
+  durationSeconds: number;
+  distanceMeters?: number;
+  inclinePercent?: number;
+  averageHeartRateBpm?: number;
+  notes?: string;
+  source: "manual" | "health_import";
+  importBatchId?: Id;
+}
+
+export interface ImportBatch {
+  id: Id;
+  importedAt: IsoInstant;
+  source: string;
+  format: string;
+  importedEntityIds: Id[];
+}
+
+export interface UserSettings {
+  units: "metric" | "imperial";
+  defaultRestSeconds: number;
+  shareHeartRateByDefault: false;
+  shareLocationByDefault: false;
+}
+
+export interface GymBackup {
+  schemaVersion: number;
+  exportedAt: IsoInstant;
+  exercises: Exercise[];
+  plans: WorkoutPlan[];
+  workoutSessions: WorkoutSession[];
+  cardioSessions: CardioSession[];
+  importBatches: ImportBatch[];
+  settings: UserSettings;
+}
