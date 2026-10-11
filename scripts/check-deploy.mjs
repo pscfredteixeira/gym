@@ -27,6 +27,19 @@ async function check() {
     assert(asset.body.length>100,"Asset vazio: "+dest);
     assert(!asset.type.includes("text/html"),"Asset está servindo HTML (provável fallback/404): "+dest);
   }
+  assert(page.body.includes('rel="apple-touch-icon"')&&page.body.includes("/gym/apple-touch-icon.png"),"HTML público não anuncia o ícone iPhone");
+  assert(page.body.includes('rel="manifest"')&&page.body.includes("/gym/manifest.webmanifest"),"HTML público não anuncia o manifesto PWA");
+  const mr=await retrieve(base+"manifest.webmanifest?deploy_check="+stamp);
+  assert(mr.status===200&&!mr.type.includes("text/html"),"Manifesto não está disponível");
+  const manifest=JSON.parse(mr.body);
+  assert(manifest.display==="standalone"&&manifest.scope==="/gym/"&&manifest.short_name==="GYM","Manifesto servido é inválido");
+  const signature=Buffer.from([137,80,78,71,13,10,26,10]);
+  for(const name of ["apple-touch-icon.png","icons/icon-192.png","icons/icon-512.png"]){
+    const result=await fetch(base+name+"?deploy_check="+stamp,{cache:"no-store",signal:AbortSignal.timeout(20000)});
+    const png=Buffer.from(await result.arrayBuffer());
+    console.log("Ícone público:",name,result.status,png.length+" bytes");
+    assert(result.status===200&&png.subarray(0,8).equals(signature)&&png.length>3000,"Ícone PNG não foi publicado: "+name);
+  }
   console.log("PASSOU: GitHub Pages está entregando a aplicação compilada e seus assets.");
 }
 let last;
