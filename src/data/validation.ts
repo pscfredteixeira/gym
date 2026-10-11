@@ -30,7 +30,7 @@ const typed = (value: unknown, options: string[]) => typeof value === "string" &
 
 export function validateSettings(raw: unknown): UserSettings {
   if (!record(raw)) throw new Error("Configurações inválidas.");
-  if (!typed(raw.units, ["metric", "imperial"]) || !count(raw.defaultRestSeconds) || raw.defaultRestSeconds > 3600 ||
+  if (!typed(raw.units, ["metric", "imperial"]) || !count(raw.defaultRestSeconds) || (raw.defaultRestSeconds as number) > 3600 ||
       typeof raw.shareHeartRateByDefault !== "boolean" || typeof raw.shareLocationByDefault !== "boolean" ||
       !optional(raw.displayName, v => text(v, 100)) ||
       !optional(raw.personalGoal, v => text(v, 300)) ||

@@ -12,7 +12,7 @@ let currentDb: Promise<IDBDatabase> | null = null;
 function openDb(): Promise<IDBDatabase> {
   if (!("indexedDB" in window)) return Promise.reject(new Error("Este navegador não oferece armazenamento IndexedDB."));
   if (currentDb) return currentDb;
-  currentDb = new Promise((resolve, reject) => {
+  currentDb = new Promise<IDBDatabase>((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, SCHEMA_VERSION);
     request.onupgradeneeded = () => {
       const db = request.result;
@@ -28,7 +28,7 @@ function openDb(): Promise<IDBDatabase> {
       resolve(db);
     };
   }).catch((err:unknown) => { currentDb = null; throw err; });
-  return currentDb;
+  return currentDb!;
 }
 
 function transactionRequest<T>(store:StoreName, mode:IDBTransactionMode, command:(objectStore:IDBObjectStore)=>IDBRequest<T>):Promise<T> {
