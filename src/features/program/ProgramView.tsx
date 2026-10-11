@@ -59,7 +59,7 @@ export function ProgramOverview({
 }
 
 export function ProgramDayDetail({
-  day,onBack,onPreview,onCardio,plan,catalog,status,onEdit
+  day,onBack,onPreview,onCardio,plan,catalog,status,onEdit,units
 }:{
   day:ProgramDay;
   onBack:()=>void;
@@ -69,6 +69,7 @@ export function ProgramDayDetail({
   catalog:Exercise[];
   status:ProgramStatus;
   onEdit:()=>void;
+  units:"metric"|"imperial";
 }) {
   const catalogMap = new Map(catalog.map(e=>[e.id,e]));
   const source = day.exercises.map(x=>[exerciseId(x.name),x] as const);
@@ -106,7 +107,7 @@ export function ProgramDayDetail({
           <span>{set.kind==="warmup"?"AQUEC. ":"SÉRIE "}{index+1}</span>
           <strong>{repsLabel(set.min,set.max)} <small>reps</small></strong>
           <em>RIR {set.rirMin===undefined?"não indicado":rirLabel(set.rirMin,set.rirMax??set.rirMin)}</em>
-        </div>)}<div className="program-exercise-rest">{row.rest>0?"Descanso: "+row.rest+" segundos":"Descanso não configurado"}{row.sets.some(s=>s.plannedWeight!==undefined)?" · Carga prevista: "+row.sets.map(s=>s.plannedWeight===undefined?"—":s.plannedWeight+" kg").join(" / "):""}</div></div>
+        </div>)}<div className="program-exercise-rest">{row.rest>0?"Descanso: "+row.rest+" segundos":"Descanso não configurado"}{row.sets.some(s=>s.plannedWeight!==undefined)?" · Carga prevista: "+row.sets.map(s=>s.plannedWeight===undefined?"—":(Math.round(s.plannedWeight*(units==="imperial"?2.2046226218:1)*10)/10)+" "+(units==="imperial"?"lb":"kg")).join(" / "):""}</div></div>
         {row.note&&<p className="program-exercise-note">{row.note}</p>}
       </article>)}</div>
     </>}

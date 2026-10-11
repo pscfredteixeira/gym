@@ -273,6 +273,7 @@ export default function App(){
           catalog={catalogExercises}
           status={programStatus}
           onEdit={()=>{if(selectedPlan)editPlan(selectedPlan.id);}}
+          units={settings.units}
         />}
         {screen==="library"&&<>
           <Titlebar eyebrow="CONHECIMENTO EM MOVIMENTO" title="Exercícios." right={<button type="button" className="round-control" onClick={()=>{setLibraryFilter("Todos");setSearch("");}} aria-label="Limpar filtros"><SlidersHorizontal size={19}/></button>}/>
