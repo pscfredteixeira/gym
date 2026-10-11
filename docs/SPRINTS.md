@@ -98,3 +98,18 @@ Observação: a interface de execução da Sprint 01 ainda apresenta valores sim
 - [ ] Aceite manual no Safari do iPhone: iniciar, registrar, fechar e retomar, concluir e consultar histórico.
 
 A Sprint 05 deverá acrescentar descanso por relógio real, comandos rápidos e aprimoramento do modo academia. Não incluir dados fictícios nas estatísticas reais.
+
+
+## Sprint 05 — Implementação (11/10/2026)
+
+- [x] Descanso automático ao registrar série nova, conforme ficha ou padrão do Perfil.
+- [x] Contagem por prazo absoluto em UTC; recálculo após suspender o Safari.
+- [x] Pausar, continuar, +15 s, -15 s e pular com persistência.
+- [x] Correção de série existente não reinicia a contagem.
+- [x] Alternar entre Uma série (modo academia) e Todas as séries.
+- [x] Avanço de seleção para próxima série pendente após salvar.
+- [x] Backup/restauração validam e preservam o estado de descanso.
+- [x] Testes automáticos, compilação, publicação e renderização no navegador.
+- [ ] Validação prática no iPhone pelo usuário.
+
+**Limitação:** não há notificação nem sinal sonoro confiável com a página fechada ou o iPhone bloqueado.
