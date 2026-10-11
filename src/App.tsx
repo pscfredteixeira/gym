@@ -13,6 +13,7 @@ import { DEFAULT_SETTINGS } from "./data/validation";
 import { readSettings, writeSettings } from "./data/storage";
 import type { Exercise, ScheduledCardio, UserSettings, WorkoutPlan, WorkoutSession } from "./domain/models";
 import { ActiveWorkoutBanner, LiveWorkout, WorkoutHistoryView } from "./features/training/TrainingView";
+import { ExerciseLibrary, ExerciseDetails } from "./features/library/ExerciseLibrary";
 import { createSessionSnapshot, recordSetWithRest, removeRecordedSet, closeSession, pauseRest, continueRest, adjustRest, skipRest, type RecordTarget, type SetInput } from "./features/training/sessionDomain";
 import { startStoredWorkout, getActiveWorkout, mutateStoredWorkout } from "./data/storage";
 import { savePlanWithExercises, deleteEntity } from "./data/storage";
@@ -24,7 +25,7 @@ import { ProgramOverview, ProgramDayDetail, ProgramLibrary, type ProgramStatus }
 import { ensureProgramCatalog, listEntities } from "./data/storage";
 
 type Tab = "home" | "workouts" | "library" | "progress" | "profile";
-type Screen = Tab | "exercise" | "session" | "rest" | "run" | "share" | "program" | "edit-plan" | "edit-schedule" | "live" | "history";
+type Screen = Tab | "session" | "rest" | "run" | "share" | "program" | "edit-plan" | "edit-schedule" | "live" | "history" | "exercise-info";
 type ShareKind = "strength" | "run";
 type ShareFormat = "story" | "feed" | "square";
 type ShareStyle = "ember" | "minimal";
@@ -51,12 +52,6 @@ const fmtPace = (durationMinutes: number, distanceKm: number) => {
 };
 function DemoImageFallback({label="GYM"}:{label?:string}) {
   return <div className="image-fallback"><Dumbbell size={30} aria-hidden="true"/><span>{label}</span></div>;
-}
-function WorkoutThumbnail({exerciseIndex=0}:{exerciseIndex?:number}) {
-  const exercise=exercises[exerciseIndex];
-  return exercise.id==="lat"
-    ? <Photo className="exercise-thumb" src={exercise.image} alt="Pessoa realizando puxada alta na polia"/>
-    : <div className="exercise-thumb thumb-gradient"><Dumbbell size={22} aria-hidden="true"/></div>;
 }
 function downloadSampleCard(kind:ShareKind,format:ShareFormat,style:ShareStyle,duration:number,distance:number,showHr:boolean,onResult:(msg:string)=>void) {
   const [width,height] = formats[format];
@@ -106,8 +101,6 @@ export default function App(){
   const [reps,setReps]=useState<Record<string,number>>({});
   const [restLeft,setRestLeft]=useState(90);
   const [restRunning,setRestRunning]=useState(false);
-  const [libraryFilter,setLibraryFilter]=useState("Todos");
-  const [search,setSearch]=useState("");
   const [period,setPeriod]=useState("3 meses");
   const [runMode,setRunMode]=useState("Esteira");
   const [runMinutes,setRunMinutes]=useState(20);
@@ -166,6 +159,8 @@ export default function App(){
   const [programStatus,setProgramStatus]=useState<ProgramStatus>("loading");
   const [savedPlans,setSavedPlans]=useState<WorkoutPlan[]>([]);
   const [catalogExercises,setCatalogExercises]=useState<Exercise[]>([]);
+  const [selectedLibraryId,setSelectedLibraryId]=useState<string|null>(null);
+  const [libraryReturn,setLibraryReturn]=useState<"library"|"program">("library");
   const [activeWorkout,setActiveWorkout]=useState<WorkoutSession|undefined>();
   const [workoutHistory,setWorkoutHistory]=useState<WorkoutSession[]>([]);
   const [trainingError,setTrainingError]=useState("");
@@ -269,13 +264,26 @@ export default function App(){
   },[screen,restRunning,restLeft]);
   useEffect(()=>{if(restLeft===0)setRestRunning(false)},[restLeft]);
   const go=(next:Screen)=>{setScreen(next);window.scrollTo({top:0,behavior:"instant"});};
-  const openExercise=(index:number)=>{setExerciseIndex(index);go("exercise");};
+  const openExerciseInfo=(id:string,from:"library"|"program"="library")=>{
+    setSelectedLibraryId(id);setLibraryReturn(from);go("exercise-info");
+  };
+  const replaceExerciseInPlan=async(planId:string,rowId:string,replacement:Exercise)=>{
+    const plan=savedPlans.find(p=>p.id===planId);
+    if(!plan)throw new Error("Ficha não encontrada no dispositivo.");
+    const row=plan.exercises.find(item=>item.id===rowId);
+    if(!row)throw new Error("Exercício original não encontrado na ficha.");
+    if(!catalogExercises.some(e=>e.id===replacement.id))throw new Error("Alternativa não está disponível no catálogo.");
+    const changed={...plan,updatedAt:new Date().toISOString(),
+      exercises:plan.exercises.map(item=>item.id===rowId?{...item,exerciseId:replacement.id}:item)};
+    await savePlanWithExercises(changed,[]);
+    await loadProgram(false);
+  };
   const sessionEx=exercises[exerciseIndex];
   const currentKey=exerciseIndex+"-"+setIndex;
   const completedCount=Object.values(completed).filter(Boolean).length;
   const plannedTotal=exercises.reduce((n,e)=>n+e.sets,0);
   const progressPct=Math.round(completedCount/plannedTotal*100);
-  const filtered=useMemo(()=>exercises.filter(e=>(libraryFilter==="Todos"||e.muscle===libraryFilter)&&e.name.toLocaleLowerCase("pt-BR").includes(search.toLocaleLowerCase("pt-BR"))),[search,libraryFilter]);
+
   const markSet=()=>{
     if(completed[currentKey]){setCompleted(previous=>({...previous,[currentKey]:false}));return;}
     setCompleted(previous=>({...previous,[currentKey]:true}));
@@ -292,7 +300,7 @@ export default function App(){
     if(kind==="weight")setWeight(prev=>({...prev,[currentKey]:Math.min(500,Math.max(0,(prev[currentKey]??mockWeights[sessionEx.id])+delta))}));
     else setReps(prev=>({...prev,[currentKey]:Math.min(100,Math.max(0,(prev[currentKey]??mockReps[sessionEx.id])+delta))}));
   };
-  const tab=navItems.find(n=>n.screen===screen)?.screen??(screen==="run"||screen==="program"||screen==="edit-plan"||screen==="edit-schedule"||screen==="live"||screen==="history"?"workouts":screen==="share"?"progress":"workouts");
+  const tab=navItems.find(n=>n.screen===screen)?.screen??(screen==="run"||screen==="program"||screen==="edit-plan"||screen==="edit-schedule"||screen==="live"||screen==="history"?"workouts":screen==="share"?"progress":screen==="exercise-info"?"library":"workouts");
   return <div className={"gym-app"+(settings.largeText?" large-text":"")+(settings.reducedMotion?" reduced-motion":"")}>
     <div className="desktop-rail" aria-hidden="true"><span>GYM</span><i/><small>MOVE WITH PURPOSE</small></div>
     <div className="app-column">
@@ -343,33 +351,15 @@ export default function App(){
           onRestAction={changeRealRest}/>}
         {screen==="live"&&!activeWorkout&&<div className="empty-state"><Info/><h3>Nenhuma sessão aberta</h3><button type="button" onClick={()=>go("workouts")}>Voltar aos treinos</button></div>}
         {screen==="history"&&<WorkoutHistoryView history={workoutHistory} onBack={()=>go("workouts")}/>}
-        {screen==="library"&&<>
-          <Titlebar eyebrow="CONHECIMENTO EM MOVIMENTO" title="Exercícios." right={<button type="button" className="round-control" onClick={()=>{setLibraryFilter("Todos");setSearch("");}} aria-label="Limpar filtros"><SlidersHorizontal size={19}/></button>}/>
-          <p className="screen-lead">Consulte os exercícios do seu Programa 10/10 e seus dias de treinamento.</p>
-          <ProgramLibrary onOpen={sourceIndex=>{
-            const originalId=planId(PROGRAM_DAYS[sourceIndex].id);
-            const scheduledIndex=assignedDays.findIndex(d=>d.planId===originalId);
-            if(scheduledIndex>=0)openProgram(scheduledIndex);else editPlan(originalId);
-          }}/>
-          <details className="demo-library-disclosure"><summary>Biblioteca visual experimental <span>5 exemplos fictícios</span></summary>
-          <label className="search-box"><Search size={20}/><input type="search" placeholder="Buscar exercício" value={search} onChange={e=>setSearch(e.target.value)} aria-label="Buscar exercício"/></label>
-          <div className="filter-row" aria-label="Filtrar por grupo muscular">{["Todos","Costas","Braços"].map(item=><button type="button" key={item} className={libraryFilter===item?"filter-chip active":"filter-chip"} onClick={()=>setLibraryFilter(item)} aria-pressed={libraryFilter===item}>{item}</button>)}</div>
-          <SectionHead title="Biblioteca" aside={filtered.length+" movimentos"}/>
-          {filtered.length===0?<div className="empty-state"><Search size={27}/><h3>Nenhum exercício encontrado</h3><p>Tente buscar por outro nome ou limpar os filtros.</p><PrimaryButton secondary onClick={()=>{setSearch("");setLibraryFilter("Todos")}}>Limpar busca</PrimaryButton></div>:<div className="library-grid">{filtered.map(ex=>{const i=exercises.findIndex(e=>e.id===ex.id);return <button type="button" className="library-card" key={ex.id} onClick={()=>openExercise(i)}><WorkoutThumbnail exerciseIndex={i}/><div><span className="library-muscle">{ex.muscle.toUpperCase()}</span><h3>{ex.name}</h3><p>{ex.equipment}</p></div><ChevronRight size={18}/></button>})}</div>}
-          <Notice>As imagens desta seção são exemplos da interface. As fotografias de execução dos exercícios reais serão preparadas na Sprint 06.</Notice>
-          </details>
-        </>}
-        {screen==="exercise"&&<>
-          <BackHeader label="EXERCÍCIO" onBack={()=>go("library")} action={<button type="button" className="round-control" onClick={()=>go("workouts")} aria-label="Ir para ficha"><Dumbbell size={19}/></button>}/>
-          <div className="exercise-hero">{sessionEx.id==="lat"?<Photo src={sessionEx.image} alt="Pessoa executando puxada alta na academia"/>:<DemoImageFallback label="IMAGEM EM PREPARAÇÃO"/>}<div className="exercise-hero-label">BIBLIOTECA VISUAL · PRÉVIA</div></div>
-          <div className="exercise-detail-head"><div><p className="eyebrow">{sessionEx.muscle.toUpperCase()} / {sessionEx.equipment.toUpperCase()}</p><h1>{sessionEx.name}</h1></div><span className="small-number">{String(exerciseIndex+1).padStart(2,"0")}/{String(exercises.length).padStart(2,"0")}</span></div>
-          <div className="muscle-pills"><span>{sessionEx.muscle}</span><span>{sessionEx.secondary}</span></div>
-          <div className="detail-meta"><div><small>SÉRIES</small><strong>{sessionEx.sets}</strong></div><div><small>REPETIÇÕES</small><strong>{sessionEx.reps}</strong></div><div><small>DESCANSO</small><strong>{sessionEx.rest}s</strong></div></div>
-          <SectionHead title="Como executar" aside="Orientações gerais"/>
-          <div className="steps">{sessionEx.cues.map((cue,i)=><div className="step" key={cue}><span>{String(i+1).padStart(2,"0")}</span><p>{cue}</p></div>)}</div>
-          <Notice>Orientações gerais, não substituem avaliação individualizada. Imagens de execução serão ampliadas na Sprint 06.</Notice>
-          <div className="bottom-actions"><PrimaryButton onClick={()=>{setSetIndex(0);go("session");}}>Ver no treino <ArrowRight size={18}/></PrimaryButton><div className="stepper"><button type="button" aria-label="Exercício anterior" onClick={()=>setExerciseIndex((exerciseIndex+exercises.length-1)%exercises.length)}><ChevronLeft/></button><span>Outro exercício</span><button type="button" aria-label="Próximo exercício" onClick={()=>setExerciseIndex((exerciseIndex+1)%exercises.length)}><ChevronRight/></button></div></div>
-        </>}
+        {screen==="library"&&<ExerciseLibrary catalog={catalogExercises} plans={savedPlans}
+          onOpen={id=>openExerciseInfo(id,"library")}/>}
+        {screen==="exercise-info"&&<ExerciseDetails
+          key={selectedLibraryId??"none"}
+          exercise={catalogExercises.find(item=>item.id===selectedLibraryId)}
+          catalog={catalogExercises} plans={savedPlans}
+          onBack={()=>go(libraryReturn)}
+          onOpen={id=>openExerciseInfo(id,libraryReturn)}
+          onReplace={replaceExerciseInPlan}/>}
         {screen==="session"&&<>
           <BackHeader label="MODO ACADEMIA · DEMONSTRAÇÃO" onBack={()=>go("workouts")} action={<span className="session-progress">{completedCount}/{plannedTotal}</span>}/>
           <div className="session-top"><p className="eyebrow">TREINO A / COSTAS & BÍCEPS</p><h1>Em movimento<span className="orange">.</span></h1><div className="progress-track"><span style={{width:progressPct+"%"}}/></div><p>{progressPct}% da ficha demonstrativa marcada</p></div>
