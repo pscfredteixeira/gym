@@ -27,6 +27,13 @@ const date = (value: unknown) => text(value, 10) && /^\d{4}-\d{2}-\d{2}$/.test(v
 const optional = (value: unknown, test: (input: unknown) => boolean) => value === undefined || test(value);
 const strings = (value: unknown) => Array.isArray(value) && value.every(v => text(v, 500));
 const typed = (value: unknown, options: string[]) => typeof value === "string" && options.includes(value);
+const weeklyPlanIdsValid = (value:unknown):boolean =>
+  Array.isArray(value) && value.length === 7 && value.every(v=>v===null || id(v));
+const scheduledCardioValid = (value:unknown):boolean =>
+  Array.isArray(value) && value.length === 7 && value.every(v=>v===null ||
+    (record(v) && text(v.label,100) && v.label.length>0 && (v.minutes===null || (count(v.minutes) && (v.minutes as number)<=600)) &&
+      typeof v.optional==="boolean" && text(v.note,500)));
+
 
 export function validateSettings(raw: unknown): UserSettings {
   if (!record(raw)) throw new Error("Configurações inválidas.");
@@ -35,7 +42,9 @@ export function validateSettings(raw: unknown): UserSettings {
       !optional(raw.displayName, v => text(v, 100)) ||
       !optional(raw.personalGoal, v => text(v, 300)) ||
       !optional(raw.largeText, v => typeof v === "boolean") ||
-      !optional(raw.reducedMotion, v => typeof v === "boolean")) {
+      !optional(raw.reducedMotion, v => typeof v === "boolean") ||
+      !optional(raw.weeklyPlanIds, weeklyPlanIdsValid) ||
+      !optional(raw.weeklyCardio, scheduledCardioValid)) {
     throw new Error("As preferências no arquivo não são válidas.");
   }
   return {
@@ -47,6 +56,8 @@ export function validateSettings(raw: unknown): UserSettings {
     personalGoal: typeof raw.personalGoal === "string" ? raw.personalGoal : "",
     largeText: raw.largeText === true,
     reducedMotion: raw.reducedMotion === true,
+    ...(Array.isArray(raw.weeklyPlanIds)?{weeklyPlanIds:raw.weeklyPlanIds as Array<string|null>}:{ }),
+    ...(Array.isArray(raw.weeklyCardio)?{weeklyCardio:raw.weeklyCardio as UserSettings["weeklyCardio"]}:{ }),
   };
 }
 const planned = (v: unknown) => record(v) && id(v.id) && typed(v.kind,["warmup","working"]) &&

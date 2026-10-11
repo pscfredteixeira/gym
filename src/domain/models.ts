@@ -97,7 +97,17 @@ export interface ImportBatch {
   importedEntityIds: Id[];
 }
 
+export interface ScheduledCardio {
+  label: string;
+  minutes: number | null;
+  optional: boolean;
+  note: string;
+}
 export interface UserSettings {
+  /** Seven Monday-to-Sunday entries; null means a rest day. */
+  weeklyPlanIds?: Array<string | null>;
+  /** Seven day-specific cardio prescriptions; null means no planned cardio. */
+  weeklyCardio?: Array<ScheduledCardio | null>;
   units: "metric" | "imperial";
   defaultRestSeconds: number;
   shareHeartRateByDefault: boolean;
