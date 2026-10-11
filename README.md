@@ -159,3 +159,7 @@ A ficha do exercício agora oferece **Adicionar foto da galeria** e **Usar link 
 5. Feche e reabra o Safari. A foto deve continuar associada à Puxada neutra.
 6. Em **Perfil**, exporte backup JSON com a foto. Restaure o backup somente depois de verificar que tem uma cópia segura.
 7. Remova a imagem na ficha do exercício e confirme que as cargas, séries e nomes continuam intactos.
+
+## Sprint 07 — corrida e cardio registrados
+
+A página de corrida registra **atividades reais informadas manualmente**: esteira, corrida ao ar livre, caminhada e outros cardios. Há cronômetro auxiliar, histórico editável, resumo e semana de minutos realizados. O Programa 10/10 informa a meta de cardio mas não a marca automaticamente como concluída. Veja [docs/SPRINT07_CARDIO.md](docs/SPRINT07_CARDIO.md) para roteiro de teste e limites. GPS, Apple Health e dados automáticos permanecem planejados para etapas futuras.

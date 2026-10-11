@@ -139,3 +139,18 @@ Não usar fotos de bases cujo próprio mantenedor desconheça a licença.
 - [x] Testar persistência de imagem e integridade da ficha no IndexedDB.
 - [ ] Validação prática de upload JPG/HEIC no Safari iOS.
 - [ ] Fotografias originais curadas para os 31 movimentos, com licença verificada.
+
+## Sprint 07 — implementação
+
+- [x] Registro manual de esteira, corrida externa, caminhada e atividades nomeadas.
+- [x] Duração, distância opcional, inclinação, frequência cardíaca e observações.
+- [x] Ritmo/velocidade calculados sem números fictícios.
+- [x] Cronômetro por relógio real, pausa e preenchimento manual da duração; persistência local do cronômetro auxiliar.
+- [x] Histórico local, edição e exclusão confirmada de registros manuais.
+- [x] Resumos reais em Hoje/Evolução e gráfico semanal de cardio.
+- [x] Integração com sugestões do Programa 10/10, sem marcar treino planejado como realizado.
+- [x] Backup JSON com cardio e validação de importações protegidas.
+- [x] Testes automatizados, build e publicação GitHub Pages.
+- [ ] Teste manual em Safari iPhone e aprovação do usuário.
+
+**Sem GPS ou sincronização automática com o Apple Watch.**
