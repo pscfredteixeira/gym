@@ -10,7 +10,7 @@ import { DemoLabel, Photo, Titlebar, SectionHead, BackHeader, PrimaryButton, Not
 import { exercises, mockWeights, mockReps, photos } from "./data/demo";
 import ProfilePanel, { type StorageState } from "./features/profile/ProfilePanel";
 import { DEFAULT_SETTINGS } from "./data/validation";
-import { readSettings, writeSettings } from "./data/storage";
+import { readSettings, writeSettings, saveEntity } from "./data/storage";
 import type { Exercise, ScheduledCardio, UserSettings, WorkoutPlan, WorkoutSession } from "./domain/models";
 import { ActiveWorkoutBanner, LiveWorkout, WorkoutHistoryView } from "./features/training/TrainingView";
 import { ExerciseLibrary, ExerciseDetails } from "./features/library/ExerciseLibrary";

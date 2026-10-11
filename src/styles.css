@@ -851,3 +851,49 @@ input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-ou
  .body-map-svg{height:205px}
  .atlas-label>span:last-child{font-size:8px}
 }
+
+
+/* Exercise recognition: user-provided demonstration photos stored in IndexedDB. */
+.gym-exercise-thumbnail{display:grid;place-items:center;position:relative;overflow:hidden;flex:0 0 auto;width:58px;height:62px;border-radius:10px;background:radial-gradient(circle at 70% 20%,#65432f,#34231c 68%,#24211f);color:#ffae80;border:1px solid #584638}
+.gym-exercise-thumbnail img{height:100%;width:100%;object-fit:cover;display:block}
+.program-exercise-heading .gym-exercise-thumbnail{width:52px;height:56px;border-radius:9px}
+.gym-live-exercise-title{display:flex;align-items:center;gap:12px;margin:4px 0 5px}
+.gym-live-exercise-title .gym-exercise-thumbnail{width:66px;height:67px}
+.gym-live-exercise-title h2{margin:0!important;min-width:0;flex:1}
+.gym-exercise-photo{position:relative;width:100%;aspect-ratio:16/10;overflow:hidden;border:1px solid #524032;background:radial-gradient(ellipse at 55% 30%,#403027,#1a1d1f 77%);border-radius:15px;margin:12px 0}
+.gym-exercise-photo>img{width:100%;height:100%;object-fit:contain;display:block;background:#101214}
+.gym-exercise-photo-tag{position:absolute;bottom:10px;left:10px;background:#121416d9;color:#fbe5d7;border:1px solid #554032a8;padding:7px 9px;border-radius:6px;font-size:10px;font-weight:800;letter-spacing:.7px}
+.gym-exercise-photo-missing{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:23px 19px;color:#d3d1d0}
+.gym-exercise-photo-missing>svg{color:#ff9a65;opacity:.9}
+.gym-exercise-photo-missing strong{font-size:17px;line-height:1.3}
+.gym-exercise-photo-missing span{color:#b4ada9;font-size:12px;line-height:1.5;max-width:260px}
+.gym-photo-editor{display:grid;gap:12px;background:var(--panel);border:1px solid #654631;border-radius:14px;padding:16px;margin:12px 0 25px}
+.gym-photo-editor-heading{display:flex;align-items:flex-start;gap:11px}
+.gym-photo-editor-heading>svg{color:#ffab7c;flex:0 0 auto;margin-top:2px}
+.gym-photo-editor-heading>div{flex:1;min-width:0}
+.gym-photo-editor-heading strong{font-size:15px;line-height:1.4;font-weight:840}
+.gym-photo-editor-heading p{font-size:12px;line-height:1.55;color:#bfc0c3;margin:5px 0 0}
+.gym-photo-choose{position:relative;min-height:53px;display:flex;align-items:center;justify-content:center;gap:9px;background:var(--orange);border-radius:11px;color:#1e120b;font-weight:850;font-size:13px;padding:12px 14px;cursor:pointer;text-align:center;overflow:hidden}
+.gym-photo-choose.disabled{opacity:.6}
+.gym-photo-choose input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;font-size:100px}
+.gym-photo-from-link{border:1px solid var(--line);border-radius:10px;background:#1b1d20;padding:11px}
+.gym-photo-from-link summary{display:flex;align-items:center;gap:9px;min-height:44px;color:#dddfe1;font-size:12px;font-weight:760;cursor:pointer;list-style:none}
+.gym-photo-from-link summary svg{color:var(--orange)}
+.gym-photo-from-link[open]{display:grid;gap:11px}
+.gym-photo-from-link label{display:grid;gap:6px;color:#dddfe1;font-size:11px;font-weight:740}
+.gym-photo-from-link input{min-height:46px;width:100%;min-width:0;background:#101214;border:1px solid #55585d;border-radius:9px;color:white;padding:9px 10px;font-size:16px}
+.gym-photo-from-link button{display:flex;justify-content:center;align-items:center;min-height:45px;padding:10px;border:1px solid #a36037;border-radius:9px;background:#3b261b;color:#ffc09a;font-weight:790;font-size:12px}
+.gym-photo-from-link button:disabled{opacity:.4}
+.gym-photo-from-link small{font-size:11px;line-height:1.5;color:#aaa7a4}
+.gym-photo-remove{justify-self:start;min-height:44px;display:flex;align-items:center;gap:8px;border:0;background:transparent;color:#f3aa9a;padding:8px 0;font-weight:780;font-size:12px}
+.gym-photo-error{margin:0;color:#ffc2b7;background:#33201d;border:1px solid #7b4a43;border-radius:8px;padding:11px 12px;font-size:12px;line-height:1.5}
+.gym-photo-success{margin:0;display:flex;gap:7px;align-items:center;color:#b9ecc6;background:#1d3324;border:1px solid #4d7d59;border-radius:8px;padding:11px 12px;font-size:12px;line-height:1.5}
+.gym-photo-note{margin:0;color:var(--muted);font-size:11px;line-height:1.6}
+@media(max-width:380px){
+ .gym-exercise-thumbnail{width:48px;height:56px}
+ .program-exercise-heading .gym-exercise-thumbnail{width:47px;height:51px}
+ .gym-live-exercise-title .gym-exercise-thumbnail{width:55px;height:57px}
+ .gym-photo-editor{padding:12px}
+ .gym-exercise-photo-missing{padding:13px}
+ .gym-exercise-photo-missing strong{font-size:15px}
+}
