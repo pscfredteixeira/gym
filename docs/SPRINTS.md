@@ -44,7 +44,8 @@ Cada sprint possui uma entrega testável. Não iniciar outra etapa enquanto houv
 - [x] Modelo e invariantes documentados.
 - [x] Decisões de PWA, saúde, privacidade e backup.
 - [x] Estrutura de execução React/TypeScript/Vite adicionada.
-- [ ] Validar build remoto e revisar publicação Pages.
+- [x] Build remoto e workflow GitHub Pages validados (execução bem-sucedida).
+- [ ] Verificar abertura e instalação no iPhone.
 - [ ] Aceite visual da interface-base no aparelho.
 
 A Sprint 01 começa com a revisão visual do conceito aprovado e construção dos componentes definitivos.
