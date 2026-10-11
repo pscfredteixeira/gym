@@ -51,7 +51,8 @@ export function validateSettings(raw: unknown): UserSettings {
 }
 const planned = (v: unknown) => record(v) && id(v.id) && typed(v.kind,["warmup","working"]) &&
   count(v.minReps) && count(v.maxReps) && (v.minReps as number) <= (v.maxReps as number) &&
-  optional(v.targetWeightKg,number) && optional(v.targetRir,n=>number(n)&&(n as number)<=10);
+  optional(v.targetWeightKg,number) && optional(v.targetRir,n=>number(n)&&(n as number)<=10) &&
+  optional(v.targetRirMax,n=>number(n)&&(n as number)<=10 && (v.targetRir===undefined || (n as number)>=(v.targetRir as number)));
 const exercise = (v: unknown) => record(v) && id(v.id) && text(v.name,200) && text(v.primaryMuscle,120) &&
   typeof v.isCustom === "boolean" && optional(v.secondaryMuscles,strings) && optional(v.equipment,n=>text(n,100)) &&
   optional(v.imageUrl,n=>text(n,2000)) && optional(v.instructions,strings);

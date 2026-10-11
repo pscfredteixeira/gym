@@ -24,6 +24,8 @@ export interface PlannedSet {
   maxReps: number;
   targetWeightKg?: number;
   targetRir?: number;
+  /** Inclusive upper bound for a planned RIR range; equal to targetRir for exact RIR. */
+  targetRirMax?: number;
 }
 
 export interface PlanExercise {

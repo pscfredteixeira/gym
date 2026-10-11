@@ -63,6 +63,31 @@ export async function writeSettings(value:UserSettings):Promise<void> {
   await transactionRequest("settings","readwrite",s=>s.put({ ...settings, id: SETTINGS_KEY }));
 }
 
+
+/** Import preset without ever replacing an existing user's plan or exercise.
+ * One IndexedDB transaction guarantees a partial program is never committed. */
+export async function ensureProgramCatalog(catalog:{exercises:Exercise[];plans:WorkoutPlan[]}):Promise<void>{
+  const db=await openDb();
+  await new Promise<void>((resolve,reject)=>{
+    try{
+      const tx=db.transaction(["exercises","plans"],"readwrite");
+      for(const exercise of catalog.exercises){
+        const store=tx.objectStore("exercises");
+        const request=store.get(exercise.id);
+        request.onsuccess=()=>{if(request.result===undefined)store.add(exercise);};
+      }
+      for(const plan of catalog.plans){
+        const store=tx.objectStore("plans");
+        const request=store.get(plan.id);
+        request.onsuccess=()=>{if(request.result===undefined)store.add(plan);};
+      }
+      tx.oncomplete=()=>resolve();
+      tx.onerror=()=>reject(tx.error??new Error("Não foi possível cadastrar o Programa 10/10."));
+      tx.onabort=()=>reject(tx.error??new Error("Cadastro do Programa 10/10 cancelado."));
+    }catch(error){reject(error);}
+  });
+}
+
 type Snapshot = {
   exercises:Exercise[];
   plans:WorkoutPlan[];
