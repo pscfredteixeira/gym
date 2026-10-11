@@ -11,17 +11,20 @@ import { exercises, mockWeights, mockReps, photos } from "./data/demo";
 import ProfilePanel, { type StorageState } from "./features/profile/ProfilePanel";
 import { DEFAULT_SETTINGS } from "./data/validation";
 import { readSettings, writeSettings } from "./data/storage";
-import type { Exercise, ScheduledCardio, UserSettings, WorkoutPlan } from "./domain/models";
+import type { Exercise, ScheduledCardio, UserSettings, WorkoutPlan, WorkoutSession } from "./domain/models";
+import { ActiveWorkoutBanner, LiveWorkout, WorkoutHistoryView } from "./features/training/TrainingView";
+import { createSessionSnapshot, recordSetInSnapshot, removeRecordedSet, closeSession, type RecordTarget, type SetInput } from "./features/training/sessionDomain";
+import { startStoredWorkout, getActiveWorkout, mutateStoredWorkout } from "./data/storage";
 import { savePlanWithExercises, deleteEntity } from "./data/storage";
 import PlanEditor from "./features/program/PlanEditor";
 import ScheduleEditor from "./features/program/ScheduleEditor";
 import { configuredPlanIds, resolveSchedule } from "./features/program/programSchedule";
-import { PROGRAM_DAYS, PROGRAM_NAME, buildProgramCatalog, planId, seriesCount } from "./data/program1010";
+import { PROGRAM_DAYS, PROGRAM_NAME, buildProgramCatalog, planId } from "./data/program1010";
 import { ProgramOverview, ProgramDayDetail, ProgramLibrary, type ProgramStatus } from "./features/program/ProgramView";
 import { ensureProgramCatalog, listEntities } from "./data/storage";
 
 type Tab = "home" | "workouts" | "library" | "progress" | "profile";
-type Screen = Tab | "exercise" | "session" | "rest" | "run" | "share" | "program" | "edit-plan" | "edit-schedule";
+type Screen = Tab | "exercise" | "session" | "rest" | "run" | "share" | "program" | "edit-plan" | "edit-schedule" | "live" | "history";
 type ShareKind = "strength" | "run";
 type ShareFormat = "story" | "feed" | "square";
 type ShareStyle = "ember" | "minimal";
@@ -163,6 +166,46 @@ export default function App(){
   const [programStatus,setProgramStatus]=useState<ProgramStatus>("loading");
   const [savedPlans,setSavedPlans]=useState<WorkoutPlan[]>([]);
   const [catalogExercises,setCatalogExercises]=useState<Exercise[]>([]);
+  const [activeWorkout,setActiveWorkout]=useState<WorkoutSession|undefined>();
+  const [workoutHistory,setWorkoutHistory]=useState<WorkoutSession[]>([]);
+  const [trainingError,setTrainingError]=useState("");
+  const reloadTraining=async()=>{
+    const all=await listEntities<WorkoutSession>("workoutSessions");
+    setWorkoutHistory(all.filter(item=>item.status!=="in_progress"));
+    setActiveWorkout(all.filter(item=>item.status==="in_progress").sort((a,b)=>b.startedAt.localeCompare(a.startedAt))[0]);
+  };
+  useEffect(()=>{void reloadTraining().catch(error=>setTrainingError(error instanceof Error?error.message:"Erro ao abrir os treinos."));},[]);
+  const beginRealWorkout=async(plan:WorkoutPlan)=>{
+    setTrainingError("");
+    try{
+      const existing=await getActiveWorkout();
+      if(existing){setActiveWorkout(existing);go("live");return;}
+      const snapshot=createSessionSnapshot(plan,catalogExercises);
+      const started=await startStoredWorkout(snapshot);
+      setActiveWorkout(started);
+      await reloadTraining();
+      go("live");
+    }catch(error){
+      setTrainingError(error instanceof Error?error.message:"Não foi possível iniciar o treino.");
+      await reloadTraining().catch(()=>{});
+    }
+  };
+  const updateRealSet=async(target:RecordTarget,data:SetInput)=>{
+    if(!activeWorkout)throw new Error("Não existe treino aberto.");
+    await mutateStoredWorkout(activeWorkout.id,session=>recordSetInSnapshot(session,target,data));
+    await reloadTraining();
+  };
+  const removeRealSet=async(target:RecordTarget)=>{
+    if(!activeWorkout)throw new Error("Não existe treino aberto.");
+    await mutateStoredWorkout(activeWorkout.id,session=>removeRecordedSet(session,target));
+    await reloadTraining();
+  };
+  const endRealWorkout=async(status:"completed"|"abandoned")=>{
+    if(!activeWorkout)throw new Error("Não existe treino aberto.");
+    await mutateStoredWorkout(activeWorkout.id,session=>closeSession(session,status));
+    await reloadTraining();
+    go("history");
+  };
 
   const loadProgram=async(install:boolean)=>{
     setProgramStatus("loading");
@@ -238,26 +281,30 @@ export default function App(){
     if(kind==="weight")setWeight(prev=>({...prev,[currentKey]:Math.min(500,Math.max(0,(prev[currentKey]??mockWeights[sessionEx.id])+delta))}));
     else setReps(prev=>({...prev,[currentKey]:Math.min(100,Math.max(0,(prev[currentKey]??mockReps[sessionEx.id])+delta))}));
   };
-  const tab=navItems.find(n=>n.screen===screen)?.screen??(screen==="run"||screen==="program"||screen==="edit-plan"||screen==="edit-schedule"?"workouts":screen==="share"?"progress":"workouts");
+  const tab=navItems.find(n=>n.screen===screen)?.screen??(screen==="run"||screen==="program"||screen==="edit-plan"||screen==="edit-schedule"||screen==="live"||screen==="history"?"workouts":screen==="share"?"progress":"workouts");
   return <div className={"gym-app"+(settings.largeText?" large-text":"")+(settings.reducedMotion?" reduced-motion":"")}>
     <div className="desktop-rail" aria-hidden="true"><span>GYM</span><i/><small>MOVE WITH PURPOSE</small></div>
     <div className="app-column">
       <header className="app-header">
-        <button className="logo" type="button" disabled={screen==="edit-plan"||screen==="edit-schedule"} onClick={()=>go("home")} aria-label="GYM, voltar ao início">GYM<span>.</span></button>
-        <div className="header-actions">{["home","workouts","program"].includes(screen)?<span className="program-header-tag">10/10</span>:<DemoLabel compact/>}<button type="button" className="header-avatar" onClick={()=>go("profile")} aria-label="Abrir perfil"><UserRound size={20}/></button></div>
+        <button className="logo" type="button" disabled={screen==="edit-plan"||screen==="edit-schedule"||screen==="live"} onClick={()=>go("home")} aria-label="GYM, voltar ao início">GYM<span>.</span></button>
+        <div className="header-actions">{["home","workouts","program","live","history"].includes(screen)?<span className="program-header-tag">10/10</span>:<DemoLabel compact/>}<button type="button" className="header-avatar" onClick={()=>go("profile")} aria-label="Abrir perfil"><UserRound size={20}/></button></div>
       </header>
       <main className="app-main" id="main-content">
         {screen==="home"&&<>
           <section className="greeting"><p className="eyebrow">SEU ESPAÇO DE MOVIMENTO</p><div className="heading-line"><h1>Vamos treinar<span className="orange">.</span></h1><span className="date-mark"><CalendarDays size={15}/> HOJE</span></div><p>Um passo de cada vez. Seu ritmo, suas conquistas.</p></section>
+          <ActiveWorkoutBanner session={activeWorkout} onResume={()=>go("live")}/>
+          <button className="history-link" type="button" onClick={()=>go("history")}>
+            <Clock3 size={18}/> Histórico de musculação <ArrowRight size={18}/>
+          </button>
           <div className="week-strip" aria-label="Escolha um dia da semana">{weekDates.map(({name,day:calendarDay},i)=><button type="button" key={name} onClick={()=>setDay(i)} className={day===i?"day-item selected":"day-item"} aria-pressed={day===i}><span>{name.toUpperCase()}</span><strong>{calendarDay}</strong><i/></button>)}</div>
-          <section className="hero-card"><Photo src={photos.hero} alt="Ambiente de academia" className="hero-photo"/><div className="hero-shade"/><div className="hero-info"><div className="topchip"><Flame size={13}/> {PROGRAM_NAME.toUpperCase()} · VERSÃO 2.0</div><div className="hero-lower"><p>{selectedDay.weekday.toUpperCase()} / {selectedDay.exercises.length?"MUSCULAÇÃO":"RECUPERAÇÃO"}</p><h2>{selectedDay.title}<span>.</span></h2><div className="hero-stats">{selectedDay.exercises.length?<><span><Dumbbell size={14}/>{selectedDay.exercises.length} exercícios</span><span><CheckCircle2 size={14}/>{seriesCount(selectedDay)} séries efetivas</span></>:<span><Activity size={14}/> Descanso / recuperação</span>}{selectedDay.cardio&&<span><Footprints size={14}/>{selectedDay.cardio.label}{selectedDay.cardio.minutes?" · "+selectedDay.cardio.minutes+" min":""}</span>}</div><button type="button" className="hero-cta" onClick={()=>openProgram(day)}>Ver programação do dia <ArrowRight size={20}/></button></div></div></section>
+          <section className="hero-card"><Photo src={photos.hero} alt="Ambiente de academia" className="hero-photo"/><div className="hero-shade"/><div className="hero-info"><div className="topchip"><Flame size={13}/> {PROGRAM_NAME.toUpperCase()} · VERSÃO 2.0</div><div className="hero-lower"><p>{selectedDay.weekday.toUpperCase()} / {selectedPlan?"MUSCULAÇÃO":"RECUPERAÇÃO"}</p><h2>{selectedDay.title}<span>.</span></h2><div className="hero-stats">{selectedPlan?<><span><Dumbbell size={14}/>{selectedPlan.exercises.length} exercícios</span><span><CheckCircle2 size={14}/>{selectedPlan.exercises.reduce((n,ex)=>n+ex.sets.filter(set=>set.kind==="working").length,0)} séries efetivas</span></>:<span><Activity size={14}/> Descanso / recuperação</span>}{selectedDay.cardio&&<span><Footprints size={14}/>{selectedDay.cardio.label}{selectedDay.cardio.minutes?" · "+selectedDay.cardio.minutes+" min":""}</span>}</div><button type="button" className="hero-cta" onClick={()=>openProgram(day)}>Ver programação do dia <ArrowRight size={20}/></button></div></div></section>
           <SectionHead title="Seu espaço" aside="Explorar treinos" onClick={()=>go("workouts")}/>
           <div className="home-cards"><button className="feature-mini" type="button" onClick={()=>go("run")}><div className="feature-icon"><Footprints size={24}/></div><small>CARDIO</small><h3>Corrida & esteira</h3><p>Ritmo, distância e tempo</p><ArrowUpRight className="corner-arrow" size={18}/></button><button className="feature-mini" type="button" onClick={()=>go("progress")}><div className="feature-icon"><TrendingUp size={24}/></div><small>RESULTADOS</small><h3>Sua evolução</h3><p>Gráficos e recordes</p><ArrowUpRight className="corner-arrow" size={18}/></button></div>
-          <div className="callout-line"><Sparkles size={18}/><span>{programStatus==="ready"?"Programa 10/10 cadastrado no armazenamento local. O registro das séries será ativado na Sprint 04.":programStatus==="loading"?"Preparando o Programa 10/10...":"A ficha pode ser consultada, mas ainda não foi confirmada no armazenamento local."}</span></div>
+          <div className="callout-line"><Sparkles size={18}/><span>{programStatus==="ready"?"Programa 10/10 salvo. Abra uma ficha para registrar séries e cargas reais.":programStatus==="loading"?"Preparando o Programa 10/10...":"A ficha pode ser consultada, mas ainda não foi confirmada no armazenamento local."}</span></div>
         </>}
-        {screen==="workouts"&&<ProgramOverview status={programStatus} onOpen={openProgram} onInstall={()=>{void loadProgram(true);}}
+        {screen==="workouts"&&<><ActiveWorkoutBanner session={activeWorkout} onResume={()=>go("live")}/><button className="history-link" type="button" onClick={()=>go("history")}><Clock3 size={18}/> Histórico de musculação <ArrowRight size={18}/></button><ProgramOverview status={programStatus} onOpen={openProgram} onInstall={()=>{void loadProgram(true);}}
           assigned={assignedDays} unassigned={unassignedPlans}
-          onEdit={id=>editPlan(id)} onNew={()=>editPlan(null)} onEditSchedule={()=>go("edit-schedule")}/>}
+          onEdit={id=>editPlan(id)} onNew={()=>editPlan(null)} onEditSchedule={()=>go("edit-schedule")}/></>}
         {screen==="edit-plan"&&<PlanEditor key={editingPlanId??"new-"+editorSerial}
           initial={savedPlans.find(p=>p.id===editingPlanId)} catalog={catalogExercises} units={settings.units}
           onSave={persistPlan} onDelete={deletePlan} onCancel={()=>go("workouts")}/>}
@@ -267,7 +314,10 @@ export default function App(){
         {screen==="program"&&<ProgramDayDetail
           day={selectedDay}
           onBack={()=>go("workouts")}
-          onPreview={startDemo}
+          onStart={()=>{if(selectedPlan)void beginRealWorkout(selectedPlan);}}
+          onResume={()=>go("live")}
+          activeWorkout={!!activeWorkout}
+          trainingError={trainingError}
           onCardio={()=>go("run")}
           plan={selectedPlan}
           catalog={catalogExercises}
@@ -275,6 +325,12 @@ export default function App(){
           onEdit={()=>{if(selectedPlan)editPlan(selectedPlan.id);}}
           units={settings.units}
         />}
+        {screen==="live"&&activeWorkout&&<LiveWorkout
+          session={activeWorkout} history={workoutHistory} units={settings.units} onBack={()=>go("workouts")}
+          onRecord={updateRealSet} onRemove={removeRealSet}
+          onFinish={()=>endRealWorkout("completed")} onAbandon={()=>endRealWorkout("abandoned")}/>}
+        {screen==="live"&&!activeWorkout&&<div className="empty-state"><Info/><h3>Nenhuma sessão aberta</h3><button type="button" onClick={()=>go("workouts")}>Voltar aos treinos</button></div>}
+        {screen==="history"&&<WorkoutHistoryView history={workoutHistory} onBack={()=>go("workouts")}/>}
         {screen==="library"&&<>
           <Titlebar eyebrow="CONHECIMENTO EM MOVIMENTO" title="Exercícios." right={<button type="button" className="round-control" onClick={()=>{setLibraryFilter("Todos");setSearch("");}} aria-label="Limpar filtros"><SlidersHorizontal size={19}/></button>}/>
           <p className="screen-lead">Consulte os exercícios do seu Programa 10/10 e seus dias de treinamento.</p>
@@ -358,11 +414,11 @@ export default function App(){
           storageState={storageState}
           storageError={storageError}
           flushSettings={flushSettings}
-          onRestored={value=>{setSettings(value);setStorageError("");setStorageState("saved");void loadProgram(false);}}
+          onRestored={value=>{setSettings(value);setStorageError("");setStorageState("saved");void loadProgram(false);void reloadTraining();}}
           onResetDemo={resetDemo}
         />}
       </main>
-      {screen!=="session"&&screen!=="rest"&&screen!=="edit-plan"&&screen!=="edit-schedule"&&<nav className="bottom-nav" aria-label="Navegação principal">{navItems.map(item=>{const Icon=item.icon;return <button type="button" key={item.screen} className={tab===item.screen?"nav-link active":"nav-link"} aria-current={tab===item.screen?"page":undefined} onClick={()=>go(item.screen)}><Icon size={21} strokeWidth={tab===item.screen?2.5:1.8}/><span>{item.label}</span></button>})}</nav>}
+      {screen!=="session"&&screen!=="rest"&&screen!=="edit-plan"&&screen!=="edit-schedule"&&screen!=="live"&&<nav className="bottom-nav" aria-label="Navegação principal">{navItems.map(item=>{const Icon=item.icon;return <button type="button" key={item.screen} className={tab===item.screen?"nav-link active":"nav-link"} aria-current={tab===item.screen?"page":undefined} onClick={()=>go(item.screen)}><Icon size={21} strokeWidth={tab===item.screen?2.5:1.8}/><span>{item.label}</span></button>})}</nav>}
     </div>
   </div>;
 }
