@@ -72,13 +72,21 @@ export function parseCommonsPhotos(input:unknown):CommonsPhoto[]{
  return output.slice(0,8);
 }
 export async function findCommonsPhotos(exercise:Pick<Exercise,"name">,signal?:AbortSignal):Promise<CommonsPhoto[]>{
- const params=new URLSearchParams({
-  action:"query",format:"json",origin:"*",generator:"search",gsrnamespace:"6",
-  gsrsearch:commonsTerm(exercise),gsrlimit:"12",prop:"imageinfo",
-  iiprop:"url|mime|extmetadata",iiurlwidth:"520",
-  iiextmetadatafilter:"LicenseShortName|Artist|Attribution|Copyrighted"
- });
- const response=await fetch("https://commons.wikimedia.org/w/api.php?"+params.toString(),{signal,mode:"cors"});
- if(!response.ok)throw new Error("A pesquisa de imagens livres não está disponível agora.");
- return parseCommonsPhotos(await response.json());
+ const specific=commonsTerm(exercise);
+ const words=specific.split(/\s+/);
+ // A shorter search may find relevant photos when the exact exercise has none.
+ const broad=words.length>2?words.slice(0,words.length-1).join(" "):specific;
+ for(const query of [...new Set([specific,broad])]){
+  const params=new URLSearchParams({
+   action:"query",format:"json",origin:"*",generator:"search",gsrnamespace:"6",
+   gsrsearch:query,gsrlimit:"12",prop:"imageinfo",
+   iiprop:"url|mime|extmetadata",iiurlwidth:"520",
+   iiextmetadatafilter:"LicenseShortName|Artist|Attribution|Copyrighted"
+  });
+  const response=await fetch("https://commons.wikimedia.org/w/api.php?"+params.toString(),{signal,mode:"cors"});
+  if(!response.ok)throw new Error("A pesquisa de imagens livres não está disponível agora.");
+  const photos=parseCommonsPhotos(await response.json());
+  if(photos.length)return photos;
+ }
+ return [];
 }
