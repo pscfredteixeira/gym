@@ -12,7 +12,7 @@ import ProfilePanel, { type StorageState } from "./features/profile/ProfilePanel
 import { DEFAULT_SETTINGS } from "./data/validation";
 import { readSettings, writeSettings } from "./data/storage";
 import type { Exercise, ScheduledCardio, UserSettings, WorkoutPlan } from "./domain/models";
-import { savePlanWithExercises, deleteEntity, writeSettings } from "./data/storage";
+import { savePlanWithExercises, deleteEntity } from "./data/storage";
 import PlanEditor from "./features/program/PlanEditor";
 import ScheduleEditor from "./features/program/ScheduleEditor";
 import { configuredPlanIds, resolveSchedule } from "./features/program/programSchedule";
