@@ -10,8 +10,9 @@ import { DemoLabel, Photo, Titlebar, SectionHead, BackHeader, PrimaryButton, Not
 import { exercises, mockWeights, mockReps, photos } from "./data/demo";
 import ProfilePanel, { type StorageState } from "./features/profile/ProfilePanel";
 import { DEFAULT_SETTINGS } from "./data/validation";
-import { readSettings, writeSettings, saveEntity } from "./data/storage";
-import type { Exercise, ScheduledCardio, UserSettings, WorkoutPlan, WorkoutSession } from "./domain/models";
+import { readSettings, writeSettings, saveEntity, saveManualCardio, deleteManualCardio } from "./data/storage";
+import type { CardioSession, Exercise, ScheduledCardio, UserSettings, WorkoutPlan, WorkoutSession } from "./domain/models";
+import CardioView, { CardioHighlights } from "./features/cardio/CardioView";
 import { ActiveWorkoutBanner, LiveWorkout, WorkoutHistoryView } from "./features/training/TrainingView";
 import { ExerciseLibrary, ExerciseDetails } from "./features/library/ExerciseLibrary";
 import { isExerciseImageUrl } from "./features/library/exerciseImages";
@@ -94,7 +95,7 @@ function downloadSampleCard(kind:ShareKind,format:ShareFormat,style:ShareStyle,d
   },"image/png");
 }
 export default function App(){
-  const [screen,setScreen]=useState<Screen>(()=>new URLSearchParams(window.location.search).get("tab")==="library"?"library":"home");
+  const [screen,setScreen]=useState<Screen>(()=>new URLSearchParams(window.location.search).get("tab")==="library"?"library":new URLSearchParams(window.location.search).get("tab")==="cardio"?"run":"home");
   const [exerciseIndex,setExerciseIndex]=useState(0);
   const [setIndex,setSetIndex]=useState(0);
   const [completed,setCompleted]=useState<Record<string,boolean>>({});
@@ -103,7 +104,6 @@ export default function App(){
   const [restLeft,setRestLeft]=useState(90);
   const [restRunning,setRestRunning]=useState(false);
   const [period,setPeriod]=useState("3 meses");
-  const [runMode,setRunMode]=useState("Esteira");
   const [runMinutes,setRunMinutes]=useState(20);
   const [runDistance,setRunDistance]=useState(3.2);
   const [shareKind,setShareKind]=useState<ShareKind>("strength");
@@ -164,6 +164,21 @@ export default function App(){
   const [libraryReturn,setLibraryReturn]=useState<"library"|"program">("library");
   const [activeWorkout,setActiveWorkout]=useState<WorkoutSession|undefined>();
   const [workoutHistory,setWorkoutHistory]=useState<WorkoutSession[]>([]);
+  const [cardioHistory,setCardioHistory]=useState<CardioSession[]>([]);
+  const [cardioError,setCardioError]=useState("");
+  const reloadCardio=async()=>{
+    const all=await listEntities<CardioSession>("cardioSessions");
+    setCardioHistory(all);
+  };
+  useEffect(()=>{void reloadCardio().catch(err=>setCardioError(err instanceof Error?err.message:"Erro ao abrir o histórico de cardio."));},[]);
+  const saveCardio=async(record:CardioSession)=>{
+    await saveManualCardio(record);
+    await reloadCardio();
+  };
+  const removeCardio=async(id:string)=>{
+    await deleteManualCardio(id);
+    await reloadCardio();
+  };
   const [trainingError,setTrainingError]=useState("");
   const reloadTraining=async()=>{
     const all=await listEntities<WorkoutSession>("workoutSessions");
@@ -324,6 +339,7 @@ export default function App(){
           <button className="history-link" type="button" onClick={()=>go("history")}>
             <Clock3 size={18}/> Histórico de musculação <ArrowRight size={18}/>
           </button>
+          <CardioHighlights sessions={cardioHistory} onOpen={()=>go("run")}/>
           <div className="week-strip" aria-label="Escolha um dia da semana">{weekDates.map(({name,day:calendarDay},i)=><button type="button" key={name} onClick={()=>setDay(i)} className={day===i?"day-item selected":"day-item"} aria-pressed={day===i}><span>{name.toUpperCase()}</span><strong>{calendarDay}</strong><i/></button>)}</div>
           <section className="hero-card"><Photo src={photos.hero} alt="Ambiente de academia" className="hero-photo"/><div className="hero-shade"/><div className="hero-info"><div className="topchip"><Flame size={13}/> {PROGRAM_NAME.toUpperCase()} · VERSÃO 2.0</div><div className="hero-lower"><p>{selectedDay.weekday.toUpperCase()} / {selectedPlan?"MUSCULAÇÃO":"RECUPERAÇÃO"}</p><h2>{selectedDay.title}<span>.</span></h2><div className="hero-stats">{selectedPlan?<><span><Dumbbell size={14}/>{selectedPlan.exercises.length} exercícios</span><span><CheckCircle2 size={14}/>{selectedPlan.exercises.reduce((n,ex)=>n+ex.sets.filter(set=>set.kind==="working").length,0)} séries efetivas</span></>:<span><Activity size={14}/> Descanso / recuperação</span>}{selectedDay.cardio&&<span><Footprints size={14}/>{selectedDay.cardio.label}{selectedDay.cardio.minutes?" · "+selectedDay.cardio.minutes+" min":""}</span>}</div><button type="button" className="hero-cta" onClick={()=>openProgram(day)}>Ver programação do dia <ArrowRight size={20}/></button></div></div></section>
           <SectionHead title="Seu espaço" aside="Explorar treinos" onClick={()=>go("workouts")}/>
@@ -391,19 +407,21 @@ export default function App(){
           <div className="rest-screen"><div className="rest-kicker"><span>GYM / RECOVERY</span><span>DESCANSO</span></div><h1>{restLeft===0?"Pronto para a próxima.":"Respira. Recupera."}</h1><div className="timer-ring" style={{background:"conic-gradient(#ff712c "+((1-restLeft/Math.max(1,sessionEx.rest))*360)+"deg, #292a2e 0)"}}><div className="timer-center"><span>DESCANSO</span><strong aria-live="off">{fmtTime(restLeft)}</strong><small>{restLeft===0?"TEMPO CONCLUÍDO":restRunning?"CONTANDO...":"PAUSADO"}</small></div></div><div className="timer-actions"><button type="button" onClick={()=>setRestLeft(v=>Math.max(0,v-15))}>−15s</button><button type="button" className="timer-toggle" onClick={()=>setRestRunning(v=>!v)} aria-label={restRunning?"Pausar":"Continuar"}>{restRunning?<Pause fill="currentColor"/>:<Play fill="currentColor"/>}</button><button type="button" onClick={()=>setRestLeft(v=>Math.min(600,v+15))}>+15s</button></div><div className="next-set"><span>PRÓXIMO PASSO</span><strong>{sessionEx.name}</strong><small>Continue a simulação de séries</small></div><PrimaryButton onClick={()=>go("session")}>Voltar ao treino <ArrowRight size={18}/></PrimaryButton></div>
           <Notice>Contador demonstrativo: em segundo plano, o navegador pode suspender a contagem. Sincronização por horário real será implementada na Sprint 05.</Notice>
         </>}
-        {screen==="run"&&<>
-          <BackHeader label="CARDIO / CORRIDA" onBack={()=>go("workouts")}/>
-          <div className="run-hero"><Photo src={photos.running} alt="Pessoa correndo em esteira na academia"/><div><span>ENCONTRE SEU RITMO</span><h1>Corre no<br/>seu tempo<span>.</span></h1></div></div>
-          <SectionHead title="Sua atividade" aside="Prévia interativa"/>
-          <div className="segmented">{["Esteira","Ar livre"].map(mode=><button type="button" key={mode} className={runMode===mode?"active":""} aria-pressed={runMode===mode} onClick={()=>setRunMode(mode)}>{mode==="Esteira"?<Activity size={17}/>:<Footprints size={17}/>} {mode}</button>)}</div>
-          <div className="run-stats"><div className="run-input"><label htmlFor="minutes">DURAÇÃO <small>MIN</small></label><div className="run-input-row"><input id="minutes" type="number" min="0" max="999" step="1" inputMode="numeric" value={runMinutes} onChange={e=>setRunMinutes(Math.max(0,Math.min(999,Math.floor(Number(e.target.value)||0))))}/><Clock3 size={25}/></div></div><div className="run-input"><label htmlFor="distance">DISTÂNCIA <small>KM</small></label><div className="run-input-row"><input id="distance" type="number" min="0" max="500" step="0.1" inputMode="decimal" value={runDistance} onChange={e=>setRunDistance(Math.max(0,Math.min(500,Number(e.target.value)||0)))}/><Footprints size={25}/></div></div></div>
-          <div className="pace-card"><div><small>RITMO MÉDIO ESTIMADO</small><strong>{fmtPace(runMinutes,runDistance)}</strong><span>{runMode==="Esteira"?"Calculado para esteira":"Calculado para corrida externa"}</span></div><Activity size={40}/></div>
-          <Notice>Valores editáveis apenas para demonstração. Ainda não são registrados nem medidos por GPS ou Apple Watch.</Notice>
-          <PrimaryButton onClick={()=>viewShare("run")}>Criar card desta corrida <Share2 size={18}/></PrimaryButton>
-        </>}
+        {screen==="run"&&<CardioView sessions={cardioHistory}
+          suggestion={selectedDay.cardio?{
+            label:selectedDay.cardio.label,
+            minutes:selectedDay.cardio.minutes??null,
+            optional:selectedDay.cardio.optional??false,
+            note:selectedDay.cardio.note??""
+          }:undefined}
+          onBack={()=>go("workouts")} onSave={saveCardio} onDelete={removeCardio}/>}
         {screen==="progress"&&<>
           <Titlebar eyebrow="TUDO COMEÇA COM CONSTÂNCIA" title="Evolução." right={<button type="button" className="round-control" onClick={()=>viewShare("strength")} aria-label="Criar card"><Share2 size={19}/></button>}/>
           <p className="screen-lead">Um lugar para enxergar cada pequena conquista.</p>
+          <CardioHighlights sessions={cardioHistory} onOpen={()=>go("run")}/>
+          <button type="button" className="cardio-progress-entry" onClick={()=>go("run")}><Footprints size={17}/> Registrar corrida ou caminhada <ArrowRight size={17}/></button>
+          {cardioError&&<div className="editor-error" role="alert">{cardioError}</div>}
+          <SectionHead title="Gráficos de interface (demonstração)"/>
           <div className="data-warning"><Info size={16}/> GRÁFICOS ILUSTRATIVOS — NÃO SÃO SEUS RESULTADOS</div>
           <div className="progress-summary"><div><span>SESSÕES DE EXEMPLO</span><strong>12</strong><small><TrendingUp size={14}/> em três meses</small></div><div><span>CARGA ILUSTRATIVA</span><strong>42 <em>kg</em></strong><small><TrendingUp size={14}/> puxada alta</small></div></div>
           <div className="chart-panel"><div className="chart-head"><div><span className="eyebrow">PROGRESSÃO DE CARGA</span><h2>Puxada alta</h2></div><MoreHorizontal size={23}/></div><div className="periods">{["1 mês","3 meses","6 meses"].map(item=><button type="button" key={item} className={period===item?"active":""} onClick={()=>setPeriod(item)}>{item}</button>)}</div><div className="chart-shell"><div className="chart-y"><span>50</span><span>40</span><span>30</span><span>20</span></div><svg viewBox="0 0 310 190" aria-label="Gráfico ilustrativo de aumento de cargas"><defs><linearGradient id="area-gym" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#ff712c" stopOpacity=".28"/><stop offset="100%" stopColor="#ff712c" stopOpacity="0"/></linearGradient></defs>{[28,70,112,154].map(n=><line key={n} x1="0" x2="310" y1={n} y2={n} stroke="#393a3f" strokeWidth="1" strokeDasharray="2 7"/>)}<polygon points={period==="1 mês"?"0,150 60,141 120,125 180,111 240,92 310,83 310,190 0,190":period==="3 meses"?"0,169 62,150 124,139 186,115 248,100 310,74 310,190 0,190":"0,180 62,170 124,150 186,126 248,98 310,66 310,190 0,190"} fill="url(#area-gym)"/><polyline points={period==="1 mês"?"0,150 60,141 120,125 180,111 240,92 310,83":period==="3 meses"?"0,169 62,150 124,139 186,115 248,100 310,74":"0,180 62,170 124,150 186,126 248,98 310,66"} fill="none" stroke="#ff712c" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"/><circle cx="310" cy={period==="1 mês"?83:period==="3 meses"?74:66} r="7" fill="#ff712c" stroke="#101113" strokeWidth="3"/></svg></div><div className="chart-x"><span>INÍCIO</span><span>PERÍODO ILUSTRATIVO</span><span>AGORA</span></div></div>
@@ -427,7 +445,7 @@ export default function App(){
           storageState={storageState}
           storageError={storageError}
           flushSettings={flushSettings}
-          onRestored={value=>{setSettings(value);setStorageError("");setStorageState("saved");void loadProgram(false);void reloadTraining();}}
+          onRestored={value=>{setSettings(value);setStorageError("");setStorageState("saved");void loadProgram(false);void reloadTraining();void reloadCardio();}}
           onResetDemo={resetDemo}
         />}
       </main>
