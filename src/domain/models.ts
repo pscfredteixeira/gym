@@ -1,4 +1,4 @@
-/** Tipos iniciais. Persistência/validação entram na Sprint 02. */
+/** Modelo estável v1: a persistência IndexedDB é implementada na Sprint 02. */
 export type Id = string;
 export type LocalDate = string; // YYYY-MM-DD — não converter pelo timezone ao exibir.
 export type IsoInstant = string; // instante ISO em UTC.
@@ -98,8 +98,12 @@ export interface ImportBatch {
 export interface UserSettings {
   units: "metric" | "imperial";
   defaultRestSeconds: number;
-  shareHeartRateByDefault: false;
-  shareLocationByDefault: false;
+  shareHeartRateByDefault: boolean;
+  shareLocationByDefault: boolean;
+  displayName?: string;
+  personalGoal?: string;
+  largeText?: boolean;
+  reducedMotion?: boolean;
 }
 
 export interface GymBackup {
