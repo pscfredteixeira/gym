@@ -2,9 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import {
   Activity, ArrowDownToLine, ArrowRight, ArrowUpRight, BarChart3, BookOpen,
   CalendarDays, Check, CheckCircle2, ChevronLeft, ChevronRight, Clock3,
-  Dumbbell, Flame, Footprints, Heart, House, Info, Menu, Minus, MoreHorizontal,
-  Pause, Play, Plus, RotateCcw, Search, Settings2, Share2, ShieldCheck,
-  SlidersHorizontal, Sparkles, Target, TimerReset, TrendingUp, UserRound, X
+  Dumbbell, Flame, Footprints, House, Info, Minus, MoreHorizontal,
+  Pause, Play, Plus, RotateCcw, Search, Share2, ShieldCheck,
+  SlidersHorizontal, Sparkles, TimerReset, TrendingUp, UserRound, X
 } from "lucide-react";
 import { DemoLabel, Photo, Titlebar, SectionHead, BackHeader, PrimaryButton, Notice } from "./components/ui";
 import { exercises, mockWeights, mockReps, photos } from "./data/demo";
