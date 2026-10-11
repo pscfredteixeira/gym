@@ -4,7 +4,7 @@ Aplicativo web de musculação e corrida, pensado primeiro para iPhone: rápido 
 
 ## Situação do projeto
 
-**Sprint 00 — fundação técnica.** Este repositório contém a arquitetura, o modelo inicial de dados, o backlog e uma interface-base de navegação. **Ainda não é um registrador de treinos funcional.** A implementação das fichas começa nas sprints seguintes.
+**Sprint 01 — prévia visual navegável publicada.** O projeto contém dez telas para testar a experiência de musculação, corrida, evolução, biblioteca, perfil e cards sociais. **Os dados exibidos são fictícios e os registros não são persistidos.** A persistência e as fichas reais começam nas sprints seguintes.
 
 ## Tecnologia
 
@@ -36,7 +36,7 @@ npm run build
 ```text
 src/
   domain/          Modelos de domínio
-  App.tsx          Interface inicial
+  App.tsx          Dez telas de demonstração
   main.tsx         Bootstrap
   styles.css       Estilos responsivos
 docs/

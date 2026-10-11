@@ -48,4 +48,4 @@ Cada sprint possui uma entrega testável. Não iniciar outra etapa enquanto houv
 - [ ] Verificar abertura e instalação no iPhone.
 - [ ] Aceite visual da interface-base no aparelho.
 
-A Sprint 01 começa com a revisão visual do conceito aprovado e construção dos componentes definitivos.
+A Sprint 01 entregou uma prévia navegável com dez telas, biblioteca demonstrativa, timer visual, edição temporária de séries, corrida de exemplo, gráficos ilustrativos, exportação PNG de cards e ajustes de acessibilidade. O usuário ainda precisa aprovar o design no iPhone, antes da Sprint 02.

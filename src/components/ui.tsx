@@ -21,7 +21,7 @@ export function BackHeader({label,onBack,action}: {label:string;onBack:()=>void;
   return <div className="back-header"><button className="round-control" type="button" onClick={onBack} aria-label="Voltar"><ChevronLeft size={22}/></button><span>{label}</span>{action??<span className="back-action-gap" />}</div>;
 }
 
-export function PrimaryButton({children,onClick,disabled=false,secondary=false,icon=true}: {children:ReactNode;onClick:()=>void;disabled?:boolean;secondary?:boolean;icon?:boolean}) {
+export function PrimaryButton({children,onClick,disabled=false,secondary=false,icon=false}: {children:ReactNode;onClick:()=>void;disabled?:boolean;secondary?:boolean;icon?:boolean}) {
   return <button type="button" disabled={disabled} onClick={onClick} className={secondary?"action-button secondary":"action-button"}>{children}{icon && <ArrowUpRight size={19}/>}</button>;
 }
 export function Notice({children}: {children:ReactNode}) {

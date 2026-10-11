@@ -24,7 +24,11 @@ const navItems: { screen: Tab; label: string; icon: typeof House }[] = [
 const formats: Record<ShareFormat, [number, number]> = {
   story: [1080, 1920], feed: [1080, 1350], square: [1080, 1080]
 };
-const weekdays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+const weekdays = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
+const today = new Date();
+const todayIndex = (today.getDay()+6)%7;
+const monday = new Date(today.getFullYear(),today.getMonth(),today.getDate()-todayIndex);
+const weekDates = weekdays.map((name,i)=>({name,day:new Date(monday.getFullYear(),monday.getMonth(),monday.getDate()+i).getDate()}));
 const fmtTime = (seconds: number) => String(Math.floor(seconds / 60)).padStart(2, "0") + ":" + String(seconds % 60).padStart(2, "0");
 const fmtPace = (durationMinutes: number, distanceKm: number) => {
   if (distanceKm <= 0 || durationMinutes <= 0) return "—";
@@ -57,7 +61,8 @@ function downloadSampleCard(kind:ShareKind,format:ShareFormat,style:ShareStyle,d
   ctx.fillStyle=accent;ctx.fillRect(90,108,80,11);
   ctx.fillStyle=ink;ctx.font="900 65px system-ui, sans-serif";ctx.fillText("GYM.",90,210);
   ctx.fillStyle=muted;ctx.font="500 29px system-ui, sans-serif";ctx.fillText("EXEMPLO · DADOS FICTÍCIOS",90,275);
-  const middle=height*.46;
+  const isSquare=height===1080;
+  const middle=height*(isSquare?.34:.46);
   ctx.fillStyle=ink;ctx.font="800 55px system-ui, sans-serif";
   ctx.fillText(kind==="strength"?"TREINO CONCLUÍDO":"CORRIDA DE HOJE",90,middle-130);
   ctx.fillStyle=accent;ctx.font="900 140px system-ui, sans-serif";
@@ -66,7 +71,8 @@ function downloadSampleCard(kind:ShareKind,format:ShareFormat,style:ShareStyle,d
   ctx.fillText(kind==="strength"?"+ BÍCEPS":"NO SEU RITMO",90,middle+80);
   ctx.strokeStyle=muted;ctx.globalAlpha=.4;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(90,middle+155);ctx.lineTo(width-90,middle+155);ctx.stroke();ctx.globalAlpha=1;
   const lines=kind==="strength"?[["DURAÇÃO","55 MIN"],["EXERCÍCIOS","5"],["SÉRIES","11"]]:[["TEMPO",duration+" MIN"],["RITMO",fmtPace(duration,distance)],["TIPO","ESTEIRA"]];
-  lines.forEach(([label,value],i)=>{const y=middle+235+i*133;ctx.fillStyle=muted;ctx.font="600 27px system-ui, sans-serif";ctx.fillText(label,92,y);ctx.fillStyle=ink;ctx.font="800 64px system-ui, sans-serif";ctx.fillText(value,90,y+68);});
+  const visibleLines=isSquare?lines.slice(0,2):lines;
+  visibleLines.forEach(([label,value],i)=>{const y=middle+235+i*133;ctx.fillStyle=muted;ctx.font="600 27px system-ui, sans-serif";ctx.fillText(label,92,y);ctx.fillStyle=ink;ctx.font="800 64px system-ui, sans-serif";ctx.fillText(value,90,y+68);});
   if(showHr){ctx.fillStyle=muted;ctx.font="500 26px system-ui, sans-serif";ctx.fillText("Frequência cardíaca não informada",90,height-230);}
   ctx.fillStyle=muted;ctx.font="500 28px system-ui, sans-serif";ctx.fillText("Movimento é progresso.",90,height-115);
   canvas.toBlob(blob=>{
@@ -99,7 +105,7 @@ export default function App(){
   const [exportStatus,setExportStatus]=useState("");
   const [largeText,setLargeText]=useState(false);
   const [reducedMotion,setReducedMotion]=useState(false);
-  const [day,setDay]=useState(2);
+  const [day,setDay]=useState(todayIndex);
 
   useEffect(()=>{
     if(screen!=="rest" || !restRunning || restLeft<=0) return;
@@ -143,7 +149,7 @@ export default function App(){
       <main className="app-main" id="main-content">
         {screen==="home"&&<>
           <section className="greeting"><p className="eyebrow">SEU ESPAÇO DE MOVIMENTO</p><div className="heading-line"><h1>Vamos treinar<span className="orange">.</span></h1><span className="date-mark"><CalendarDays size={15}/> HOJE</span></div><p>Um passo de cada vez. Seu ritmo, suas conquistas.</p></section>
-          <div className="week-strip" aria-label="Escolha um dia da semana">{weekdays.slice(1).concat(weekdays[0]).map((name,i)=><button type="button" key={name} onClick={()=>setDay(i)} className={day===i?"day-item selected":"day-item"} aria-pressed={day===i}><span>{name.toUpperCase()}</span><strong>{12+i}</strong><i/></button>)}</div>
+          <div className="week-strip" aria-label="Escolha um dia da semana">{weekDates.map(({name,day:calendarDay},i)=><button type="button" key={name} onClick={()=>setDay(i)} className={day===i?"day-item selected":"day-item"} aria-pressed={day===i}><span>{name.toUpperCase()}</span><strong>{calendarDay}</strong><i/></button>)}</div>
           <section className="hero-card"><Photo src={photos.hero} alt="Atleta treinando com barra em academia" className="hero-photo"/><div className="hero-shade"/><div className="hero-info"><div className="topchip"><Flame size={13}/> TREINO DE DEMONSTRAÇÃO</div><div className="hero-lower"><p>FORÇA / DIA A</p><h2>Costas &<br/>bíceps<span>.</span></h2><div className="hero-stats"><span><Dumbbell size={14}/> 5 exercícios</span><span><Clock3 size={14}/> ~55 min</span></div><button type="button" className="hero-cta" onClick={startDemo}>Começar prévia <ArrowRight size={20}/></button></div></div></section>
           <SectionHead title="Seu espaço" aside="Explorar treinos" onClick={()=>go("workouts")}/>
           <div className="home-cards"><button className="feature-mini" type="button" onClick={()=>go("run")}><div className="feature-icon"><Footprints size={24}/></div><small>CARDIO</small><h3>Corrida & esteira</h3><p>Ritmo, distância e tempo</p><ArrowUpRight className="corner-arrow" size={18}/></button><button className="feature-mini" type="button" onClick={()=>go("progress")}><div className="feature-icon"><TrendingUp size={24}/></div><small>RESULTADOS</small><h3>Sua evolução</h3><p>Gráficos e recordes</p><ArrowUpRight className="corner-arrow" size={18}/></button></div>
@@ -177,7 +183,7 @@ export default function App(){
           <SectionHead title="Como executar" aside="Orientações gerais"/>
           <div className="steps">{sessionEx.cues.map((cue,i)=><div className="step" key={cue}><span>{String(i+1).padStart(2,"0")}</span><p>{cue}</p></div>)}</div>
           <Notice>Orientações gerais, não substituem avaliação individualizada. Imagens de execução serão ampliadas na Sprint 06.</Notice>
-          <div className="bottom-actions"><PrimaryButton onClick={startDemo}>Ver no treino <ArrowRight size={18}/></PrimaryButton><div className="stepper"><button type="button" aria-label="Exercício anterior" onClick={()=>setExerciseIndex((exerciseIndex+exercises.length-1)%exercises.length)}><ChevronLeft/></button><span>Outro exercício</span><button type="button" aria-label="Próximo exercício" onClick={()=>setExerciseIndex((exerciseIndex+1)%exercises.length)}><ChevronRight/></button></div></div>
+          <div className="bottom-actions"><PrimaryButton onClick={()=>{setSetIndex(0);go("session");}}>Ver no treino <ArrowRight size={18}/></PrimaryButton><div className="stepper"><button type="button" aria-label="Exercício anterior" onClick={()=>setExerciseIndex((exerciseIndex+exercises.length-1)%exercises.length)}><ChevronLeft/></button><span>Outro exercício</span><button type="button" aria-label="Próximo exercício" onClick={()=>setExerciseIndex((exerciseIndex+1)%exercises.length)}><ChevronRight/></button></div></div>
         </>}
         {screen==="session"&&<>
           <BackHeader label="MODO ACADEMIA · DEMONSTRAÇÃO" onBack={()=>go("workouts")} action={<span className="session-progress">{completedCount}/{plannedTotal}</span>}/>
