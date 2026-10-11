@@ -18,7 +18,7 @@ export function estimateExercisePhotoSize(dataUrl:string):number {
 }
 
 export async function prepareExercisePhoto(file:File):Promise<string> {
-  if(!file.type.startsWith("image/"))
+  if(!file.type.startsWith("image/")&&!/\.(?:heic|heif|jpe?g|png|webp|avif)$/i.test(file.name))
     throw new Error("Selecione uma imagem da sua galeria (JPG, PNG ou HEIC compatível).");
   if(file.size>MAX_SOURCE_PHOTO_BYTES)
     throw new Error("A foto original é muito grande. Escolha uma imagem menor que 20 MB.");

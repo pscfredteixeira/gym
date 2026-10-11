@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { guideFor, matchingAlternatives } from "../../data/exerciseGuides";
+import { ExercisePhoto } from "../library/ExercisePhoto";
 import { ArrowDown, ArrowUp, Check, ChevronDown, Copy, Dumbbell, Info, Plus, Save, Search, Trash2, X } from "lucide-react";
 import type { Exercise, PlannedSet, WorkoutPlan } from "../../domain/models";
 import { validateWorkoutPlan } from "../../data/validation";
@@ -97,6 +98,7 @@ export default function PlanEditor({initial,catalog,units,onSave,onDelete,onCanc
         return <article className="editor-exercise" key={item.id}>
           <div className="editor-exercise-head">
             <span className="editor-number">{String(index+1).padStart(2,"0")}</span>
+            {ex&&<ExercisePhoto compact exercise={ex}/>}
             <div><strong>{ex?.name??"Exercício não encontrado"}</strong><small>{ex?.primaryMuscle??""}{ex?.equipment?" · "+ex.equipment:""}</small></div>
             <div className="editor-arrange">
               <button type="button" title="Mover para cima" aria-label={"Mover "+(ex?.name??"exercício")+" para cima"} disabled={index===0} onClick={()=>update(moveRow(draft,index,-1))}><ArrowUp size={17}/></button>
