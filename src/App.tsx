@@ -2,11 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import {
   Activity, ArrowDownToLine, ArrowRight, ArrowUpRight, BarChart3, BookOpen,
   CalendarDays, Check, CheckCircle2, ChevronLeft, ChevronRight, Clock3,
-  Dumbbell, Flame, Footprints, House, Info, Minus, MoreHorizontal,
+  Dumbbell, Flame, Footprints, House, Info, Minus,
   Pause, Play, Plus, RotateCcw, Share2, ShieldCheck,
   Sparkles, TrendingUp, UserRound, X
 } from "lucide-react";
-import { DemoLabel, Photo, Titlebar, SectionHead, BackHeader, PrimaryButton, Notice } from "./components/ui";
+import { DemoLabel, Photo, SectionHead, BackHeader, PrimaryButton, Notice } from "./components/ui";
 import { exercises, mockWeights, mockReps, photos } from "./data/demo";
 import ProfilePanel, { type StorageState } from "./features/profile/ProfilePanel";
 import { DEFAULT_SETTINGS } from "./data/validation";
@@ -96,7 +96,7 @@ function downloadSampleCard(kind:ShareKind,format:ShareFormat,style:ShareStyle,d
   },"image/png");
 }
 export default function App(){
-  const [screen,setScreen]=useState<Screen>(()=>new URLSearchParams(window.location.search).get("tab")==="library"?"library":new URLSearchParams(window.location.search).get("tab")==="cardio"?"run":"home");
+  const [screen,setScreen]=useState<Screen>(()=>new URLSearchParams(window.location.search).get("tab")==="library"?"library":new URLSearchParams(window.location.search).get("tab")==="cardio"?"run":new URLSearchParams(window.location.search).get("tab")==="progress"?"progress":"home");
   const [exerciseIndex,setExerciseIndex]=useState(0);
   const [setIndex,setSetIndex]=useState(0);
   const [completed,setCompleted]=useState<Record<string,boolean>>({});
