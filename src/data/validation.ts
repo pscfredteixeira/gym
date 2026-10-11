@@ -109,3 +109,20 @@ export function validateGymBackup(value: unknown): GymBackup {
   };
   return output;
 }
+
+/** Validations for atomic writes from the mobile plan editor. */
+export function validateWorkoutPlan(value: unknown): void {
+  if (!plan(value)) throw new Error("Ficha inválida. Confira nome, exercícios, séries e descanso.");
+  const p=value as { exercises: {id:string;sets:{id:string}[];restSeconds:number}[] };
+  const seen=new Set<string>();
+  for(const ex of p.exercises){
+    if (seen.has(ex.id))throw new Error("Há exercícios duplicados com o mesmo identificador.");
+    seen.add(ex.id);
+    if(ex.restSeconds>3600) throw new Error("O descanso não pode ultrapassar 3600 segundos.");
+    const series=new Set<string>();
+    for(const set of ex.sets){if(series.has(set.id))throw new Error("Séries duplicadas no mesmo exercício.");series.add(set.id);}
+  }
+}
+export function validateCustomExercise(value: unknown): void {
+  if(!exercise(value)) throw new Error("Exercício inválido. Confira nome, grupo muscular e equipamento.");
+}

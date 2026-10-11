@@ -148,3 +148,26 @@ export async function restoreBackup(raw:unknown):Promise<UserSettings>{
   });
   return backup.settings;
 }
+
+/** Saves a plan and its newly-created exercise definitions in a single transaction.
+ * Training history is never opened, rewritten or deleted by this operation. */
+export async function savePlanWithExercises(plan:WorkoutPlan, additions:Exercise[]):Promise<void> {
+  const { validateWorkoutPlan, validateCustomExercise } = await import("./validation.ts");
+  validateWorkoutPlan(plan);
+  for(const ex of additions) validateCustomExercise(ex);
+  const ids=new Set(additions.map(x=>x.id));
+  if (ids.size!==additions.length) throw new Error("Exercícios novos possuem IDs repetidos.");
+  const db=await openDb();
+  await new Promise<void>((resolve,reject)=>{
+    try{
+      const tx=db.transaction(["plans","exercises"],"readwrite");
+      for(const ex of additions){
+        tx.objectStore("exercises").put(ex);
+      }
+      tx.objectStore("plans").put(plan);
+      tx.oncomplete=()=>resolve();
+      tx.onerror=()=>reject(tx.error??new Error("Não foi possível salvar a ficha."));
+      tx.onabort=()=>reject(tx.error??new Error("Salvamento cancelado, dados anteriores preservados."));
+    }catch(error){reject(error);}
+  });
+}
