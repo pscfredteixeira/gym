@@ -128,3 +128,27 @@ jobs:
             exit 1
           fi
           echo "PASSOU: tela de cardio e formulário real renderizados no GitHub Pages"
+
+      - name: Testar evolução real no navegador
+        shell: bash
+        run: |
+          set -euo pipefail
+          BROWSER="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$BROWSER" ]; then
+            echo "::error::Navegador não encontrado"
+            exit 1
+          fi
+          timeout 65 "$BROWSER" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --virtual-time-budget=18000 --dump-dom "https://pscfredteixeira.github.io/gym/?tab=progress&browser_check=${GITHUB_SHA}" > /tmp/gym-progress.html 2> /tmp/gym-progress.log || {
+            tail -n 40 /tmp/gym-progress.log; exit 1
+          }
+          if ! grep -q "SEU HISTÓRICO. SEM SIMULAÇÕES." /tmp/gym-progress.html || ! grep -q "Progressão de carga" /tmp/gym-progress.html; then
+            echo "::error::A tela de evolução real não renderizou"
+            head -c 2000 /tmp/gym-progress.html || true
+            tail -n 50 /tmp/gym-progress.log || true
+            exit 1
+          fi
+          if grep -q "GRÁFICOS ILUSTRATIVOS — NÃO SÃO SEUS RESULTADOS" /tmp/gym-progress.html; then
+            echo "::error::Gráficos fictícios foram renderizados na aba Evolução"
+            exit 1
+          fi
+          echo "PASSOU: evolução real renderizada no GitHub Pages sem gráficos fictícios"
