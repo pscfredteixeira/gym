@@ -96,7 +96,9 @@ test("old session cannot be edited; another workout can be abandoned with histor
 test("backup rejects inconsistent links and restores all real workouts",async()=>{
   const original=await createBackup();
   const wrong=structuredClone(original);
-  wrong.workoutSessions[0].exercises[0].sets[0].plannedSetId="nonexistent-series";
+  const completed=wrong.workoutSessions.find(s=>s.status==="completed");
+  assert.ok(completed);
+  completed.exercises[0].sets[0].plannedSetId="nonexistent-series";
   await assert.rejects(()=>restoreBackup(wrong),/Série não pertence/);
   assert.equal((await listEntities("workoutSessions")).length,2);
   await restoreBackup(original);
