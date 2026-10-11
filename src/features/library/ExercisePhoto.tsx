@@ -4,7 +4,7 @@ import type { Exercise } from "../../domain/models";
 import { isExerciseImageUrl, prepareExercisePhoto } from "./exerciseImages";
 
 export function ExercisePhoto({exercise,compact=false}:{
-  exercise:Pick<Exercise,"name"|"imageUrl">;compact?:boolean
+  exercise:Pick<Exercise,"name"|"imageUrl"|"imageAuthor"|"imageSourceUrl"|"imageLicense">;compact?:boolean
 }) {
   const [failed,setFailed]=useState(false);
   useEffect(()=>setFailed(false),[exercise.imageUrl]);
@@ -16,10 +16,14 @@ export function ExercisePhoto({exercise,compact=false}:{
   return <div className={"gym-exercise-photo "+(show?"has-photo":"empty")}>
     {show?<img src={src} alt={"Imagem demonstrativa cadastrada para "+exercise.name} onError={()=>setFailed(true)}/>:
       <div className="gym-exercise-photo-missing"><ImageIcon size={39}/>
-        <strong>Sem imagem demonstrativa</strong>
-        <span>Adicione uma foto da máquina ou do movimento para reconhecê-lo no treino.</span>
+        <strong>{src?"Imagem não carregou":"Foto ainda não cadastrada"}</strong>
+        <span>{src?"O endereço pode estar indisponível. Escolha outra imagem abaixo.":"Veja sugestões de fotos livres ou adicione uma imagem da sua galeria."}</span>
       </div>}
     {show&&<span className="gym-exercise-photo-tag">IMAGEM CADASTRADA</span>}
+    {show&&exercise.imageSourceUrl&&<div className="gym-exercise-photo-attribution">
+      <span>{exercise.imageLicense??"Licença na fonte"} · {exercise.imageAuthor??"Wikimedia Commons"}</span>
+      <a href={exercise.imageSourceUrl} target="_blank" rel="noopener noreferrer">Fonte e licença</a>
+    </div>}
   </div>;
 }
 

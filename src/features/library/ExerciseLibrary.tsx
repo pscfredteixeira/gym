@@ -3,6 +3,8 @@ import { ArrowRight, BookOpen, ChevronRight, Dumbbell, Info, ListFilter, RotateC
 import type { Exercise, WorkoutPlan } from "../../domain/models";
 import { BackHeader, Notice, SectionHead } from "../../components/ui";
 import { ExercisePhoto, ExercisePhotoEditor } from "./ExercisePhoto";
+import { CommonsPhotoPicker } from "./CommonsPhotoPicker";
+import type { CommonsPhoto } from "./commonsPhotos";
 import { guideFor, matchingAlternatives, searchExercises, usedInPlans } from "../../data/exerciseGuides";
 
 const MUSCLES=["Todos","Dorsais","Costas superiores","Peito","Ombros","Trapézio","Bíceps","Tríceps","Quadríceps","Posterior de coxa","Panturrilhas","Abdômen"];
@@ -118,7 +120,7 @@ export function ExerciseDetails({
   exercise:Exercise|undefined;catalog:Exercise[];plans:WorkoutPlan[];
   onBack:()=>void;onOpen:(id:string)=>void;
   onReplace:(planId:string,rowId:string,replacement:Exercise)=>Promise<void>;
-  onSaveImage:(exerciseId:string,imageUrl:string|undefined)=>Promise<void>;
+  onSaveImage:(exerciseId:string,imageUrl:string|undefined,meta?:Pick<Exercise,"imageSourceUrl"|"imageAuthor"|"imageLicense">)=>Promise<void>;
 }){
   const [selectedPlan,setSelectedPlan]=useState("");
   const [selectedRow,setSelectedRow]=useState("");
@@ -148,6 +150,7 @@ export function ExerciseDetails({
     </div>
     <ExercisePhoto exercise={exercise}/>
     <ExercisePhotoEditor exercise={exercise} onSave={imageUrl=>onSaveImage(exercise.id,imageUrl)}/>
+    <CommonsPhotoPicker exercise={exercise} onChoose={(photo:CommonsPhoto)=>onSaveImage(exercise.id,photo.url,{imageSourceUrl:photo.source,imageAuthor:photo.author,imageLicense:photo.license})}/>
     <MuscleMap primaryMuscle={exercise.primaryMuscle}/>
     <SectionHead title="Como executar" aside={guide?"3 etapas":"Guia indisponível"}/>
     {guide?<div className="atlas-steps">{guide.execution.map((step,i)=><div key={step}><span>{String(i+1).padStart(2,"0")}</span><p>{step}</p></div>)}</div>:

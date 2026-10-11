@@ -283,13 +283,15 @@ export default function App(){
   const openExerciseInfo=(id:string,from:"library"|"program"="library")=>{
     setSelectedLibraryId(id);setLibraryReturn(from);go("exercise-info");
   };
-  const saveExerciseImage=async(id:string,imageUrl:string|undefined)=>{
+  const saveExerciseImage=async(id:string,imageUrl:string|undefined,meta?:Pick<Exercise,"imageSourceUrl"|"imageAuthor"|"imageLicense">)=>{
     if(imageUrl!==undefined&&!isExerciseImageUrl(imageUrl))
       throw new Error("Imagem inválida ou maior que o limite de armazenamento.");
     const exercise=catalogExercises.find(item=>item.id===id);
     if(!exercise)throw new Error("Este exercício não foi encontrado.");
-    await saveEntity("exercises",{...exercise,imageUrl});
-    setCatalogExercises(items=>items.map(item=>item.id===id?{...item,imageUrl}:item));
+    const updated={...exercise,imageUrl,
+      imageSourceUrl:meta?.imageSourceUrl,imageAuthor:meta?.imageAuthor,imageLicense:meta?.imageLicense};
+    await saveEntity("exercises",updated);
+    setCatalogExercises(items=>items.map(item=>item.id===id?updated:item));
   };
   const replaceExerciseInPlan=async(planId:string,rowId:string,replacement:Exercise)=>{
     const plan=savedPlans.find(p=>p.id===planId);
