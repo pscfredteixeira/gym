@@ -1,5 +1,5 @@
 import type { UserSettings, WorkoutPlan, ScheduledCardio } from "../../domain/models";
-import { PROGRAM_DAYS, planId, type ProgramDay } from "../../data/program1010";
+import { PROGRAM_DAYS, planId, type ProgramDay } from "../../data/program1010.ts";
 
 export const defaultWeeklyPlanIds = ():Array<string|null> =>
   PROGRAM_DAYS.map(d=>d.exercises.length>0?planId(d.id):null);
