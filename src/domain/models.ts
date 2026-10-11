@@ -4,7 +4,7 @@ export type LocalDate = string; // YYYY-MM-DD — não converter pelo timezone a
 export type IsoInstant = string; // instante ISO em UTC.
 export type SetKind = "warmup" | "working";
 export type SessionStatus = "in_progress" | "completed" | "abandoned";
-export type CardioKind = "treadmill" | "outdoor_run" | "other";
+export type CardioKind = "treadmill" | "outdoor_run" | "walk" | "other";
 
 export interface Exercise {
   id: Id;
@@ -86,6 +86,8 @@ export interface WorkoutSession {
 export interface CardioSession {
   id: Id;
   kind: CardioKind;
+  /** Optional description for custom cardio, such as cycling. */
+  activityName?: string;
   localDate: LocalDate;
   startedAt?: IsoInstant;
   durationSeconds: number;

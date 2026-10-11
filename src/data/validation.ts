@@ -87,7 +87,7 @@ const session = (v: unknown) => record(v) && id(v.id) && date(v.localDate) && is
   Array.isArray(v.exercises) && v.exercises.every(sessionExercise) &&
   (v.endedAt === undefined || Date.parse(v.endedAt as string)>=Date.parse(v.startedAt as string));
 const cardio = (v: unknown) => record(v) && id(v.id) && date(v.localDate) &&
-  typed(v.kind,["treadmill","outdoor_run","other"]) && count(v.durationSeconds) &&
+  typed(v.kind,["treadmill","outdoor_run","walk","other"]) && optional(v.activityName,n=>text(n,100)) && count(v.durationSeconds) &&
   optional(v.startedAt,iso) && optional(v.distanceMeters,number) && optional(v.inclinePercent,number) &&
   optional(v.averageHeartRateBpm,number) && optional(v.notes,n=>text(n,3000)) &&
   typed(v.source,["manual","health_import"]) && optional(v.importBatchId,id);
@@ -166,4 +166,15 @@ export function validateWorkoutSession(value:unknown):void {
       }
     }
   }
+}
+
+/** Validate a single cardio record before any IndexedDB mutation. */
+export function validateCardioSession(value:unknown):void {
+  if(!cardio(value)) throw new Error("Registro de cardio inválido: confira os campos informados.");
+  const c=value as {durationSeconds:number;distanceMeters?:number;inclinePercent?:number;averageHeartRateBpm?:number;activityName?:string;kind:string};
+  if(c.durationSeconds>604800)throw new Error("A duração não pode ultrapassar sete dias.");
+  if(c.distanceMeters!==undefined&&c.distanceMeters>1000000)throw new Error("A distância informada está acima do limite.");
+  if(c.inclinePercent!==undefined&&c.inclinePercent>30)throw new Error("Inclinação deve estar entre 0 e 30%.");
+  if(c.averageHeartRateBpm!==undefined&&(c.averageHeartRateBpm<20||c.averageHeartRateBpm>250))throw new Error("Frequência cardíaca fora do intervalo permitido.");
+  if(c.kind==="other"&&!c.activityName?.trim())throw new Error("Dê um nome para a atividade personalizada.");
 }
