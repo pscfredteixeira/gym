@@ -128,7 +128,7 @@ export function ProgramDayDetail({
       {" "}Ao iniciar, a sessão registra uma cópia da ficha, preservada mesmo se você editar os exercícios depois.
     </Notice>
     {trainingError&&<div className="editor-error" role="alert">{trainingError}</div>}
-    {rows.length>0&&<div className="program-preview-action"><PrimaryButton onClick={activeWorkout?onResume:onStart}>
+    {plan&&rows.length>0&&<div className="program-preview-action"><PrimaryButton onClick={activeWorkout?onResume:onStart}>
       {activeWorkout?"Retomar treino em andamento":"Iniciar treino real"} <ArrowRight size={17}/>
     </PrimaryButton><small>{activeWorkout?"Há uma sessão aberta; conclua ou interrompa antes de iniciar outra.":"Suas séries, cargas e repetições serão salvas no histórico."}</small></div>}
   </>;
