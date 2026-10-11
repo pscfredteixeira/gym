@@ -93,7 +93,7 @@ function downloadSampleCard(kind:ShareKind,format:ShareFormat,style:ShareStyle,d
   },"image/png");
 }
 export default function App(){
-  const [screen,setScreen]=useState<Screen>("home");
+  const [screen,setScreen]=useState<Screen>(()=>new URLSearchParams(window.location.search).get("tab")==="library"?"library":"home");
   const [exerciseIndex,setExerciseIndex]=useState(0);
   const [setIndex,setSetIndex]=useState(0);
   const [completed,setCompleted]=useState<Record<string,boolean>>({});

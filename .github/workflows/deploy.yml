@@ -88,3 +88,23 @@ jobs:
             exit 1
           fi
           echo "PASSOU: tela inicial do React renderizada em um navegador real"
+
+      - name: Testar biblioteca real no navegador
+        shell: bash
+        run: |
+          set -euo pipefail
+          BROWSER="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$BROWSER" ]; then
+            echo "::error::Navegador não encontrado"
+            exit 1
+          fi
+          timeout 65 "$BROWSER" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --virtual-time-budget=18000 --dump-dom "https://pscfredteixeira.github.io/gym/?tab=library&browser_check=${GITHUB_SHA}" > /tmp/gym-atlas.html 2> /tmp/gym-atlas.log || {
+            tail -n 40 /tmp/gym-atlas.log; exit 1
+          }
+          if ! grep -q "Conheça cada" /tmp/gym-atlas.html || ! grep -q "Puxada neutra" /tmp/gym-atlas.html; then
+            echo "::error::A biblioteca não renderizou os exercícios do Programa 10/10"
+            head -c 2500 /tmp/gym-atlas.html || true
+            tail -n 55 /tmp/gym-atlas.log || true
+            exit 1
+          fi
+          echo "PASSOU: biblioteca e exercícios reais disponíveis no GitHub Pages"
