@@ -171,7 +171,7 @@ export function LiveWorkout({
     <div className="live-exercise-heading"><span className="eyebrow">EXERCÍCIO {exerciseIndex+1} / {session.exercises.length}</span>
       <div className="gym-live-exercise-title"><ExercisePhoto compact exercise={{name:ex.exerciseNameSnapshot,imageUrl:catalog.find(item=>item.id===ex.exerciseId)?.imageUrl}}/><h2>{ex.exerciseNameSnapshot}</h2></div>
       {catalog.find(item=>item.id===ex.exerciseId)?.imageUrl&&<details className="gym-live-full-photo"><summary>Ver foto demonstrativa do exercício</summary>
-        <ExercisePhoto exercise={{name:ex.exerciseNameSnapshot,imageUrl:catalog.find(item=>item.id===ex.exerciseId)?.imageUrl}}/>
+        <ExercisePhoto exercise={{name:ex.exerciseNameSnapshot,imageUrl:catalog.find(item=>item.id===ex.exerciseId)?.imageUrl,imageSourceUrl:catalog.find(item=>item.id===ex.exerciseId)?.imageSourceUrl,imageAuthor:catalog.find(item=>item.id===ex.exerciseId)?.imageAuthor,imageLicense:catalog.find(item=>item.id===ex.exerciseId)?.imageLicense}}/>
       </details>}
       <p>{ex.plannedSetsSnapshot.length} séries planejadas · {ex.restSecondsSnapshot?"Descanso "+ex.restSecondsSnapshot+"s":"Descanso padrão do Perfil"}</p>
       {ex.notes&&<p className="live-prescription-note">{ex.notes}</p>}
