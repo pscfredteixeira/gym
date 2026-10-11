@@ -682,3 +682,61 @@ input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-ou
  .active-training-banner{padding:11px;gap:9px}
  .active-training-icon{height:42px;width:42px}
 }
+
+
+/* Sprint 05 — Focused gym-mode UI, accessible 44px rest controls */
+.live-mode-switch{display:grid;grid-template-columns:1fr 1fr;gap:5px;border:1px solid #373b40;background:#16181a;border-radius:13px;padding:5px;margin:13px 0 12px}
+.live-mode-switch button{display:flex;align-items:center;justify-content:center;gap:8px;min-height:44px;border:0;border-radius:9px;color:#a8abaf;background:transparent;font-size:12px;font-weight:800}
+.live-mode-switch button.active{background:#36261d;color:#ffb486;border:1px solid #714730}
+.live-focus-mode .live-heading{padding-bottom:10px}
+.live-focus-mode .live-heading h1{font-size:clamp(26px,6.5vw,35px);margin:6px 0 10px}
+.live-focus-mode .live-summary{margin:7px 0 10px}
+.live-focus-mode .live-exercise-nav{margin-bottom:4px;padding-bottom:9px}
+.live-focus-mode .live-exercise-nav button{min-height:68px;flex-basis:123px;padding:9px}
+.live-focus-mode .live-exercise-heading{margin:6px 0 11px}
+.live-focus-mode .live-exercise-heading h2{font-size:22px;margin:5px 0}
+.live-rest-panel{border:1px solid #8b532f;background:linear-gradient(120deg,#402718,#221c1a);border-radius:14px;padding:14px;margin:13px 0 12px}
+.live-rest-panel.finished{background:#193021;border-color:#466c4c}
+.live-rest-main{display:flex;align-items:center;gap:10px}
+.live-rest-icon{display:grid;place-items:center;flex:0 0 auto;width:42px;height:42px;background:#603b24;color:#ffae77;border-radius:10px}
+.live-rest-panel.finished .live-rest-icon{background:#2b5034;color:#9ee0ae}
+.live-rest-copy{min-width:0;flex:1}
+.live-rest-copy strong{font-size:14px;display:block;line-height:1.25}
+.live-rest-copy small{font-size:10px;color:#d5b59e;display:block;margin-top:4px;line-height:1.3}
+.live-rest-panel.finished .live-rest-copy small{color:#b1d6b9}
+.live-rest-clock{font-variant-numeric:tabular-nums;font-size:clamp(25px,8vw,36px);letter-spacing:-1px;font-weight:900;color:#ffb486;white-space:nowrap}
+.live-rest-panel.finished .live-rest-clock{color:#a1e3ae}
+.live-rest-actions{display:grid;grid-template-columns:1fr 1.4fr 1fr 1.2fr;gap:6px;margin-top:12px}
+.live-rest-actions button{display:flex;justify-content:center;align-items:center;gap:3px;min-width:0;min-height:46px;border-radius:9px;padding:7px 4px;font-size:11px;font-weight:830;background:#352b26;color:#f9e5d8;border:1px solid #74513d}
+.live-rest-actions button:disabled{opacity:.4}
+.live-rest-actions .live-rest-toggle{background:var(--orange);color:#211207;border-color:var(--orange)}
+.live-rest-actions .live-rest-skip{background:#272729;color:#faf6f1;border-color:#515153}
+.live-last-collapsible{margin:12px 0;border:1px solid #303337;border-radius:11px;background:#191c1e}
+.live-last-collapsible summary{display:flex;align-items:center;gap:9px;cursor:pointer;min-height:45px;padding:10px 12px;color:#bac4bb;font-size:11px;font-weight:760}
+.live-last-collapsible summary svg:first-child{color:#8dd59b}
+.live-last-collapsible summary svg:last-child{margin-left:auto}
+.live-last-collapsible .last-performance{margin:0 10px 10px;border-radius:8px}
+.focus-step-selector{display:flex;align-items:center;gap:8px;overflow-x:auto;margin:14px 0 9px;padding:2px 0 5px}
+.focus-step-selector button{flex:0 0 auto;display:grid;place-items:center;min-width:48px;height:48px;border-radius:11px;border:1px solid #525357;background:#202326;color:#efefef;font-size:14px;font-weight:840}
+.focus-step-selector button.active{border:2px solid var(--orange);color:#ffac78;background:#40291e}
+.focus-step-selector button.saved{color:#90dda4;background:#203b2a;border-color:#487452}
+.focus-step-selector button.active.saved{outline:2px solid var(--orange);outline-offset:1px}
+.live-focus-mode .live-sets{margin-top:0}
+.live-focus-mode .live-set{padding:17px}
+.live-focus-mode .live-set-fields{margin-top:16px}
+.live-focus-mode .live-set-fields input{min-height:58px;font-size:clamp(19px,5vw,26px)}
+.live-focus-mode .live-save-series{min-height:58px;font-size:15px}
+.live-focus-navigation{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:14px 0 6px}
+.live-focus-navigation button{display:flex;align-items:center;justify-content:center;gap:5px;border:1px solid #44474c;border-radius:10px;min-height:48px;padding:9px 11px;background:#282a2d;color:#f3f3f3;font-size:12px;font-weight:770}
+.live-focus-navigation button:disabled{opacity:.3}
+.live-focus-navigation span{font-size:10px;color:var(--muted);text-align:center;flex:1}
+.live-focus-mode .live-tip{margin-top:8px;font-size:11px}
+@media(max-width:380px){
+ .live-rest-actions{gap:4px}
+ .live-rest-actions button{font-size:10px;gap:2px}
+ .live-rest-actions button svg{width:13px;height:13px}
+ .live-rest-panel{padding:11px}
+ .live-rest-icon{width:36px;height:36px}
+ .live-rest-clock{font-size:26px}
+ .live-focus-navigation span{font-size:9px}
+}
