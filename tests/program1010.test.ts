@@ -1,4 +1,6 @@
 import "fake-indexeddb/auto";
+// Provide the browser global for local IndexedDB integration tests.
+(globalThis as typeof globalThis & { window: typeof globalThis }).window = globalThis;
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
