@@ -79,13 +79,13 @@ export function ProgramDayDetail({
       key:item.id,
       name:catalogMap.get(item.exerciseId)?.name??matched?.name??"Exercício personalizado",
       sets:item.sets.map(s=>({
-        key:s.id,min:s.minReps,max:s.maxReps,rirMin:s.targetRir,rirMax:s.targetRirMax??s.targetRir,kind:s.kind
+        key:s.id,min:s.minReps,max:s.maxReps,rirMin:s.targetRir,rirMax:s.targetRirMax??s.targetRir,kind:s.kind,plannedWeight:s.targetWeightKg
       })),
       note:item.notes,rest:item.restSeconds
     };
   })??day.exercises.map((item,index)=>({
     key:String(index),name:item.name,
-    sets:item.ranges.map(([min,max],i)=>({key:String(i),min,max,rirMin:item.rir[0],rirMax:item.rir[1],kind:"working" as const})),
+    sets:item.ranges.map(([min,max],i)=>({key:String(i),min,max,rirMin:item.rir[0],rirMax:item.rir[1],kind:"working" as const,plannedWeight:undefined as number|undefined})),
     note:item.note,rest:0
   }));
   const total=rows.reduce((n,r)=>n+r.sets.filter(s=>s.kind==="working").length,0);
@@ -103,10 +103,10 @@ export function ProgramDayDetail({
       <div className="program-exercise-list">{rows.map((row,i)=><article className="program-exercise" key={row.key}>
         <div className="program-exercise-heading"><span className="program-order">{String(i+1).padStart(2,"0")}</span><div><h2>{row.name}</h2><span>{row.sets.filter(s=>s.kind==="working").length} séries efetivas</span></div></div>
         <div className="program-sets">{row.sets.map((set,index)=><div className="program-set" key={set.key}>
-          <span>SÉRIE {index+1}</span>
+          <span>{set.kind==="warmup"?"AQUEC. ":"SÉRIE "}{index+1}</span>
           <strong>{repsLabel(set.min,set.max)} <small>reps</small></strong>
           <em>RIR {set.rirMin===undefined?"não indicado":rirLabel(set.rirMin,set.rirMax??set.rirMin)}</em>
-        </div>)}</div>
+        </div>)}<div className="program-exercise-rest">{row.rest>0?"Descanso: "+row.rest+" segundos":"Descanso não configurado"}{row.sets.some(s=>s.plannedWeight!==undefined)?" · Carga prevista: "+row.sets.map(s=>s.plannedWeight===undefined?"—":s.plannedWeight+" kg").join(" / "):""}</div></div>
         {row.note&&<p className="program-exercise-note">{row.note}</p>}
       </article>)}</div>
     </>}

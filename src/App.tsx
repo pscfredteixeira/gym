@@ -259,7 +259,7 @@ export default function App(){
           assigned={assignedDays} unassigned={unassignedPlans}
           onEdit={id=>editPlan(id)} onNew={()=>editPlan(null)} onEditSchedule={()=>go("edit-schedule")}/>}
         {screen==="edit-plan"&&<PlanEditor key={editingPlanId??"new-"+editorSerial}
-          initial={savedPlans.find(p=>p.id===editingPlanId)} catalog={catalogExercises}
+          initial={savedPlans.find(p=>p.id===editingPlanId)} catalog={catalogExercises} units={settings.units}
           onSave={persistPlan} onDelete={deletePlan} onCancel={()=>go("workouts")}/>}
         {screen==="edit-schedule"&&<ScheduleEditor
           settings={settings} plans={savedPlans} onSave={saveSchedule}

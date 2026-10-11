@@ -11,6 +11,7 @@ import {
 type Props = {
   initial?:WorkoutPlan;
   catalog:Exercise[];
+  units:"metric" | "imperial";
   onSave:(plan:WorkoutPlan,additions:Exercise[])=>Promise<void>;
   onDelete:(plan:WorkoutPlan)=>Promise<void>;
   onCancel:()=>void;
@@ -19,7 +20,7 @@ const numeric=(value:string,min:number,max:number)=>Math.max(min,Math.min(max,Nu
 const rir=(value:string)=>Math.max(0,Math.min(10,Number.isFinite(Number(value))?Math.round(Number(value)):0));
 const localName=(text:string)=>text.trim().toLocaleLowerCase("pt-BR");
 
-export default function PlanEditor({initial,catalog,onSave,onDelete,onCancel}:Props){
+export default function PlanEditor({initial,catalog,units,onSave,onDelete,onCancel}:Props){
   const [draft,setDraft]=useState<WorkoutPlan>(()=>initial?copyPlan(initial):blankPlan());
   const [added,setAdded]=useState<Exercise[]>([]);
   const [dirty,setDirty]=useState(false);
@@ -119,6 +120,15 @@ export default function PlanEditor({initial,catalog,onSave,onDelete,onCancel}:Pr
                 onChange={e=>{if(e.target.value==="")update(updateSeries(draft,index,seriesIndex,{targetRir:undefined,targetRirMax:undefined}));else {const v=rir(e.target.value);update(updateSeries(draft,index,seriesIndex,{targetRir:v,targetRirMax:Math.max(v,set.targetRirMax??v)}));}}}/></label>
               <label>RIR máx.<input type="number" inputMode="numeric" min="0" max="10" value={set.targetRirMax??set.targetRir??""}
                 onChange={e=>{if(e.target.value==="")update(updateSeries(draft,index,seriesIndex,{targetRir:undefined,targetRirMax:undefined}));else{const v=rir(e.target.value);update(updateSeries(draft,index,seriesIndex,{targetRir:Math.min(v,set.targetRir??v),targetRirMax:v}));}}}/></label>
+              <label className="editor-planned-weight">Carga planejada ({units==="metric"?"kg":"lb"}) — opcional
+                <input type="number" min="0" max="1000" inputMode="decimal" step=".5" placeholder="Sem carga definida"
+                  value={set.targetWeightKg===undefined?"":units==="metric"?set.targetWeightKg:Math.round(set.targetWeightKg*2.2046226218*10)/10}
+                  onChange={e=>{
+                    const v=e.target.value;
+                    const kg=v===""?undefined:Math.min(1000,Math.max(0,Number(v)||0))/(units==="metric"?1:2.2046226218);
+                    update(updateSeries(draft,index,seriesIndex,{targetWeightKg:kg}));
+                  }}/>
+              </label>
             </div>
           </div>)}
           <button type="button" className="editor-subaction" onClick={()=>update(updatePlanExercise(draft,index,{sets:[...item.sets,makeSet(item.sets[item.sets.length-1])]}))}><Plus size={17}/> Adicionar série</button>
