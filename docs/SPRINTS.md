@@ -154,3 +154,18 @@ Não usar fotos de bases cujo próprio mantenedor desconheça a licença.
 - [ ] Teste manual em Safari iPhone e aprovação do usuário.
 
 **Sem GPS ou sincronização automática com o Apple Watch.**
+
+## Sprint 08 — Evolução real
+
+- [x] Substituição dos indicadores e gráficos fictícios da aba Evolução por agregados reais.
+- [x] Filtros 30/90/180 dias e todo o histórico, segundo datas locais.
+- [x] Gráfico de maior carga efetiva por dia e por exercício registrado; kg/lb.
+- [x] Total de séries efetivas, repetições, aquecimento e volume externo (kg × reps).
+- [x] Indicadores de cardio com minutos e distância opcional; ritmo de atividades com distância.
+- [x] Gráfico de dias ativos nas últimas seis semanas, sem duplicação de cardio e força no mesmo dia.
+- [x] Estados vazios sem números fictícios e acesso a Histórico/Cardio.
+- [x] Reprocessamento após editar/restaurar históricos, sem nova versão do backup.
+- [x] Testes automatizados, compilação, GitHub Pages e smoke test da rota Evolução.
+- [ ] Validação manual da aba Evolução no Safari do iPhone pelo usuário.
+
+O estúdio de cards permanece como prévia com **dados fictícios** e não é exportação de treinos reais.

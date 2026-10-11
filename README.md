@@ -163,3 +163,7 @@ A ficha do exercício agora oferece **Adicionar foto da galeria** e **Usar link 
 ## Sprint 07 — corrida e cardio registrados
 
 A página de corrida registra **atividades reais informadas manualmente**: esteira, corrida ao ar livre, caminhada e outros cardios. Há cronômetro auxiliar, histórico editável, resumo e semana de minutos realizados. O Programa 10/10 informa a meta de cardio mas não a marca automaticamente como concluída. Veja [docs/SPRINT07_CARDIO.md](docs/SPRINT07_CARDIO.md) para roteiro de teste e limites. GPS, Apple Health e dados automáticos permanecem planejados para etapas futuras.
+
+## Sprint 08 — Evolução real
+
+A aba **Evolução** agora exibe treinos concluídos, séries, progressão da maior carga por exercício, volume de treino, cardio registrado e constância nas últimas seis semanas. Filtros de 30/90/180 dias ou todo o histórico; sem inventar dados quando o banco estiver vazio. Veja [docs/SPRINT08_PROGRESS.md](docs/SPRINT08_PROGRESS.md).
