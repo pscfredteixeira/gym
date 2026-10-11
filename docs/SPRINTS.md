@@ -49,3 +49,13 @@ Cada sprint possui uma entrega testável. Não iniciar outra etapa enquanto houv
 - [ ] Aceite visual da interface-base no aparelho.
 
 A Sprint 01 entregou uma prévia navegável com dez telas, biblioteca demonstrativa, timer visual, edição temporária de séries, corrida de exemplo, gráficos ilustrativos, exportação PNG de cards e ajustes de acessibilidade. O usuário ainda precisa aprovar o design no iPhone, antes da Sprint 02.
+
+## Sprint 02 — acompanhamento
+
+- [x] Stores IndexedDB v1 e repositórios CRUD.
+- [x] Preferências no Perfil com gravação automática e mensagens de status.
+- [x] Backup JSON versionado e restauração transacional com validação antecipada.
+- [x] Testes automatizados de integridade, exportação e restauração.
+- [ ] Confirmar manualmente no Safari do iPhone: fechar/abrir, backup em Arquivos e restauração.
+
+**Registros de treino ainda não estão disponíveis**: dados demonstrativos permanecem separados dos dados reais.

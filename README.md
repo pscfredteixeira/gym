@@ -4,7 +4,7 @@ Aplicativo web de musculação e corrida, pensado primeiro para iPhone: rápido 
 
 ## Situação do projeto
 
-**Sprint 01 — prévia visual navegável publicada.** O projeto contém dez telas para testar a experiência de musculação, corrida, evolução, biblioteca, perfil e cards sociais. **Os dados exibidos são fictícios e os registros não são persistidos.** A persistência e as fichas reais começam nas sprints seguintes.
+**Sprint 02 — armazenamento e preferências.** A interface de Perfil agora salva nome, objetivo, unidades, intervalo padrão e acessibilidade usando IndexedDB. Também exporta um backup JSON versionado e permite restauração validada e atômica. **Os treinos, séries, corridas e gráficos demonstrativos continuam fictícios e não são persistidos**: o editor de fichas começa na Sprint 03 e o registro real na Sprint 04.
 
 ## Tecnologia
 
@@ -28,6 +28,7 @@ Para validar a base:
 
 ```bash
 npm run typecheck
+npm test
 npm run build
 ```
 
@@ -64,3 +65,13 @@ O Vite está configurado com a base `/gym/`. O modo **Settings > Pages > Build a
 6. Cada sprint é validada no iPhone antes da próxima entrega.
 
 Ver [escopo](docs/PRODUCT.md), [arquitetura](docs/ARCHITECTURE.md), [modelo](docs/DATA_MODEL.md) e [sprints](docs/SPRINTS.md).
+
+## Sprint 02 — Teste de persistência
+
+1. No iPhone, abrir **Perfil** e escolher um nome de exibição, um objetivo e Textos maiores.
+2. Aguardar **Dados locais disponíveis**; fechar a aba e abrir novamente para confirmar as preferências.
+3. Em **Backup e restauração**, escolher **Exportar backup JSON** e guardar o arquivo no app Arquivos.
+4. Alterar temporariamente o nome, escolher **Restaurar backup** e selecionar o arquivo exportado; confirmar a substituição. O nome deve voltar ao anterior.
+5. Usar **Atualizar contagens** para conferir os registros reais. Os exemplos da prévia não entram nas contagens.
+
+O armazenamento pertence a cada navegador/instalação. Abrir uma aba privada ou outro dispositivo não reproduz automaticamente os mesmos dados. Nunca confiar exclusivamente no cache do navegador; guardar backups periodicamente.

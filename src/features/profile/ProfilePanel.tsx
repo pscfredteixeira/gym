@@ -1,6 +1,6 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowDownToLine, CheckCircle2, FileUp, Info, RotateCcw, ShieldCheck, UserRound } from "lucide-react";
-import { MAX_BACKUP_BYTES } from "../../data/validation";
+import { MAX_BACKUP_BYTES, validateGymBackup } from "../../data/validation";
 import { createBackup, getDataCounts, restoreBackup } from "../../data/storage";
 import type { UserSettings } from "../../domain/models";
 import { Notice, SectionHead, Titlebar } from "../../components/ui";
@@ -28,6 +28,7 @@ export default function ProfilePanel({
   const [message,setMessage]=useState("");
   const [counts,setCounts]=useState<{plans:number;strength:number;cardio:number;exercises:number}|null>(null);
 
+  useEffect(()=>{ if(storageState==="loading" || storageState==="error") return; let alive=true; getDataCounts().then(value=>{if(alive)setCounts(value);}).catch(()=>{});return ()=>{alive=false;};},[storageState==="loading",storageState==="error"]);
   const available=storageState!=="loading" && storageState!=="error" && !busy;
   const update=(patch:Partial<UserSettings>)=>onChange({...settings,...patch});
   const refreshCounts=async()=>setCounts(await getDataCounts());
@@ -55,7 +56,7 @@ export default function ProfilePanel({
     try{
       if(file.size===0 || file.size>MAX_BACKUP_BYTES) throw new Error("Arquivo vazio ou acima do limite de 10 MB.");
       if(!file.name.toLowerCase().endsWith(".json")) throw new Error("Escolha um backup .json do GYM.");
-      const json:unknown=JSON.parse(await file.text());
+      const json=validateGymBackup(JSON.parse(await file.text()) as unknown);
       if(!window.confirm("Restaurar este backup? Todos os dados locais atuais do GYM serão SUBSTITUÍDOS pelo arquivo escolhido. Cancele se não tiver uma cópia de segurança.")){
         setMessage("Restauração cancelada; seus dados foram mantidos.");return;
       }

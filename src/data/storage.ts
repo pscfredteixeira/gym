@@ -1,5 +1,5 @@
 import type { GymBackup, Exercise, WorkoutPlan, WorkoutSession, CardioSession, ImportBatch, UserSettings } from "../domain/models";
-import { DEFAULT_SETTINGS, SCHEMA_VERSION, validateGymBackup, validateSettings } from "./validation";
+import { DEFAULT_SETTINGS, SCHEMA_VERSION, validateGymBackup, validateSettings } from "./validation.ts";
 
 const DB_NAME = "gym-local-v1";
 const SETTINGS_KEY = "current";
