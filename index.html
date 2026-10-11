@@ -7,10 +7,38 @@
     <meta name="description" content="GYM — Plataforma de musculação, corrida e evolução." />
     <title>GYM — Seu treino, no seu ritmo</title>
     <link rel="icon" type="image/svg+xml" href="/gym/favicon.svg" />
+    <style>
+      html,body{margin:0;min-height:100%;background:#0c0e10;color:#f8f8f7;font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif}
+      #gym-boot{min-height:100svh;display:flex;align-items:center;justify-content:center;text-align:center;padding:32px}
+      #gym-boot strong{font-size:34px;letter-spacing:-2px}
+      #gym-boot strong span{color:#ff712c}
+      #gym-boot p{font-size:14px;line-height:1.6;color:#b5b5b8}
+      #gym-boot a{color:#ffad81}
+      #gym-boot-error{display:none;max-width:330px}
+      body.gym-boot-failed #gym-boot-wait{display:none}
+      body.gym-boot-failed #gym-boot-error{display:block}
+    </style>
+    <script>
+      (function () {
+        function showError() {
+          if (document.getElementById("gym-boot")) {
+            document.body.classList.add("gym-boot-failed");
+          }
+        }
+        window.addEventListener("error", showError);
+        window.addEventListener("unhandledrejection", showError);
+        window.setTimeout(showError, 12000);
+      })();
+    </script>
     <script type="module" crossorigin src="/gym/assets/index-DGANbtME.js"></script>
     <link rel="stylesheet" crossorigin href="/gym/assets/index-WGKBnG8v.css">
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div id="gym-boot" role="status">
+        <div id="gym-boot-wait"><strong>GYM<span>.</span></strong><p>Carregando seu espaço de treinamento...</p></div>
+        <div id="gym-boot-error"><strong>GYM<span>.</span></strong><p>Não foi possível iniciar o aplicativo. Tente atualizar a página no Safari.</p><a href="/gym/">Recarregar GYM</a></div>
+      </div>
+    </div>
   </body>
 </html>
