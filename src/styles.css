@@ -1118,3 +1118,7 @@ input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-ou
 .gym-exercise-photo-attribution a{font-size:11px;color:#ffad79;text-decoration:underline}
 @media(max-width:370px){.gym-commons-picker{padding:11px}.gym-commons-photo-preview{height:107px}.gym-commons-results{gap:7px}.gym-commons-photo{padding:6px}.gym-commons-photo-details span{font-size:9px}}
 @media(prefers-reduced-motion:reduce){.gym-commons-loading svg{animation:none}}
+
+
+.gym-exercise-thumbnail:has(.gym-thumb-missing-label){display:flex;flex-direction:column;justify-content:center;align-items:center;gap:3px}
+.gym-thumb-missing-label{color:#ffb184;font-size:8px;font-weight:900;letter-spacing:.35px;white-space:nowrap}
