@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Activity, ArrowDownToLine, ArrowRight, ArrowUpRight, BarChart3, BookOpen,
   CalendarDays, Check, CheckCircle2, ChevronLeft, ChevronRight, Clock3,
@@ -8,6 +8,10 @@ import {
 } from "lucide-react";
 import { DemoLabel, Photo, Titlebar, SectionHead, BackHeader, PrimaryButton, Notice } from "./components/ui";
 import { exercises, mockWeights, mockReps, photos } from "./data/demo";
+import ProfilePanel, { type StorageState } from "./features/profile/ProfilePanel";
+import { DEFAULT_SETTINGS } from "./data/validation";
+import { readSettings, writeSettings } from "./data/storage";
+import type { UserSettings } from "./domain/models";
 
 type Tab = "home" | "workouts" | "library" | "progress" | "profile";
 type Screen = Tab | "exercise" | "session" | "rest" | "run" | "share";
@@ -103,8 +107,49 @@ export default function App(){
   const [shareStyle,setShareStyle]=useState<ShareStyle>("ember");
   const [shareHeart,setShareHeart]=useState(false);
   const [exportStatus,setExportStatus]=useState("");
-  const [largeText,setLargeText]=useState(false);
-  const [reducedMotion,setReducedMotion]=useState(false);
+  const [settings,setSettings]=useState<UserSettings>(DEFAULT_SETTINGS);
+  const [storageState,setStorageState]=useState<StorageState>("loading");
+  const [storageError,setStorageError]=useState("");
+  const [settingsReady,setSettingsReady]=useState(false);
+  const writeQueue=useRef<Promise<void>>(Promise.resolve());
+  const saveGeneration=useRef(0);
+
+  useEffect(()=>{
+    let active=true;
+    readSettings().then(value=>{
+      if(!active)return;
+      setSettings(value);setStorageState("ready");setSettingsReady(true);
+    }).catch(error=>{
+      if(!active)return;
+      setStorageError(error instanceof Error?error.message:"Falha no armazenamento.");
+      setStorageState("error");
+    });
+    return ()=>{active=false;};
+  },[]);
+
+  useEffect(()=>{
+    if(!settingsReady)return;
+    const generation=++saveGeneration.current;
+    setStorageState("saving");
+    const timer=window.setTimeout(()=>{
+      const operation=writeQueue.current.catch(()=>{}).then(()=>writeSettings(settings));
+      writeQueue.current=operation;
+      operation.then(()=>{
+        if(generation===saveGeneration.current){setStorageState("saved");setStorageError("");}
+      }).catch(error=>{
+        if(generation===saveGeneration.current){
+          setStorageState("error");
+          setStorageError(error instanceof Error?error.message:"Não foi possível salvar.");
+        }
+      });
+    },500);
+    return ()=>window.clearTimeout(timer);
+  },[settings,settingsReady]);
+
+  const flushSettings=async()=>{
+    await writeQueue.current;
+    await writeSettings(settings);
+  };
   const [day,setDay]=useState(todayIndex);
 
   useEffect(()=>{
@@ -139,7 +184,7 @@ export default function App(){
     else setReps(prev=>({...prev,[currentKey]:Math.min(100,Math.max(0,(prev[currentKey]??mockReps[sessionEx.id])+delta))}));
   };
   const tab=navItems.find(n=>n.screen===screen)?.screen??(screen==="run"?"workouts":screen==="share"?"progress":"workouts");
-  return <div className={"gym-app"+(largeText?" large-text":"")+(reducedMotion?" reduced-motion":"")}>
+  return <div className={"gym-app"+(settings.largeText?" large-text":"")+(settings.reducedMotion?" reduced-motion":"")}>
     <div className="desktop-rail" aria-hidden="true"><span>GYM</span><i/><small>MOVE WITH PURPOSE</small></div>
     <div className="app-column">
       <header className="app-header">
@@ -235,16 +280,15 @@ export default function App(){
           {exportStatus&&<p className="export-status" role="status">{exportStatus}</p>}
           <Notice>A imagem contém a marca “EXEMPLO · DADOS FICTÍCIOS”. Exportação de dados reais será desenvolvida na Sprint 09.</Notice>
         </>}
-        {screen==="profile"&&<>
-          <Titlebar eyebrow="CONFIGURAÇÕES" title="Seu espaço." right={<span className="profile-mark"><UserRound size={25}/></span>}/>
-          <p className="screen-lead">Personalize o jeito de usar o GYM.</p>
-          <div className="profile-identity"><span className="profile-logo">G<span>.</span></span><div><strong>GYM Preview</strong><small>Sprint 01 · Demonstração</small></div><span className="profile-version">v0.1</span></div>
-          <SectionHead title="Acessibilidade"/>
-          <div className="setting-list"><label className="setting-row"><span><strong>Textos maiores</strong><small>Melhora a leitura durante o treino</small></span><input type="checkbox" role="switch" checked={largeText} onChange={e=>setLargeText(e.target.checked)}/></label><label className="setting-row"><span><strong>Reduzir animações</strong><small>Movimentos mais discretos</small></span><input type="checkbox" role="switch" checked={reducedMotion} onChange={e=>setReducedMotion(e.target.checked)}/></label></div>
-          <SectionHead title="Seus dados"/>
-          <div className="setting-list"><div className="setting-row non-interactive"><span><strong>Backup e restauração</strong><small>Disponível na Sprint 02</small></span><span className="setting-soon">EM BREVE</span></div><div className="setting-row non-interactive"><span><strong>Apple Saúde</strong><small>Importação manual prevista na Sprint 10</small></span><span className="setting-soon">PLANEJADO</span></div><button type="button" className="setting-row" onClick={resetDemo}><span><strong>Reiniciar a demonstração</strong><small>Limpa apenas alterações temporárias</small></span><RotateCcw size={19}/></button></div>
-          <div className="credits"><p><ShieldCheck size={17}/> Nesta prévia, nenhuma informação de treino é enviada a servidores.</p><a href="https://github.com/pscfredteixeira/gym/blob/main/docs/IMAGE_SOURCES.md" target="_blank" rel="noopener noreferrer">Créditos das imagens <ArrowUpRight size={15}/></a></div>
-        </>}
+        {screen==="profile"&&<ProfilePanel
+          settings={settings}
+          onChange={setSettings}
+          storageState={storageState}
+          storageError={storageError}
+          flushSettings={flushSettings}
+          onRestored={value=>{setSettings(value);setStorageError("");setStorageState("saved");}}
+          onResetDemo={resetDemo}
+        />}
       </main>
       {screen!=="session"&&screen!=="rest"&&<nav className="bottom-nav" aria-label="Navegação principal">{navItems.map(item=>{const Icon=item.icon;return <button type="button" key={item.screen} className={tab===item.screen?"nav-link active":"nav-link"} aria-current={tab===item.screen?"page":undefined} onClick={()=>go(item.screen)}><Icon size={21} strokeWidth={tab===item.screen?2.5:1.8}/><span>{item.label}</span></button>})}</nav>}
     </div>
