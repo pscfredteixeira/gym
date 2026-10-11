@@ -127,3 +127,15 @@ A Sprint 05 deverá acrescentar descanso por relógio real, comandos rápidos e 
 - [ ] Validação manual do novo layout e trocas no Safari iPhone.
 
 Não usar fotos de bases cujo próprio mantenedor desconheça a licença.
+
+
+## Complemento da Sprint 06 — Fotografias demonstrativas
+
+- [x] Adicionar/trocar/remover imagem pela galeria do iPhone e por link HTTPS.
+- [x] Compactação de fotos com limite e armazenamento local persistente.
+- [x] Exibir miniaturas em Exercícios, Treinar, editor e modo academia.
+- [x] Ver foto maior no detalhe e durante a sessão real.
+- [x] Preservar fotos em backup JSON e validar formatos permitidos.
+- [x] Testar persistência de imagem e integridade da ficha no IndexedDB.
+- [ ] Validação prática de upload JPG/HEIC no Safari iOS.
+- [ ] Fotografias originais curadas para os 31 movimentos, com licença verificada.

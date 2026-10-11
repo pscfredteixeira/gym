@@ -137,3 +137,25 @@ O GYM já permite iniciar, registrar, retomar, concluir e consultar sessões **r
 
 ## Sprint 06 — Biblioteca de exercícios e substituições
 A aba **Exercícios** agora usa a biblioteca real do Programa 10/10 e movimentos personalizados, com busca, filtros, guias em português, mapas musculares esquemáticos e opções de troca de exercícios nas fichas. Consulte [a documentação da Sprint 06](docs/EXERCISE_LIBRARY.md). Fotografias demonstrativas específicas seguem pendentes de direitos de uso comprovados.
+
+
+## Imagens demonstrativas adicionadas pelo usuário (Sprint 06.1)
+
+A ficha do exercício agora oferece **Adicionar foto da galeria** e **Usar link de uma imagem**. Na biblioteca, toque num movimento (por exemplo, Puxada neutra); a foto aparece acima do mapa muscular e dos passos de execução. Pode ser trocada ou removida a qualquer momento.
+
+- **Fotos do iPhone:** o navegador reduz a imagem para até 900 pixels no maior lado, converte para JPEG e limita cada imagem a cerca de 195 mil caracteres no banco. O arquivo original fica apenas no dispositivo; os dados compactados são mantidos no IndexedDB e exportados no backup JSON. Nada é enviado para o GitHub nem ao servidor do GYM.
+- **Links HTTPS:** opcionalmente, o usuário pode cadastrar um link externo de imagem. O endereço fica salvo na ficha, mas a fotografia depende de conexão e da disponibilidade do servidor original. Ao abrir uma imagem externa, o navegador acessará o site remoto. É responsabilidade do usuário usar material autorizado.
+- **Onde aparece:** cartão da biblioteca, detalhe do exercício, prescrição de cada dia de musculação, editor de ficha e modo academia. A sessão em andamento também dispõe de **Ver foto demonstrativa** para ampliar uma foto já cadastrada.
+- **Preservação:** a imagem pertence ao cadastro global do movimento, não a uma cópia da ficha. O ato de adicionar/remover imagem não troca o exercício ou altera séries e registros históricos.
+- **Limites:** backup JSON permanece sujeito ao limite global de 10 MB. Se o usuário cadastrar muitas fotos grandes, o tamanho pode chegar ao limite; a compactação permite dezenas de imagens pequenas. O armazenamento está associado ao navegador, não sincronizado entre aparelhos.
+- **Não há foto automática:** os 31 exercícios do Programa 10/10 continuam sem fotografia pré-cadastrada até que o usuário escolha uma imagem ou que seja integrada uma biblioteca com direitos de uso verificados.
+
+### Teste manual
+
+1. Abra **Exercícios > Puxada neutra** e toque **Adicionar foto da galeria**.
+2. Selecione uma fotografia do aparelho e aguarde **Foto reduzida e salva**.
+3. Volte à lista de exercícios. Confira a miniatura; depois abra **Treinar > PULL** e veja a mesma imagem ao lado do nome.
+4. Abra uma sessão real e expanda **Ver foto demonstrativa**.
+5. Feche e reabra o Safari. A foto deve continuar associada à Puxada neutra.
+6. Em **Perfil**, exporte backup JSON com a foto. Restaure o backup somente depois de verificar que tem uma cópia segura.
+7. Remova a imagem na ficha do exercício e confirme que as cargas, séries e nomes continuam intactos.

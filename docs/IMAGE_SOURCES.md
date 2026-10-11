@@ -17,3 +17,10 @@ Não foi feito hotlink nem cópia de imagens do `yuhonas/free-exercise-db`, porq
 - https://github.com/yuhonas/free-exercise-db/issues/12
 
 A obtenção de fotografias exatas e com licença clara continua pendente.
+
+
+## Fotografias escolhidas diretamente pelo usuário
+
+A partir da atualização de outubro de 2026, o GYM aceita fotografias selecionadas no iPhone ou links HTTPS informados pelo usuário. Fotos escolhidas na galeria são compactadas localmente e persistidas no IndexedDB; não fazem parte do repositório público. Links apontam para servidores externos, sujeitos a licença, disponibilidade e privacidade.
+
+**Não confundimos essas fotos escolhidas com fotografias licenciadas e curadas oficialmente pelo projeto.** A biblioteca inicial continua sem fotos automáticas dos movimentos originais.
