@@ -306,7 +306,7 @@ export default function App(){
     <div className="app-column">
       <header className="app-header">
         <button className="logo" type="button" disabled={screen==="edit-plan"||screen==="edit-schedule"||screen==="live"} onClick={()=>go("home")} aria-label="GYM, voltar ao início">GYM<span>.</span></button>
-        <div className="header-actions">{["home","workouts","program","live","history"].includes(screen)?<span className="program-header-tag">10/10</span>:<DemoLabel compact/>}<button type="button" className="header-avatar" onClick={()=>go("profile")} aria-label="Abrir perfil"><UserRound size={20}/></button></div>
+        <div className="header-actions">{["home","workouts","program","live","history","library","exercise-info"].includes(screen)?<span className="program-header-tag">10/10</span>:<DemoLabel compact/>}<button type="button" className="header-avatar" onClick={()=>go("profile")} aria-label="Abrir perfil"><UserRound size={20}/></button></div>
       </header>
       <main className="app-main" id="main-content">
         {screen==="home"&&<>

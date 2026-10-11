@@ -134,3 +134,6 @@ O GYM já permite iniciar, registrar, retomar, concluir e consultar sessões **r
 ### Testes
 
 `npm test` executa testes isolados de snapshot, proteção contra múltiplas sessões, persistência no IndexedDB, gravação/edição/desfazer série, histórico, fim de treino e restauração com arquivos malformados. `npm run build` e o workflow de publicação verificam TypeScript e carregamento público do site.
+
+## Sprint 06 — Biblioteca de exercícios e substituições
+A aba **Exercícios** agora usa a biblioteca real do Programa 10/10 e movimentos personalizados, com busca, filtros, guias em português, mapas musculares esquemáticos e opções de troca de exercícios nas fichas. Consulte [a documentação da Sprint 06](docs/EXERCISE_LIBRARY.md). Fotografias demonstrativas específicas seguem pendentes de direitos de uso comprovados.

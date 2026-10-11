@@ -8,3 +8,12 @@ A Sprint 01 utiliza imagens de terceiros apenas como elementos visuais demonstra
 - [Pexels — Corrida na esteira](https://www.pexels.com/photo/man-running-on-treadmill-1954524/), foto 1954524; licença Pexels.
 
 **Importante:** algumas imagens de ambientação não correspondem ao movimento mostrado no cartão. Na Sprint 06, substituir por registros precisos de cada exercício e adicionar imagens alternativas caso o CDN falhe. Nunca apresentar uma foto de outro exercício como instrução técnica de execução.
+
+## Sprint 06: mapas próprios e fotografias não incluídas
+A biblioteca real de movimentos utiliza mapas SVG originais, construídos em `src/features/library/ExerciseLibrary.tsx`, para indicar músculos predominantes em vista anterior e posterior. São **diagramas estilizados**, não fotografias, nem demonstrações exatas da biomecânica.
+
+Não foi feito hotlink nem cópia de imagens do `yuhonas/free-exercise-db`, porque o próprio mantenedor desconhece as licenças das fotografias fornecidas e declara que o uso ocorre por conta e risco do distribuidor:
+- https://github.com/yuhonas/free-exercise-db/issues/2
+- https://github.com/yuhonas/free-exercise-db/issues/12
+
+A obtenção de fotografias exatas e com licença clara continua pendente.

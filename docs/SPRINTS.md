@@ -113,3 +113,17 @@ A Sprint 05 deverá acrescentar descanso por relógio real, comandos rápidos e 
 - [ ] Validação prática no iPhone pelo usuário.
 
 **Limitação:** não há notificação nem sinal sonoro confiável com a página fechada ou o iPhone bloqueado.
+
+## Sprint 06 — entrega técnica
+
+- [x] Biblioteca pesquisável dos 31 movimentos originais e exercícios personalizados em IndexedDB.
+- [x] Filtros por nome (com ou sem acento), músculo, equipamento e movimentos pessoais.
+- [x] Instruções individualizadas e cuidados para cada movimento original.
+- [x] Mapas musculares SVG esquemáticos, originais e rotulados como ilustração.
+- [x] Substituições explícitas, alternativas existentes e integração ao editor de ficha.
+- [x] Troca persistente, preservando configurações das séries e o histórico de treinos.
+- [x] Testes de cobertura e integridade, compilação e publicação automatizada.
+- [ ] Fotografias reais por movimento com licença verificável.
+- [ ] Validação manual do novo layout e trocas no Safari iPhone.
+
+Não usar fotos de bases cujo próprio mantenedor desconheça a licença.
