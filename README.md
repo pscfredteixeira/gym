@@ -81,3 +81,24 @@ O armazenamento pertence a cada navegador/instalação. Abrir uma aba privada ou
 O planejamento semanal de segunda a domingo agora está pré-cadastrado: PUSH, PULL, LEGS, descanso, UPPER, LOWER + BÍCEPS, descanso, com 66 séries efetivas e cardio especificado. Visualizar em **Hoje** e **Treinar**; os dias sem musculação apresentam recuperação. As prescrições e faixas de RIR ficam salvas em IndexedDB sem sobrescrever dados existentes. Consulte [docs/PROGRAMA-10-10.md](docs/PROGRAMA-10-10.md).
 
 Atenção: a ficha está disponível para consulta e backup, não para registrar séries reais ainda. As páginas de execução anteriores permanecem simulações. Idade, altura e peso corporal não estão armazenados neste repositório público.
+
+## Sprint 03 — Editor de fichas e agenda
+
+O GYM agora tem um editor funcional de fichas, acessível por **Treinar > selecionar um dia > Personalizar esta ficha**. Alterações de nome, ordem dos exercícios, séries de aquecimento/efetivas, faixas de repetições, RIR mínimo/máximo, descanso e observações são persistidas em IndexedDB após clicar em **Salvar alterações**.
+
+É possível adicionar movimentos da biblioteca (33 posições originais, com exercícios repetidos reutilizados), cadastrar movimentos próprios, substituir exercícios, duplicar fichas e criar novos treinos. Fichas personalizadas fora da semana aparecem em **Treinar > Fichas fora da agenda**.
+
+A opção **Treinar > Organizar semana** permite trocar fichas entre os sete dias e ajustar cardio opcional, tipo de atividade e duração. Quando se seleciona uma ficha já alocada em outro dia, as posições são trocadas para evitar duplicações inadvertidas. Cardios são planejamento, não sessões concluídas.
+
+Regras de segurança: edição nunca escreve na store `workoutSessions`; dados antigos permanecem íntegros; exclusão só é oferecida para fichas criadas pelo usuário, e estas devem primeiro sair da agenda. Presets originais permanecem disponíveis para reatribuição. Alterações entram no backup JSON versionado, com leitura compatível com backups da Sprint 02.
+
+### Teste manual no iPhone
+
+1. Entrar em **Treinar**, escolher PULL (terça) e clicar em **Personalizar esta ficha**.
+2. Alterar o descanso da puxada neutra para 90 segundos e salvar. Fechar e reabrir o GYM para verificar.
+3. Em **Treinar > Organizar semana**, trocar PULL e PUSH e salvar; conferir **Hoje** e a agenda.
+4. Criar uma ficha nova, adicionar e reordenar dois exercícios, salvar. A ficha aparece fora da semana até ser atribuída.
+5. Em **Perfil**, exportar backup. Alterar um exercício e restaurar o backup: a alteração deve ser revertida.
+6. Conferir que o histórico não ganhou sessões falsas após editar fichas.
+
+**Não é Sprint 04:** a tela de execução fictícia permanece identificada como simulação; registro de séries reais, carga efetivamente usada e cronômetro associado a uma sessão ainda não foram implementados.

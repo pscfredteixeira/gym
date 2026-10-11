@@ -68,3 +68,17 @@ A Sprint 01 entregou uma prévia navegável com dez telas, biblioteca demonstrat
 - [x] Visualização em Hoje / Treinar / Exercícios e backup contendo o programa.
 - [ ] Sprint 03: edição da ficha e adaptação personalizada.
 - [ ] Sprint 04: execução e salvamento de séries reais.
+
+## Sprint 03 — implementação
+
+- [x] Editor responsivo de fichas, exercícios, ordem e observações.
+- [x] Alteração de quantidade e tipo das séries, repetições, RIR por faixa e descanso.
+- [x] Troca de exercícios existentes e cadastro de exercício personalizado.
+- [x] Criação, duplicação e exclusão segura de fichas personalizadas fora da agenda.
+- [x] Agenda semanal editável com troca de dias e cardio opcional.
+- [x] Salvamento explícito em IndexedDB, preservação de sessões antigas e backup.
+- [x] Testes automatizados de operações imutáveis, guarda de históricos, agenda e restauração.
+- [x] Testes automatizados de build e publicação GitHub Pages.
+- [ ] Validação manual no Safari do iPhone pelo usuário, antes de iniciar a Sprint 04.
+
+Observação: a interface de execução da Sprint 01 ainda apresenta valores simulados e NÃO registra séries reais. Não misturar a simulação com dados salvos.

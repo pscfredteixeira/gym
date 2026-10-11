@@ -88,3 +88,12 @@ Repositório `pscfredteixeira/gym` com URL projetada em `https://pscfredteixeira
 - Não alterar estrutura de dados sem migração planejada.
 - Sem perda de dados registrados ao editar planos.
 - Documentação atualizada quando houver mudança de fluxo.
+
+## Sprint 03 — edição e agenda
+
+- `src/features/program/PlanEditor.tsx` e `planEditor.ts` mantêm um rascunho local, confirmação explícita e funções imutáveis.
+- `savePlanWithExercises` grava plano + exercícios personalizados em uma única transação IndexedDB, sem alterar `workoutSessions`.
+- `ProgramOverview` e `ProgramDayDetail` exibem os dados atuais dos planos, não apenas os valores do preset.
+- `src/features/program/programSchedule.ts` resolve a agenda semanal a partir de `UserSettings.weeklyPlanIds` e `weeklyCardio`, com valores padrão no Programa 10/10.
+- As duas propriedades de agenda são opcionais no backup de esquema v1, garantindo compatibilidade retroativa com arquivos exportados na Sprint 02.
+- Todo salvamento deve ser confirmado no navegador antes de navegar; erros permanecem visíveis.
