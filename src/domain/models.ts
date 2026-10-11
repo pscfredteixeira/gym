@@ -52,6 +52,8 @@ export interface CompletedSet {
   reps: number;
   rir?: number;
   completedAt: IsoInstant;
+  /** Stable reference to one planned set inside the session snapshot. */
+  plannedSetId?: Id;
 }
 
 export interface SessionExercise {
@@ -60,6 +62,8 @@ export interface SessionExercise {
   exerciseNameSnapshot: string;
   order: number;
   plannedSetsSnapshot: PlannedSet[];
+  /** Rest time as prescribed when this session began, independent of later edits. */
+  restSecondsSnapshot?: number;
   sets: CompletedSet[];
   notes?: string;
 }

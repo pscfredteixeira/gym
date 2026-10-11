@@ -72,10 +72,10 @@ const planExercise = (v: unknown) => record(v) && id(v.id) && id(v.exerciseId) &
 const plan = (v: unknown) => record(v) && id(v.id) && text(v.name,200) && iso(v.createdAt) && iso(v.updatedAt) &&
   Array.isArray(v.exercises) && v.exercises.every(planExercise);
 const completedSet = (v: unknown) => record(v) && id(v.id) && typed(v.kind,["warmup","working"]) &&
-  number(v.weightKg) && count(v.reps) && optional(v.rir,n=>number(n)&&(n as number)<=10) && iso(v.completedAt);
+  number(v.weightKg) && count(v.reps) && optional(v.rir,n=>number(n)&&(n as number)<=10) && iso(v.completedAt) && optional(v.plannedSetId,id);
 const sessionExercise = (v: unknown) => record(v) && id(v.id) && id(v.exerciseId) &&
   text(v.exerciseNameSnapshot,200) && count(v.order) && Array.isArray(v.plannedSetsSnapshot) &&
-  v.plannedSetsSnapshot.every(planned) && Array.isArray(v.sets) && v.sets.every(completedSet) &&
+  v.plannedSetsSnapshot.every(planned) && optional(v.restSecondsSnapshot,n=>count(n)&&(n as number)<=3600) && Array.isArray(v.sets) && v.sets.every(completedSet) &&
   optional(v.notes,n=>text(n,3000));
 const session = (v: unknown) => record(v) && id(v.id) && date(v.localDate) && iso(v.startedAt) &&
   typed(v.status,["in_progress","completed","abandoned"]) && optional(v.endedAt,iso) &&
@@ -136,4 +136,29 @@ export function validateWorkoutPlan(value: unknown): void {
 }
 export function validateCustomExercise(value: unknown): void {
   if(!exercise(value)) throw new Error("Exercício inválido. Confira nome, grupo muscular e equipamento.");
+}
+
+/** Accepts old v1 sessions but validates new completed-to-planned set references. */
+export function validateWorkoutSession(value:unknown):void {
+  if(!session(value))throw new Error("Registro de treino inválido. Nenhuma alteração foi feita.");
+  const current=value as {
+    exercises:{id:string;plannedSetsSnapshot:{id:string}[];sets:{id:string;plannedSetId?:string}[]}[];
+  };
+  const ids=new Set<string>();
+  for(const ex of current.exercises) {
+    if(ids.has(ex.id))throw new Error("Exercícios duplicados no registro.");
+    ids.add(ex.id);
+    const planned=new Set(ex.plannedSetsSnapshot.map(s=>s.id));
+    if(planned.size!==ex.plannedSetsSnapshot.length)throw new Error("Séries planejadas duplicadas.");
+    const linked=new Set<string>(), setIds=new Set<string>();
+    for(const set of ex.sets) {
+      if(setIds.has(set.id))throw new Error("Série registrada duas vezes.");
+      setIds.add(set.id);
+      if(set.plannedSetId !== undefined) {
+        if(!planned.has(set.plannedSetId))throw new Error("Série não pertence à ficha iniciada.");
+        if(linked.has(set.plannedSetId))throw new Error("Registro duplicado da mesma série planejada.");
+        linked.add(set.plannedSetId);
+      }
+    }
+  }
 }
