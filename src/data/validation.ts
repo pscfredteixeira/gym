@@ -79,6 +79,9 @@ const sessionExercise = (v: unknown) => record(v) && id(v.id) && id(v.exerciseId
   optional(v.notes,n=>text(n,3000));
 const session = (v: unknown) => record(v) && id(v.id) && date(v.localDate) && iso(v.startedAt) &&
   typed(v.status,["in_progress","completed","abandoned"]) && optional(v.endedAt,iso) &&
+  optional(v.restUntil,iso) && optional(v.restPausedSeconds,n=>count(n)&&(n as number)<=3600) &&
+  !(v.restUntil!==undefined && v.restPausedSeconds!==undefined) &&
+  (v.status==="in_progress" || (v.restUntil===undefined && v.restPausedSeconds===undefined)) &&
   optional(v.planId,id) && optional(v.planNameSnapshot,n=>text(n,200)) &&
   Array.isArray(v.exercises) && v.exercises.every(sessionExercise) &&
   (v.endedAt === undefined || Date.parse(v.endedAt as string)>=Date.parse(v.startedAt as string));

@@ -76,6 +76,10 @@ export interface WorkoutSession {
   startedAt: IsoInstant;
   endedAt?: IsoInstant;
   status: SessionStatus;
+  /** Running timer stores an absolute UTC deadline. */
+  restUntil?: IsoInstant;
+  /** Paused timer stores remaining seconds. Zero indicates finished. */
+  restPausedSeconds?: number;
   exercises: SessionExercise[];
 }
 
