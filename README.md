@@ -50,7 +50,9 @@ docs/
 
 ## Publicação
 
-O Vite está configurado com a base `/gym/`. Para publicar, selecionar **Settings > Pages > Build and deployment > Source: GitHub Actions**. O workflow realiza build e deploy a cada atualização de `main`. Enquanto o Pages não estiver ativado e o workflow não for concluído, não há URL pública confirmada.
+**Correção de tela branca:** o código-fonte HTML agora mora em `app/index.html`. O arquivo `index.html` na raiz e a pasta `assets/` são artefatos compilados, gerados pelo GitHub Actions. Isso garante que o site abra tanto no modo Pages por branch quanto no modo Pages por Actions. **Não edite manualmente o `index.html` da raiz**; edite `app/index.html`. O workflow precisa de permissão `contents: write` para sincronizar arquivos compilados.
+
+O Vite está configurado com a base `/gym/`. O modo **Settings > Pages > Build and deployment > Source: GitHub Actions** continua sendo o recomendado, mas a publicação por branch também tem suporte via artefatos compilados na raiz. O workflow realiza build e deploy a cada atualização de `main`. Enquanto o Pages não estiver ativado e o workflow não for concluído, não há URL pública confirmada.
 
 ## Regras do projeto
 

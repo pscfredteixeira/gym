@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -23,6 +23,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -31,6 +33,25 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Typecheck and build
         run: npm run build
+      # GitHub Pages may still be configured as "Deploy from a branch",
+      # while an Actions-based deployment is also enabled. The branch
+      # build otherwise serves index.html with an uncompiled .tsx script:
+      # a blank screen on iPhone. Publish the compiled site to BOTH paths
+      # so either Pages source produces a functioning application.
+      - name: Keep branch-based Pages publication functional
+        run: |
+          cp dist/index.html index.html
+          rm -rf assets
+          cp -R dist/assets assets
+          cp dist/favicon.svg favicon.svg
+          touch .nojekyll
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html assets favicon.svg .nojekyll
+          if ! git diff --cached --quiet; then
+            git commit -m "build: sync compiled GYM site [skip ci]"
+            git push origin HEAD:main
+          fi
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - name: Upload compiled app
