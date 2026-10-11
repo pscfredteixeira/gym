@@ -21,7 +21,7 @@ function ProgressChart({points,units}:{points:StrengthPoint[];units:UserSettings
    upper=Math.max(5,Math.ceil(max/5)*5),bottom=0;
  const x=(i:number)=>points.length===1?310:49+i*(525/(points.length-1));
  const y=(value:number)=>175-(value-bottom)/(upper-bottom)*136;
- const line=points.map((p,i)=>`${x(i)},${y(values[i])}`).join(" ");
+ const line=points.map((_,i)=>`${x(i)},${y(values[i])}`).join(" ");
  const dots=points.map((p,i)=>({id:p.date,x:x(i),y:y(values[i]),value:values[i],date:p.date}));
  return <div className="real-progress-chart-wrap">
    <svg className="real-progress-chart" viewBox="0 0 620 225" role="img"
