@@ -11,13 +11,17 @@ import { exercises, mockWeights, mockReps, photos } from "./data/demo";
 import ProfilePanel, { type StorageState } from "./features/profile/ProfilePanel";
 import { DEFAULT_SETTINGS } from "./data/validation";
 import { readSettings, writeSettings } from "./data/storage";
-import type { Exercise, UserSettings, WorkoutPlan } from "./domain/models";
+import type { Exercise, ScheduledCardio, UserSettings, WorkoutPlan } from "./domain/models";
+import { savePlanWithExercises, deleteEntity, writeSettings } from "./data/storage";
+import PlanEditor from "./features/program/PlanEditor";
+import ScheduleEditor from "./features/program/ScheduleEditor";
+import { configuredPlanIds, resolveSchedule } from "./features/program/programSchedule";
 import { PROGRAM_DAYS, PROGRAM_NAME, buildProgramCatalog, planId, seriesCount } from "./data/program1010";
 import { ProgramOverview, ProgramDayDetail, ProgramLibrary, type ProgramStatus } from "./features/program/ProgramView";
 import { ensureProgramCatalog, listEntities } from "./data/storage";
 
 type Tab = "home" | "workouts" | "library" | "progress" | "profile";
-type Screen = Tab | "exercise" | "session" | "rest" | "run" | "share" | "program";
+type Screen = Tab | "exercise" | "session" | "rest" | "run" | "share" | "program" | "edit-plan" | "edit-schedule";
 type ShareKind = "strength" | "run";
 type ShareFormat = "story" | "feed" | "square";
 type ShareStyle = "ember" | "minimal";
@@ -154,6 +158,8 @@ export default function App(){
     await writeSettings(settings);
   };
   const [day,setDay]=useState(todayIndex);
+  const [editingPlanId,setEditingPlanId]=useState<string|null>(null);
+  const [editorSerial,setEditorSerial]=useState(0);
   const [programStatus,setProgramStatus]=useState<ProgramStatus>("loading");
   const [savedPlans,setSavedPlans]=useState<WorkoutPlan[]>([]);
   const [catalogExercises,setCatalogExercises]=useState<Exercise[]>([]);
@@ -175,7 +181,31 @@ export default function App(){
   };
   useEffect(()=>{void loadProgram(true);},[]);
   const openProgram=(index:number)=>{setDay(index);go("program");};
-  const selectedDay=PROGRAM_DAYS[day];
+  const assignedDays=resolveSchedule(settings,savedPlans);
+  const selectedDay=assignedDays[day].day;
+  const selectedPlan=assignedDays[day].plan;
+  const assignedIds=new Set(assignedDays.map(x=>x.planId).filter(Boolean));
+  const unassignedPlans=savedPlans.filter(p=>!assignedIds.has(p.id));
+  const editPlan=(id:string|null)=>{setEditingPlanId(id);setEditorSerial(v=>v+1);go("edit-plan");};
+  const persistPlan=async(plan:WorkoutPlan,additions:Exercise[])=>{
+    await savePlanWithExercises(plan,additions);
+    await loadProgram(false);
+    go("workouts");
+  };
+  const deletePlan=async(plan:WorkoutPlan)=>{
+    if(configuredPlanIds(settings).includes(plan.id)) throw new Error("Retire esta ficha da agenda semanal antes de excluí-la.");
+    if(!plan.id.startsWith("custom-")) throw new Error("A ficha original não pode ser excluída, mas pode sair da agenda.");
+    await deleteEntity("plans",plan.id);
+    await loadProgram(false);
+    go("workouts");
+  };
+  const saveSchedule=async(ids:Array<string|null>,cardio:Array<ScheduledCardio|null>)=>{
+    const next={...settings,weeklyPlanIds:ids,weeklyCardio:cardio};
+    await flushSettings();
+    await writeSettings(next);
+    setSettings(next);
+    go("workouts");
+  };
 
   useEffect(()=>{
     if(screen!=="rest" || !restRunning || restLeft<=0) return;
@@ -208,12 +238,12 @@ export default function App(){
     if(kind==="weight")setWeight(prev=>({...prev,[currentKey]:Math.min(500,Math.max(0,(prev[currentKey]??mockWeights[sessionEx.id])+delta))}));
     else setReps(prev=>({...prev,[currentKey]:Math.min(100,Math.max(0,(prev[currentKey]??mockReps[sessionEx.id])+delta))}));
   };
-  const tab=navItems.find(n=>n.screen===screen)?.screen??(screen==="run"||screen==="program"?"workouts":screen==="share"?"progress":"workouts");
+  const tab=navItems.find(n=>n.screen===screen)?.screen??(screen==="run"||screen==="program"||screen==="edit-plan"||screen==="edit-schedule"?"workouts":screen==="share"?"progress":"workouts");
   return <div className={"gym-app"+(settings.largeText?" large-text":"")+(settings.reducedMotion?" reduced-motion":"")}>
     <div className="desktop-rail" aria-hidden="true"><span>GYM</span><i/><small>MOVE WITH PURPOSE</small></div>
     <div className="app-column">
       <header className="app-header">
-        <button className="logo" type="button" onClick={()=>go("home")} aria-label="GYM, voltar ao início">GYM<span>.</span></button>
+        <button className="logo" type="button" disabled={screen==="edit-plan"||screen==="edit-schedule"} onClick={()=>go("home")} aria-label="GYM, voltar ao início">GYM<span>.</span></button>
         <div className="header-actions">{["home","workouts","program"].includes(screen)?<span className="program-header-tag">10/10</span>:<DemoLabel compact/>}<button type="button" className="header-avatar" onClick={()=>go("profile")} aria-label="Abrir perfil"><UserRound size={20}/></button></div>
       </header>
       <main className="app-main" id="main-content">
@@ -225,20 +255,33 @@ export default function App(){
           <div className="home-cards"><button className="feature-mini" type="button" onClick={()=>go("run")}><div className="feature-icon"><Footprints size={24}/></div><small>CARDIO</small><h3>Corrida & esteira</h3><p>Ritmo, distância e tempo</p><ArrowUpRight className="corner-arrow" size={18}/></button><button className="feature-mini" type="button" onClick={()=>go("progress")}><div className="feature-icon"><TrendingUp size={24}/></div><small>RESULTADOS</small><h3>Sua evolução</h3><p>Gráficos e recordes</p><ArrowUpRight className="corner-arrow" size={18}/></button></div>
           <div className="callout-line"><Sparkles size={18}/><span>{programStatus==="ready"?"Programa 10/10 cadastrado no armazenamento local. O registro das séries será ativado na Sprint 04.":programStatus==="loading"?"Preparando o Programa 10/10...":"A ficha pode ser consultada, mas ainda não foi confirmada no armazenamento local."}</span></div>
         </>}
-        {screen==="workouts"&&<ProgramOverview status={programStatus} onOpen={openProgram} onInstall={()=>{void loadProgram(true);}}/>}
+        {screen==="workouts"&&<ProgramOverview status={programStatus} onOpen={openProgram} onInstall={()=>{void loadProgram(true);}}
+          assigned={assignedDays} unassigned={unassignedPlans}
+          onEdit={id=>editPlan(id)} onNew={()=>editPlan(null)} onEditSchedule={()=>go("edit-schedule")}/>}
+        {screen==="edit-plan"&&<PlanEditor key={editingPlanId??"new-"+editorSerial}
+          initial={savedPlans.find(p=>p.id===editingPlanId)} catalog={catalogExercises}
+          onSave={persistPlan} onDelete={deletePlan} onCancel={()=>go("workouts")}/>}
+        {screen==="edit-schedule"&&<ScheduleEditor
+          settings={settings} plans={savedPlans} onSave={saveSchedule}
+          onCancel={()=>go("workouts")}/>}
         {screen==="program"&&<ProgramDayDetail
           day={selectedDay}
           onBack={()=>go("workouts")}
           onPreview={startDemo}
           onCardio={()=>go("run")}
-          plan={savedPlans.find(plan=>plan.id===planId(selectedDay.id))}
+          plan={selectedPlan}
           catalog={catalogExercises}
           status={programStatus}
+          onEdit={()=>{if(selectedPlan)editPlan(selectedPlan.id);}}
         />}
         {screen==="library"&&<>
           <Titlebar eyebrow="CONHECIMENTO EM MOVIMENTO" title="Exercícios." right={<button type="button" className="round-control" onClick={()=>{setLibraryFilter("Todos");setSearch("");}} aria-label="Limpar filtros"><SlidersHorizontal size={19}/></button>}/>
           <p className="screen-lead">Consulte os exercícios do seu Programa 10/10 e seus dias de treinamento.</p>
-          <ProgramLibrary onOpen={openProgram}/>
+          <ProgramLibrary onOpen={sourceIndex=>{
+            const originalId=planId(PROGRAM_DAYS[sourceIndex].id);
+            const scheduledIndex=assignedDays.findIndex(d=>d.planId===originalId);
+            if(scheduledIndex>=0)openProgram(scheduledIndex);else editPlan(originalId);
+          }}/>
           <details className="demo-library-disclosure"><summary>Biblioteca visual experimental <span>5 exemplos fictícios</span></summary>
           <label className="search-box"><Search size={20}/><input type="search" placeholder="Buscar exercício" value={search} onChange={e=>setSearch(e.target.value)} aria-label="Buscar exercício"/></label>
           <div className="filter-row" aria-label="Filtrar por grupo muscular">{["Todos","Costas","Braços"].map(item=><button type="button" key={item} className={libraryFilter===item?"filter-chip active":"filter-chip"} onClick={()=>setLibraryFilter(item)} aria-pressed={libraryFilter===item}>{item}</button>)}</div>
@@ -318,7 +361,7 @@ export default function App(){
           onResetDemo={resetDemo}
         />}
       </main>
-      {screen!=="session"&&screen!=="rest"&&<nav className="bottom-nav" aria-label="Navegação principal">{navItems.map(item=>{const Icon=item.icon;return <button type="button" key={item.screen} className={tab===item.screen?"nav-link active":"nav-link"} aria-current={tab===item.screen?"page":undefined} onClick={()=>go(item.screen)}><Icon size={21} strokeWidth={tab===item.screen?2.5:1.8}/><span>{item.label}</span></button>})}</nav>}
+      {screen!=="session"&&screen!=="rest"&&screen!=="edit-plan"&&screen!=="edit-schedule"&&<nav className="bottom-nav" aria-label="Navegação principal">{navItems.map(item=>{const Icon=item.icon;return <button type="button" key={item.screen} className={tab===item.screen?"nav-link active":"nav-link"} aria-current={tab===item.screen?"page":undefined} onClick={()=>go(item.screen)}><Icon size={21} strokeWidth={tab===item.screen?2.5:1.8}/><span>{item.label}</span></button>})}</nav>}
     </div>
   </div>;
 }
