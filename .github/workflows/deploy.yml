@@ -35,6 +35,8 @@ jobs:
         run: npm test
       - name: Typecheck and build
         run: npm run build
+      - name: Validate iPhone home screen app icons and manifest
+        run: npm run test:pwa
       # GitHub Pages may still be configured as "Deploy from a branch",
       # while an Actions-based deployment is also enabled. The branch
       # build otherwise serves index.html with an uncompiled .tsx script:
@@ -46,10 +48,14 @@ jobs:
           rm -rf assets
           cp -R dist/assets assets
           cp dist/favicon.svg favicon.svg
+          cp dist/manifest.webmanifest manifest.webmanifest
+          cp dist/apple-touch-icon.png apple-touch-icon.png
+          rm -rf icons
+          cp -R dist/icons icons
           touch .nojekyll
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html assets favicon.svg .nojekyll
+          git add index.html assets favicon.svg manifest.webmanifest apple-touch-icon.png icons .nojekyll
           if ! git diff --cached --quiet; then
             git commit -m "build: sync compiled GYM site [skip ci]"
             git push origin HEAD:main
