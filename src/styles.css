@@ -1005,3 +1005,83 @@ input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-ou
 .cardio-empty p{font-size:12px;color:var(--muted);line-height:1.6;max-width:320px;margin:0}
 .cardio-show-more{width:100%;min-height:48px;color:#ffb584;background:#2e231c;border:1px solid #6b4d39;border-radius:10px;font-weight:780;font-size:12px;margin-top:12px}
 @media(max-width:375px){.cardio-form{padding:12px}.cardio-clock-actions{grid-template-columns:1.2fr .95fr 43px;gap:5px}.cardio-clock-actions button{font-size:10px;padding:7px 3px}.cardio-kind-options button{padding:9px 7px;gap:5px}.cardio-kind-options button span{font-size:11px}.cardio-week-bars{gap:3px;padding:13px 5px}.cardio-week-bars em{font-size:8px}.cardio-history-stats>span{padding:9px 4px}}
+
+
+/* Sprint 08: analytics derived exclusively from locally recorded sessions */
+.real-progress-page{padding-bottom:18px}
+.real-progress-heading{padding:12px 0 14px}
+.real-progress-heading h1{font-size:clamp(36px,10vw,49px);font-weight:900;letter-spacing:-2px;line-height:1.07;margin:11px 0 12px}
+.real-progress-heading h1 span{color:var(--orange)}
+.real-progress-heading p{font-size:13px;line-height:1.65;color:var(--muted);margin:0;max-width:490px}
+.real-progress-period{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;padding:5px;background:#232629;border:1px solid #383b40;border-radius:13px;margin:12px 0 20px}
+.real-progress-period button{min-height:45px;border:0;border-radius:9px;background:transparent;color:#bdc1c7;font-size:11px;font-weight:780}
+.real-progress-period button.active{background:var(--orange);color:#251208;font-weight:880}
+.real-progress-overview{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:15px 0 27px}
+.real-progress-metric{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:15px 12px;min-width:0}
+.real-progress-metric>div{display:flex;align-items:center;gap:7px;color:#bfc1c5;font-size:9px;font-weight:840;letter-spacing:.35px;line-height:1.4}
+.real-progress-metric>div svg{color:#ff9d61;flex:0 0 auto}
+.real-progress-metric>strong{display:block;font-size:clamp(30px,8vw,43px);font-weight:900;letter-spacing:-1.2px;line-height:1.15;margin:12px 0 7px;font-variant-numeric:tabular-nums}
+.real-progress-metric>small{display:block;font-size:10px;color:#a9abb1;line-height:1.5}
+.real-progress-section{margin:23px 0 32px}
+.real-progress-section-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-bottom:14px}
+.real-progress-section-heading h2{font-size:21px;letter-spacing:-.6px;font-weight:860;line-height:1.2;margin:7px 0 0}
+.real-progress-section-heading>button{display:flex;align-items:center;gap:4px;white-space:nowrap;min-height:44px;border:0;background:none;color:#ffaf7d;font-size:11px;font-weight:790;padding:8px 0}
+.real-progress-aside{color:#aab1b8;font-size:10px;white-space:nowrap}
+.real-progress-selector{display:grid;gap:8px;font-size:11px;font-weight:760;color:#ceced0;padding:2px 0 13px}
+.real-progress-selector select{width:100%;min-width:0;min-height:49px;background:#222529;border:1px solid #575d63;border-radius:10px;color:#fff;font-size:15px;padding:9px 12px}
+.real-progress-exercise-metrics{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px}
+.real-progress-exercise-metrics>div{padding:13px;background:#2c241f;border:1px solid #604634;border-radius:11px}
+.real-progress-exercise-metrics small{display:block;color:#c3a898;font-size:9px;line-height:1.45;font-weight:790;min-height:27px}
+.real-progress-exercise-metrics strong{display:block;font-size:clamp(25px,7vw,33px);font-weight:900;line-height:1.1;color:#fff;margin-top:5px;font-variant-numeric:tabular-nums}
+.real-progress-exercise-metrics em,.real-progress-volume em{font-size:12px;font-style:normal;color:#d5ad93;font-weight:590}
+.real-progress-chart-wrap{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:11px 8px 13px;overflow:hidden}
+.real-progress-chart{display:block;width:100%;height:auto;min-height:168px}
+.real-progress-chart-foot{display:flex;justify-content:space-between;gap:10px;color:#b5b6bc;font-size:10px;line-height:1.5;padding:3px 9px}
+.real-progress-samples{display:grid;gap:0;margin:12px 0;background:#1e2023;border:1px solid var(--line);border-radius:11px;overflow:hidden}
+.real-progress-samples>div{display:grid;grid-template-columns:52px 1fr auto;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid #34363a;font-size:12px}
+.real-progress-samples>div:last-child{border:0}
+.real-progress-samples>div>span{color:#b8b9bd}
+.real-progress-samples strong{font-variant-numeric:tabular-nums}
+.real-progress-samples small{font-size:10px;color:#b9babe;text-align:right}
+.real-progress-smallnote{color:#a9adb2;font-size:11px;line-height:1.65;margin:11px 1px 13px}
+.real-progress-volume{display:grid;grid-template-columns:1.6fr 1fr;gap:10px;margin-top:17px}
+.real-progress-volume>div{padding:15px 12px;background:var(--panel);border:1px solid var(--line);border-radius:12px;min-width:0}
+.real-progress-volume span{font-size:9px;color:#b7b9be;line-height:1.5;letter-spacing:.25px;font-weight:800;display:block;min-height:27px}
+.real-progress-volume strong{display:block;font-size:clamp(20px,6vw,29px);line-height:1.2;font-weight:900;margin-top:6px}
+.real-progress-cardio-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.real-progress-cardio-grid>div{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px;display:grid;align-content:start;gap:7px}
+.real-progress-cardio-grid>div:last-child{grid-column:1/-1}
+.real-progress-cardio-grid svg{color:#ff9e68}
+.real-progress-cardio-grid span{font-size:9px;font-weight:820;color:#b7b8bb;line-height:1.5}
+.real-progress-cardio-grid strong{font-size:clamp(21px,6vw,28px);font-weight:880;line-height:1.2;font-variant-numeric:tabular-nums}
+.real-progress-cardio-grid strong small{font-size:12px;color:#cbc0b9}
+.real-progress-weeks{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;align-items:end;border:1px solid var(--line);background:var(--panel);border-radius:13px;padding:13px 10px}
+.real-progress-week{display:grid;justify-items:center;align-content:end;gap:7px;min-width:0}
+.real-progress-week strong{font-size:15px;font-variant-numeric:tabular-nums}
+.real-progress-week strong small{font-size:9px;color:#aeb0b6;font-weight:600}
+.real-progress-weektrack{height:110px;display:flex;align-items:flex-end;justify-content:center;background:#2a2c30;border-radius:7px 7px 2px 2px;width:100%;overflow:hidden}
+.real-progress-weektrack span{background:linear-gradient(#ffb77f,#f36c30);border-radius:6px 6px 0 0;width:100%}
+.real-progress-week>small{color:#b4b8bd;font-size:9px;white-space:nowrap}
+.real-progress-empty{border:1px solid #564636;background:#25221f;border-radius:13px;padding:23px 18px;margin:13px 0;display:grid;justify-items:center;gap:9px;text-align:center}
+.real-progress-empty>svg{color:#fba367}
+.real-progress-empty>strong{font-size:15px;line-height:1.35}
+.real-progress-empty>p{font-size:12px;line-height:1.55;color:#c5c0bc;max-width:330px;margin:0}
+.real-progress-empty.compact{background:var(--panel);border-color:var(--line);padding:20px}
+.real-progress-empty-actions{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:12px}
+.real-progress-empty-actions button{display:flex;align-items:center;justify-content:center;gap:6px;min-height:46px;background:#473020;border:1px solid #9b6340;color:#ffd3b3;border-radius:10px;padding:10px 12px;font-size:12px;font-weight:810}
+.real-progress-share{width:100%;display:flex;align-items:center;gap:11px;text-align:left;min-height:78px;background:var(--panel);border:1px solid var(--line);color:var(--text);border-radius:13px;padding:15px;margin:12px 0 23px}
+.real-progress-share>svg{color:var(--orange);flex:0 0 auto}
+.real-progress-share>span{flex:1;min-width:0}
+.real-progress-share strong{font-size:13px;display:block}
+.real-progress-share small{font-size:11px;line-height:1.5;color:#b6b7bb;display:block;margin-top:4px}
+@media(max-width:385px){
+ .real-progress-metric{padding:12px 9px}
+ .real-progress-metric>div{font-size:8px}
+ .real-progress-metric>div svg{width:15px;height:15px}
+ .real-progress-period{gap:3px}
+ .real-progress-period button{font-size:10px}
+ .real-progress-samples>div{grid-template-columns:45px 1fr auto;padding:9px 8px}
+ .real-progress-samples small{font-size:9px}
+ .real-progress-weeks{gap:5px;padding:11px 7px}
+ .real-progress-week>small{font-size:8px}
+}
