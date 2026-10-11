@@ -386,3 +386,94 @@ input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-ou
 .backup-panel .text-action{align-self:flex-start;min-height:44px;}
 .storage-feedback{font-size:12px;line-height:1.6;color:#dfcbbd;background:#29201c;border-radius:9px;padding:12px;margin:0;}
 .visually-hidden{position:absolute!important;clip:rect(0,0,0,0)!important;clip-path:inset(50%)!important;width:1px!important;height:1px!important;overflow:hidden!important;white-space:nowrap!important;}
+
+
+/* Programa 10/10: fichas reais, sem métricas demonstrativas. */
+.program-header-tag{display:inline-flex;align-items:center;justify-content:center;min-height:29px;padding:5px 12px;border:1px solid #78472e;background:#302018;color:#ffad7c;font-size:12px;font-weight:850;border-radius:99px;letter-spacing:1.5px}
+.program-intro{margin:5px 0 25px;}
+.program-intro h1{font-size:clamp(34px,9vw,49px);font-weight:880;letter-spacing:-2.4px;margin:9px 0 7px;line-height:1.05}
+.program-intro p{font-size:13px;color:var(--muted);line-height:1.6;margin:0}
+.program-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:21px 0}
+.program-metrics>div{background:var(--panel);border:1px solid var(--line);padding:16px 9px;border-radius:13px;min-width:0}
+.program-metrics strong{display:block;font-size:clamp(27px,6vw,36px);line-height:1.1;color:var(--text);font-weight:870;letter-spacing:-1.3px}
+.program-metrics span{display:block;font-size:9px;letter-spacing:.35px;color:var(--muted);font-weight:750;line-height:1.4;margin-top:8px}
+.program-save-banner{display:flex;gap:10px;align-items:flex-start;padding:13px 14px;border:1px solid #704a32;background:#2d211a;color:#e7b694;border-radius:13px;font-size:11px;line-height:1.6}
+.program-save-banner svg{flex:0 0 auto;margin-top:1px}
+.program-save-banner.is-saved{background:#18291f;border-color:#3b634a;color:#b9e0c5}
+.program-retry{display:flex;align-items:center;gap:8px;min-height:47px;border:1px solid var(--line);background:var(--panel-2);color:#ffe0ca;border-radius:10px;padding:10px 14px;margin-top:10px;font-size:12px;font-weight:750}
+.program-week-list{display:grid;gap:9px}
+.program-week-day{display:flex;align-items:center;gap:13px;min-width:0;min-height:88px;padding:13px 14px;background:var(--panel);border:1px solid var(--line);border-radius:15px;text-align:left;color:var(--text)}
+.program-week-day:hover,.program-library-item:hover{background:#24272a}
+.program-day-index{display:grid;place-items:center;align-self:stretch;min-width:48px;border-radius:10px;background:#3f291e;color:#ffa970;font-size:12px;letter-spacing:.5px;font-weight:880}
+.program-day-index.rest{color:#b8b8bc;background:#303236}
+.program-week-copy{flex:1;display:block;min-width:0}
+.program-week-copy strong{display:block;font-size:17px;letter-spacing:-.5px;line-height:1.25}
+.program-week-copy small{display:block;color:#b3b4b9;font-size:12px;line-height:1.4;margin-top:4px}
+.program-week-copy em{display:block;color:#eea374;font-style:normal;font-size:11px;line-height:1.45;margin-top:6px}
+.program-week-day>svg{color:#aaaeb3;flex:0 0 auto}
+.program-priorities{border-radius:15px;border:1px solid var(--line);background:var(--panel);padding:17px}
+.program-priorities>p{font-size:13px;color:#e2e3e5;font-weight:700;margin:0 0 14px;line-height:1.5}
+.program-priorities>div{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-top:1px solid #313337}
+.program-priorities>div span{font-size:12px;font-weight:850;color:var(--orange)}
+.program-priorities>div strong{font-size:13px;line-height:1.5;font-weight:620}
+.program-day-head{margin:16px 0 25px}
+.program-day-head h1{font-size:clamp(36px,8vw,50px);letter-spacing:-1.8px;margin:9px 0;line-height:1.05;font-weight:900}
+.program-day-head>p{font-size:15px;color:var(--muted);margin:0 0 12px}
+.program-focus{display:inline-flex;align-items:center;gap:6px;color:#ffc49f;background:#3b261c;border:1px solid #734a33;border-radius:99px;padding:9px 12px;font-size:11px;font-weight:770}
+.program-day-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.program-day-summary span{display:flex;align-items:center;justify-content:center;gap:8px;background:#242629;border:1px solid #393b40;border-radius:11px;padding:12px 8px;font-size:11px;font-weight:760}
+.program-day-summary svg{width:17px;flex:0 0 auto;color:var(--orange)}
+.program-exercise-list{display:grid;gap:12px}
+.program-exercise{background:var(--panel);border:1px solid var(--line);border-radius:15px;padding:17px}
+.program-exercise-heading{display:flex;gap:12px;align-items:flex-start}
+.program-order{color:var(--orange);font-size:14px;font-weight:880;min-width:23px;padding-top:4px}
+.program-exercise-heading>div{min-width:0;flex:1}
+.program-exercise h2{font-size:17px;line-height:1.3;letter-spacing:-.4px;margin:0 0 5px;font-weight:820}
+.program-exercise-heading span:not(.program-order){display:block;color:var(--muted);font-size:11px}
+.program-sets{display:grid;gap:8px;margin:15px 0 0}
+.program-set{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.1fr) minmax(0,.7fr);align-items:center;gap:8px;border:1px solid #37393d;background:#111315;border-radius:10px;padding:12px 11px}
+.program-set>span{color:#a4a6ab;font-size:10px;font-weight:750;letter-spacing:.2px}
+.program-set>strong{font-size:15px;font-weight:870;letter-spacing:-.2px;white-space:nowrap}
+.program-set>strong small{font-size:11px;color:var(--muted);font-weight:600}
+.program-set>em{font-size:12px;font-weight:780;color:#ffab7b;font-style:normal;white-space:nowrap;text-align:right}
+.program-exercise-note{margin:12px 0 0;color:#c0c1c4;font-size:12px;line-height:1.6}
+.program-cardio{display:flex;gap:14px;align-items:flex-start;margin-top:18px;border-radius:16px;border:1px solid #734c31;background:#2c2018;padding:20px}
+.program-cardio>svg{color:var(--orange);flex:0 0 auto}
+.program-cardio>div{flex:1;min-width:0}
+.program-cardio span{color:#ffb184;font-size:10px;font-weight:800;letter-spacing:.7px}
+.program-cardio h2{font-size:18px;margin:6px 0;font-weight:830;line-height:1.25}
+.program-cardio p{color:#d2b6a6;font-size:12px;line-height:1.6}
+.program-cardio button{background:none;border:0;padding:11px 0;color:#ffb487;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:750;min-height:44px}
+.program-rest{padding:30px 20px;text-align:center;background:var(--panel);border:1px solid var(--line);border-radius:17px;margin-top:19px}
+.program-rest svg{color:var(--orange)}
+.program-rest h2{margin:15px 0 8px;font-size:22px}
+.program-rest p{margin:0;font-size:13px;color:var(--muted);line-height:1.6}
+.program-preview-action{margin-top:18px;text-align:center}
+.program-preview-action>small{color:var(--muted);display:block;margin:12px 0 0;font-size:11px;line-height:1.5}
+.program-library{margin-top:20px}
+.program-library>p{margin:-4px 0 15px;font-size:12px;color:var(--muted);line-height:1.65}
+.program-library-grid{display:grid;gap:8px}
+.program-library-item{min-height:66px;border:1px solid var(--line);background:var(--panel);padding:11px 13px;display:flex;align-items:center;gap:12px;text-align:left;border-radius:12px;color:var(--text)}
+.program-library-item>span{width:43px;height:43px;display:grid;place-items:center;border-radius:10px;color:var(--orange);background:#31221a;flex:0 0 auto}
+.program-library-item>div{min-width:0;flex:1}
+.program-library-item strong{display:block;font-size:13px;line-height:1.4}
+.program-library-item small{display:block;font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4}
+.program-library-item>svg{color:#a8a8aa;flex:0 0 auto}
+.demo-library-disclosure{margin-top:26px;border:1px solid var(--line);background:var(--panel);border-radius:15px;padding:13px}
+.demo-library-disclosure summary{cursor:pointer;min-height:44px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:7px;font-size:12px;font-weight:790;list-style:revert}
+.demo-library-disclosure summary span{font-size:11px;color:var(--muted);font-weight:550}
+.demo-library-disclosure[open]{padding-bottom:18px}
+@media(max-width:370px){
+  .program-week-day{gap:9px;padding:10px;min-height:78px}
+  .program-day-index{min-width:41px;font-size:11px}
+  .program-week-copy strong{font-size:15px}
+  .program-week-copy small,.program-week-copy em{font-size:10px}
+  .program-exercise{padding:12px}
+  .program-set{gap:4px;padding:11px 7px}
+  .program-set>span{font-size:9px}
+  .program-set>strong{font-size:13px}
+  .program-set>strong small{font-size:10px}
+  .program-set>em{font-size:11px}
+  .program-metrics>div{padding:13px 6px}
+  .program-metrics span{font-size:8px}
+}
