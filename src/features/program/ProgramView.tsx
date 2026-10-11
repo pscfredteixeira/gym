@@ -1,18 +1,22 @@
-import { Activity, ArrowRight, ChevronRight, CircleCheck, Dumbbell, Footprints, RotateCcw } from "lucide-react";
+import { Activity, ArrowRight, ChevronRight, CircleCheck, Dumbbell, Footprints, RotateCcw, Pencil, CalendarRange, Plus } from "lucide-react";
 import type { Exercise, WorkoutPlan } from "../../domain/models";
 import {
   PROGRAM_DAYS, PROGRAM_FOCUS, PROGRAM_NAME, PROGRAM_PRIORITIES, PROGRAM_SUBTITLE,
-  type ProgramDay, exerciseId, repsLabel, rirLabel, seriesCount, totalWeeklySets
+  type ProgramDay, exerciseId, repsLabel, rirLabel
 } from "../../data/program1010";
 import { BackHeader, Notice, PrimaryButton, SectionHead } from "../../components/ui";
 
 export type ProgramStatus = "loading" | "ready" | "error" | "not_installed";
 
 export function ProgramOverview({
-  status,onOpen,onInstall
+  status,onOpen,onInstall,assigned,onEdit,onNew,onEditSchedule,unassigned
 }:{
-  status:ProgramStatus;onOpen:(index:number)=>void;onInstall:()=>void
+  status:ProgramStatus;onOpen:(index:number)=>void;onInstall:()=>void;
+  assigned:Array<{day:ProgramDay;plan?:WorkoutPlan;planId:string|null}>;
+  onEdit:(id:string)=>void;onNew:()=>void;onEditSchedule:()=>void;unassigned:WorkoutPlan[]
 }){
+  const daysWithWorkout=assigned.filter(item=>!!item.plan).length;
+  const effectiveSets=assigned.reduce((sum,item)=>sum+(item.plan?.exercises.reduce((count,ex)=>count+ex.sets.filter(s=>s.kind==="working").length,0)??0),0);
   return <>
     <div className="program-intro">
       <span className="eyebrow">SEU PLANEJAMENTO SEMANAL</span>
@@ -20,9 +24,9 @@ export function ProgramOverview({
       <p>{PROGRAM_SUBTITLE} · inspirado em Jordan Peters</p>
     </div>
     <div className="program-metrics">
-      <div><strong>05</strong><span>DIAS DE MUSCULAÇÃO</span></div>
-      <div><strong>{totalWeeklySets}</strong><span>SÉRIES EFETIVAS / SEMANA</span></div>
-      <div><strong>02</strong><span>DIAS DE RECUPERAÇÃO</span></div>
+      <div><strong>{daysWithWorkout.toString().padStart(2,"0")}</strong><span>DIAS DE MUSCULAÇÃO</span></div>
+      <div><strong>{effectiveSets}</strong><span>SÉRIES EFETIVAS / SEMANA</span></div>
+      <div><strong>{(7-daysWithWorkout).toString().padStart(2,"0")}</strong><span>DIAS SEM MUSCULAÇÃO</span></div>
     </div>
     <div className={"program-save-banner "+(status==="ready"?"is-saved":"")} role="status">
       <CircleCheck size={20}/>
@@ -34,15 +38,17 @@ export function ProgramOverview({
       </span>
     </div>
     {(status==="error"||status==="not_installed")&&<button className="program-retry" type="button" onClick={onInstall}><RotateCcw size={17}/> Tentar cadastrar novamente</button>}
+    <div className="program-action-row"><button type="button" onClick={onEditSchedule}><CalendarRange size={18}/> Organizar semana</button><button type="button" onClick={onNew}><Plus size={18}/> Nova ficha</button></div>
     <SectionHead title="Sua semana" aside="Selecione o dia"/>
     <div className="program-week-list">
-      {PROGRAM_DAYS.map((day,index)=><button type="button" key={day.id} className="program-week-day" onClick={()=>onOpen(index)}>
-        <span className={day.exercises.length?"program-day-index":"program-day-index rest"}>{day.short}</span>
+      {assigned.map(({day,plan},index)=><button type="button" key={day.id} className="program-week-day" onClick={()=>onOpen(index)}>
+        <span className={plan?"program-day-index":"program-day-index rest"}>{day.short}</span>
         <span className="program-week-copy"><strong>{day.title}</strong><small>{day.subtitle}</small>
-          <em>{day.exercises.length?day.exercises.length+" exercícios · "+seriesCount(day)+" séries efetivas":"Recuperação / descanso"}
+          <em>{plan?plan.exercises.length+" exercícios · "+plan.exercises.reduce((sum,ex)=>sum+ex.sets.filter(s=>s.kind==="working").length,0)+" séries efetivas":"Recuperação / descanso"}
             {day.cardio?" · "+day.cardio.label:""}</em>
         </span><ChevronRight size={19}/></button>)}
     </div>
+    {unassigned.length>0&&<><SectionHead title="Fichas fora da agenda" aside={unassigned.length+" disponíveis"}/><div className="program-unassigned">{unassigned.map(plan=><button type="button" key={plan.id} onClick={()=>onEdit(plan.id)}><span><strong>{plan.name}</strong><small>{plan.exercises.length} exercícios · toque para editar</small></span><Pencil size={18}/></button>)}</div></>}
     <SectionHead title="Objetivo e prioridades"/>
     <div className="program-priorities">
       <p>{PROGRAM_FOCUS}</p>
@@ -53,7 +59,7 @@ export function ProgramOverview({
 }
 
 export function ProgramDayDetail({
-  day,onBack,onPreview,onCardio,plan,catalog,status
+  day,onBack,onPreview,onCardio,plan,catalog,status,onEdit
 }:{
   day:ProgramDay;
   onBack:()=>void;
@@ -62,6 +68,7 @@ export function ProgramDayDetail({
   plan:WorkoutPlan|undefined;
   catalog:Exercise[];
   status:ProgramStatus;
+  onEdit:()=>void;
 }) {
   const catalogMap = new Map(catalog.map(e=>[e.id,e]));
   const source = day.exercises.map(x=>[exerciseId(x.name),x] as const);
@@ -83,12 +90,13 @@ export function ProgramDayDetail({
   }));
   const total=rows.reduce((n,r)=>n+r.sets.filter(s=>s.kind==="working").length,0);
   return <>
-    <BackHeader label="PROGRAMA 10/10 · VERSÃO 2.0" onBack={onBack}/>
-    <div className="program-day-head"><span className="eyebrow">{day.weekday.toUpperCase()} · {day.exercises.length?"MUSCULAÇÃO":"RECUPERAÇÃO"}</span>
+    <BackHeader label="SUA FICHA DE TREINO" onBack={onBack} action={plan?<button type="button" className="round-control" onClick={onEdit} aria-label="Editar esta ficha"><Pencil size={19}/></button>:undefined}/>
+    <div className="program-day-head"><span className="eyebrow">{day.weekday.toUpperCase()} · {plan?"MUSCULAÇÃO":"RECUPERAÇÃO"}</span>
       <h1>{day.title}<span className="orange">.</span></h1>
       <p>{day.subtitle}</p>
       {day.focus&&<span className="program-focus"><Dumbbell size={15}/>{day.focus}</span>}
     </div>
+    {plan&&<button type="button" className="program-edit-call" onClick={onEdit}><Pencil size={17}/> Personalizar esta ficha <ArrowRight size={17}/></button>}
     {rows.length>0&&<>
       <div className="program-day-summary"><span><Dumbbell size={17}/>{rows.length} exercícios</span><span><CircleCheck size={17}/>{total} séries efetivas</span></div>
       <SectionHead title="Exercícios" aside="Séries e RIR previstos"/>
@@ -110,7 +118,7 @@ export function ProgramDayDetail({
         <button type="button" onClick={onCardio}>Ver módulo de corrida <ArrowRight size={16}/></button>
       </div>
     </section>}
-    {!day.exercises.length&&<div className="program-rest"><Activity size={32}/><h2>Dia de recuperação</h2><p>{day.note??"Recuperação priorizada. Não há séries de musculação programadas."}</p></div>}
+    {!rows.length&&<div className="program-rest"><Activity size={32}/><h2>Dia de recuperação</h2><p>{day.note??"Recuperação priorizada. Não há séries de musculação programadas."}</p></div>}
     <Notice>
       {status==="ready"?"Ficha salva neste navegador.": "Ficha visível como referência, sem confirmação de salvamento."}
       {" "}O registro de séries reais será habilitado na Sprint 04; a tela atual é para consultar o planejamento.
@@ -131,7 +139,7 @@ export function ProgramLibrary({
   }));
   const entries=Array.from(unique.values());
   return <section className="program-library">
-    <SectionHead title="No seu Programa 10/10" aside={entries.length+" exercícios"}/>
+    <SectionHead title="Prescrições originais 10/10" aside={entries.length+" exercícios"}/>
     <p>Selecione um exercício para consultar o dia da sua ficha, as repetições e o RIR.</p>
     <div className="program-library-grid">{entries.map(ex=><button key={ex.name} type="button" className="program-library-item" onClick={()=>onOpen(ex.day)}>
       <span><Dumbbell size={19}/></span><div><strong>{ex.name}</strong><small>{ex.muscle} · {ex.equipment}</small></div><ChevronRight size={17}/>
