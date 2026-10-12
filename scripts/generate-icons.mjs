@@ -1,84 +1,39 @@
 #!/usr/bin/env node
 /**
- * Generate deterministic PNG application icons, without a third-party rasterizer.
- * The same orange "G" monogram is represented in public/icons/gym-mark.svg.
- * Apple Home Screen uses the 180px PNG; Chromium/Android use 192px/512px.
+ * Recreate the user-approved GYM icon in the sizes required by Safari and PWA.
+ * Design source is a compact, palette-compressed raster in gym-approved-art.mjs.
+ * All work happens locally during build; no fonts or external assets required.
  */
-import { deflateSync } from "node:zlib";
+import { brotliDecompressSync, deflateSync } from "node:zlib";
 import { mkdir, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
+import { GYM_ICON_ART } from "./gym-approved-art.mjs";
 
-const commands=[
-  ["M",358,166],
-  ["C",329,141,295,130,255,130],
-  ["C",171,130,111,185,111,256],
-  ["C",111,331,174,386,256,386],
-  ["C",301,386,338,372,360,354],
-  ["L",360,273],
-  ["L",275,273]
-];
+const palette=Buffer.from(GYM_ICON_ART.palette,"hex");
+const source=brotliDecompressSync(Buffer.from(GYM_ICON_ART.pixelsBrotli,"base64"));
+const {width:sw,height:sh}=GYM_ICON_ART;
+if(source.length!==sw*sh||palette.length%3!==0||palette.length<3*32)
+  throw new Error("Imagem GYM aprovada está incompleta ou corrompida.");
 
-function cubic(a,b,c,d,t){
-  const i=1-t;
-  return i*i*i*a+3*i*i*t*b+3*i*t*t*c+t*t*t*d;
-}
-function buildSegments(){
-  const pts=[];
-  let x=0,y=0;
-  for(const c of commands){
-    if(c[0]==="M"){x=c[1];y=c[2];pts.push([x,y]);continue;}
-    if(c[0]==="L"){x=c[1];y=c[2];pts.push([x,y]);continue;}
-    const px=x,py=y;
-    for(let i=1;i<=30;i++){
-      const t=i/30;
-      pts.push([cubic(px,c[1],c[3],c[5],t),cubic(py,c[2],c[4],c[6],t)]);
+function render(size) {
+  const output=Buffer.alloc(size*size*4);
+  const sample=(x,y,c)=>{
+    const sx=Math.min(sw-1,Math.max(0,x));
+    const sy=Math.min(sh-1,Math.max(0,y));
+    return palette[source[sy*sw+sx]*3+c];
+  };
+  for(let y=0;y<size;y++)for(let x=0;x<size;x++){
+    const fx=(x+.5)*sw/size-.5,fy=(y+.5)*sh/size-.5;
+    const x0=Math.floor(fx),y0=Math.floor(fy);
+    const dx=fx-x0,dy=fy-y0,base=(y*size+x)*4;
+    for(let c=0;c<3;c++){
+      const upper=sample(x0,y0,c)*(1-dx)+sample(x0+1,y0,c)*dx;
+      const lower=sample(x0,y0+1,c)*(1-dx)+sample(x0+1,y0+1,c)*dx;
+      output[base+c]=Math.round(upper*(1-dy)+lower*dy);
     }
-    x=c[5];y=c[6];
+    output[base+3]=255;
   }
-  return pts.slice(1).map((p,i)=>[...pts[i],...p]);
-}
-const segments=buildSegments();
-function distance(x,y){
-  let min=1e9;
-  for(const [x1,y1,x2,y2] of segments){
-    const vx=x2-x1,vy=y2-y1;
-    const t=Math.max(0,Math.min(1,((x-x1)*vx+(y-y1)*vy)/(vx*vx+vy*vy)));
-    const dx=x-x1-t*vx,dy=y-y1-t*vy;
-    const d=dx*dx+dy*dy;
-    if(d<min)min=d;
-  }
-  return Math.sqrt(min);
-}
-function clamp(n){return Math.min(255,Math.max(0,Math.round(n)));}
-function render(size){
-  const rgba=Buffer.alloc(size*size*4);
-  const aa=512/size*0.72;
-  for(let py=0;py<size;py++){
-    const y=(py+0.5)*512/size;
-    for(let px=0;px<size;px++){
-      const x=(px+0.5)*512/size,idx=(py*size+px)*4;
-      const r=Math.hypot((x-240)/480,(y-178)/480);
-      const light=Math.max(0,1-r*2.1);
-      let red=14+8*light,green=17+8*light,blue=21+8*light;
-      if(x>75&&x<412&&y>90&&y<423){
-        const dist=distance(x,y);
-        const spread=Math.max(0,dist-29);
-        const glow=Math.max(0,0.12*Math.exp(-spread/18));
-        red=red*(1-glow)+239*glow;
-        green=green*(1-glow)+111*glow;
-        blue=blue*(1-glow)+40*glow;
-        const coverage=Math.max(0,Math.min(1,(29+aa-dist)/(2*aa)));
-        const gradient=Math.max(0,Math.min(1,(y-140)/255));
-        const gr=255,gg=151-49*gradient,gb=73-35*gradient;
-        red=red*(1-coverage)+gr*coverage;
-        green=green*(1-coverage)+gg*coverage;
-        blue=blue*(1-coverage)+gb*coverage;
-      }
-      rgba[idx]=clamp(red);rgba[idx+1]=clamp(green);
-      rgba[idx+2]=clamp(blue);rgba[idx+3]=255;
-    }
-  }
-  return rgba;
+  return output;
 }
 const crcTable=new Uint32Array(256);
 for(let n=0;n<256;n++){
@@ -113,8 +68,11 @@ function toPng(rgba,size){
 }
 const outputs=[
   [180,"public/apple-touch-icon.png"],
+  [180,"public/apple-touch-icon-v2.png"],
   [192,"public/icons/icon-192.png"],
-  [512,"public/icons/icon-512.png"]
+  [192,"public/icons/icon-192-v2.png"],
+  [512,"public/icons/icon-512.png"],
+  [512,"public/icons/icon-512-v2.png"]
 ];
 for(const [size,name] of outputs){
   const file=join(process.cwd(),name);
