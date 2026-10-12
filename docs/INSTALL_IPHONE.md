@@ -27,3 +27,9 @@ O ícone e o modo standalone não significam que o aplicativo inteiro funciona o
 ### Verificação técnica
 
 `npm run build` aciona `scripts/generate-icons.mjs` antes do build; `npm run test:pwa` confirma manifesto, links iOS e arquivos PNG com dimensões corretas. O workflow de publicação sincroniza o manifesto e os PNGs para a raiz que serve o Pages por branch e também os inclui no artefato de Pages por Actions. A checagem HTTP em `scripts/check-deploy.mjs` valida os endpoints públicos.
+
+## Revisão do ícone (2026-10-12)
+
+O ícone aprovado, com as letras **GYM** em laranja sobre grafite, está publicado como `/gym/apple-touch-icon-v3.png`. O HTML aponta exclusivamente para a nova versão e o manifesto usa `icon-192-v3.png` e `icon-512-v3.png`. Os arquivos antigos são preservados por compatibilidade.
+
+**Ícones de aplicativos já instalados no iPhone não são necessariamente atualizados pelo Safari quando o arquivo do site muda.** Faça primeiro um backup JSON no Perfil. Depois de guardar esse backup, remova apenas a instalação antiga da Tela de Início, abra a versão mais recente do GYM no Safari normal e use **Compartilhar → Adicionar à Tela de Início** novamente. Se os treinos não forem transferidos automaticamente, importe o backup JSON na nova instalação.

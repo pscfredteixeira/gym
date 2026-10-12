@@ -69,10 +69,13 @@ function toPng(rgba,size){
 const outputs=[
   [180,"public/apple-touch-icon.png"],
   [180,"public/apple-touch-icon-v2.png"],
+  [180,"public/apple-touch-icon-v3.png"],
   [192,"public/icons/icon-192.png"],
   [192,"public/icons/icon-192-v2.png"],
+  [192,"public/icons/icon-192-v3.png"],
   [512,"public/icons/icon-512.png"],
-  [512,"public/icons/icon-512-v2.png"]
+  [512,"public/icons/icon-512-v2.png"],
+  [512,"public/icons/icon-512-v3.png"]
 ];
 for(const [size,name] of outputs){
   const file=join(process.cwd(),name);
