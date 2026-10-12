@@ -1,15 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="GYM: G laranja sobre fundo grafite">
-  <defs>
-    <radialGradient id="background" cx="48%" cy="32%" r="80%">
-      <stop stop-color="#1b1f24"/>
-      <stop offset="1" stop-color="#0e1115"/>
-    </radialGradient>
-    <linearGradient id="orange" x1="0" y1="0" x2="0" y2="1">
-      <stop stop-color="#ff9749"/>
-      <stop offset="1" stop-color="#ff6626"/>
-    </linearGradient>
-  </defs>
-  <rect width="512" height="512" fill="url(#background)"/>
-  <path d="M358 166 C329 141 295 130 255 130 C171 130 111 185 111 256 C111 331 174 386 256 386 C301 386 338 372 360 354 L360 273 L275 273"
-    fill="none" stroke="url(#orange)" stroke-width="58" stroke-linejoin="round" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="GYM laranja sobre grafite">
+ <defs><radialGradient id="b"><stop stop-color="#25282b"/><stop offset="1" stop-color="#101215"/></radialGradient><linearGradient id="o" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#ff9924"/><stop offset="1" stop-color="#ff5b16"/></linearGradient></defs>
+ <rect width="512" height="512" rx="64" fill="url(#b)"/>
+ <rect x="18" y="18" width="476" height="476" rx="62" fill="none" stroke="url(#o)" stroke-width="9"/>
+ <text x="254" y="305" text-anchor="middle" font-family="Inter,Arial Black,system-ui,sans-serif" font-size="159" font-weight="950" letter-spacing="-17" fill="url(#o)">GYM</text>
 </svg>
