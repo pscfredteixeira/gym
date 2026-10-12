@@ -5,11 +5,11 @@ const manifest=JSON.parse(await readFile("dist/manifest.webmanifest","utf-8"));
 const html=await readFile("dist/index.html","utf-8");
 check(manifest.id==="/gym/"&&manifest.scope==="/gym/"&&manifest.start_url==="/gym/"&&manifest.display==="standalone","Manifesto da PWA inválido");
 check(manifest.short_name==="GYM","Nome do aplicativo incorreto");
-check(html.includes('rel="apple-touch-icon"')&&html.includes("/gym/apple-touch-icon.png"),"Ícone do iPhone não aparece no HTML");
+check(html.includes('rel="apple-touch-icon"')&&html.includes("/gym/apple-touch-icon-v2.png"),"Ícone do iPhone não aparece no HTML");
 check(html.includes('rel="manifest"')&&html.includes("/gym/manifest.webmanifest"),"Manifesto não aparece no HTML");
 check(html.includes('apple-mobile-web-app-capable" content="yes"'),"Configuração standalone do iPhone ausente");
 const signature=Buffer.from([137,80,78,71,13,10,26,10]);
-const expected=[["dist/apple-touch-icon.png",180],["dist/icons/icon-192.png",192],["dist/icons/icon-512.png",512]];
+const expected=[["dist/apple-touch-icon.png",180],["dist/apple-touch-icon-v2.png",180],["dist/icons/icon-192.png",192],["dist/icons/icon-192-v2.png",192],["dist/icons/icon-512.png",512],["dist/icons/icon-512-v2.png",512]];
 for(const [path,size] of expected){
  const png=await readFile(path);
  check(png.subarray(0,8).equals(signature),"PNG inválido: "+path);
