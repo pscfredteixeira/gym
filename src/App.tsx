@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  Activity, ArrowDownToLine, ArrowRight, ArrowUpRight, BarChart3, BookOpen,
+  Activity, ArrowRight, ArrowUpRight, BarChart3, BookOpen,
   CalendarDays, Check, CheckCircle2, ChevronLeft, ChevronRight, Clock3,
   Dumbbell, Flame, Footprints, House, Info, Minus,
-  Pause, Play, Plus, RotateCcw, Share2, ShieldCheck,
-  Sparkles, TrendingUp, UserRound, X
+  Pause, Play, Plus, RotateCcw, Share2,
+  Sparkles, TrendingUp, UserRound
 } from "lucide-react";
 import { DemoLabel, Photo, SectionHead, BackHeader, PrimaryButton, Notice } from "./components/ui";
 import { exercises, mockWeights, mockReps, photos } from "./data/demo";

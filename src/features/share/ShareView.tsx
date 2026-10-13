@@ -1,5 +1,5 @@
 import { useEffect,useMemo,useState } from "react";
-import { ArrowDownToLine,ArrowLeft,ArrowRight,CheckCircle2,Dumbbell,Footprints,Image as ImageIcon,Share2,ShieldCheck } from "lucide-react";
+import { ArrowDownToLine,ArrowRight,CheckCircle2,Dumbbell,Footprints,Image as ImageIcon,Share2,ShieldCheck } from "lucide-react";
 import type { CardioSession,UserSettings,WorkoutSession } from "../../domain/models";
 import { BackHeader,Notice,PrimaryButton } from "../../components/ui";
 import { cardBlob,cardFileName,drawShareCard } from "./shareCanvas";
