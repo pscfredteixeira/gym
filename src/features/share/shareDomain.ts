@@ -1,5 +1,5 @@
 import type { CardioSession, WorkoutSession } from "../../domain/models";
-import { cardioTitle, paceLabel } from "../cardio/cardioDomain";
+import { cardioTitle, paceLabel } from "../cardio/cardioDomain.ts";
 
 export type ShareFormat="story"|"feed"|"square";
 export type ShareStyle="ember"|"minimal";
