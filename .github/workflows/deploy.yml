@@ -162,3 +162,26 @@ jobs:
             exit 1
           fi
           echo "PASSOU: evolução real renderizada no GitHub Pages sem gráficos fictícios"
+
+      - name: Testar estúdio real de compartilhamento e instalação iPhone
+        shell: bash
+        run: |
+          set -euo pipefail
+          BROWSER="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+          if [ -z "$BROWSER" ]; then
+            echo "::error::Navegador não encontrado"
+            exit 1
+          fi
+          timeout 65 "$BROWSER" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --virtual-time-budget=16000 --dump-dom "https://pscfredteixeira.github.io/gym/?tab=share&build_check=${GITHUB_SHA}" > /tmp/gym-share-real.html 2> /tmp/gym-share-real.log || {
+            tail -n 40 /tmp/gym-share-real.log; exit 1
+          }
+          if ! grep -q "SEUS RESULTADOS. SUA HISTÓRIA." /tmp/gym-share-real.html || ! grep -q "Nenhum treino concluído" /tmp/gym-share-real.html; then
+            echo "::error::Estúdio real não abriu corretamente com estado vazio"
+            head -c 1800 /tmp/gym-share-real.html || true
+            exit 1
+          fi
+          if grep -q "PRÉVIA FICTÍCIA" /tmp/gym-share-real.html; then
+            echo "::error::Cards fictícios ainda aparecem no estúdio real"
+            exit 1
+          fi
+          echo "PASSOU: estúdio real e estado vazio renderizados corretamente"

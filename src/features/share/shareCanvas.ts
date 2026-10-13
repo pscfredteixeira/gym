@@ -62,7 +62,9 @@ export function drawShareCard(data:CardData,format:ShareFormat,style:ShareStyle,
  }
  ctx.fillStyle=accent;ctx.fillRect(pad,height-144,70,7);
  text("MOVIMENTO É PROGRESSO.",pad,height-98,"700 26px Arial, sans-serif",muted);
- text(data.credit,width-pad,height-98,"700 21px Arial, sans-serif",muted);
+ ctx.textAlign="right";
+ text(data.credit,width-pad,height-56,"700 19px Arial, sans-serif",muted);
+ ctx.textAlign="left";
  // Right-aligned credit without allowing it to overlap the footer slogan.
  // The text fits in a separate row if it is too long.
  return canvas;

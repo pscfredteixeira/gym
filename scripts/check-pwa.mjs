@@ -50,3 +50,10 @@ for(const [file,size] of [["dist/apple-touch-icon-v3.png",180],["dist/icons/icon
  assertWordmark(await readFile(file),size);
 }
 console.log("PASSOU: versão GYM standalone com ícones válidos para iPhone e Android.");
+
+
+const installation=await readFile("dist/instalar.html","utf-8");
+check(installation.includes("apple-touch-icon-v3.png")&&installation.includes("INSTALAÇÃO IPHONE"),"Página de instalação exclusiva inválida");
+const installManifest=JSON.parse(await readFile("dist/manifest-install.webmanifest","utf-8"));
+check(installManifest.display==="standalone"&&installManifest.id!==manifest.id,"Instalação não tem identidade própria");
+console.log("PASSOU: instalador exclusivo e ícone pronto para iPhone.");

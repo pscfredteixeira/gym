@@ -192,3 +192,15 @@ O estúdio de cards permanece como prévia com **dados fictícios** e não é ex
 - [ ] Validar manualmente a instalação e abertura no iPhone do usuário.
 
 Esta melhoria antecipa a **instalabilidade**; o cache offline completo e atualizações offline permanecem na Sprint 11. Veja `docs/INSTALL_IPHONE.md`.
+
+## Sprint 09 — Estúdio de cards reais
+
+- [x] Seleção de sessões de musculação concluídas e cardio real com IDs e datas originais.
+- [x] Cargas/séries realizadas, duração, tempo, quilometragem informada e ritmo somente quando possível calcular.
+- [x] Preview WYSIWYG e exportação PNG/JPG em 9:16, 4:5 e 1:1.
+- [x] Paletas grafite/laranja e minimalista.
+- [x] Privacidade: nome, FC, observações e lista de exercícios configuráveis por card.
+- [x] Menu nativo Compartilhar do iPhone quando suportado e fallback de arquivo.
+- [x] Nenhum dado fictício no estúdio de cards; estado vazio útil.
+- [x] Página de instalação exclusiva para corrigir cache de ícone em instalações iOS antigas.
+- [ ] Validar exportação e instalação do ícone diretamente no Safari do usuário.

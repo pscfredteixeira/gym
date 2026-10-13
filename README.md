@@ -186,3 +186,7 @@ As fotografias obtidas no Commons mantêm `imageUrl`, `imageSourceUrl`, `imageAu
 ## Instalação na Tela de Início do iPhone
 
 O GYM já inclui ícone próprio em PNG (180 × 180 para iPhone, mais versões PWA 192 × 192 e 512 × 512), manifesto e modo standalone. No **Safari**, abrir a URL pública, tocar em **Compartilhar → Adicionar à Tela de Início** e confirmar o nome GYM. Veja o [guia completo](docs/INSTALL_IPHONE.md), incluindo o cuidado importante de fazer backup dos treinos antes de instalar ou substituir um atalho antigo. **Instalável não significa offline**: o cache offline será tratado na Sprint 11.
+
+## Sprint 09 — cards com resultados reais
+
+O estúdio agora gera cards a partir de sessões **concluídas** e atividades reais de cardio no IndexedDB. É possível selecionar a sessão, formato (Story, feed ou quadrado), estilo, PNG/JPG e campos opcionais de privacidade. A prévia usa o mesmo renderizador Canvas da exportação. Sem sessões reais, mostra um estado vazio. Compartilhamento pelo menu nativo do iPhone quando disponível; caso contrário, gera arquivo para salvar. A instalação iPhone dispõe de página específica em `/gym/instalar.html`, que exibe a miniatura correta antes de adicionar o atalho.

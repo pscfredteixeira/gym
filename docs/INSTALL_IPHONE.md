@@ -33,3 +33,7 @@ O ícone e o modo standalone não significam que o aplicativo inteiro funciona o
 O ícone aprovado, com as letras **GYM** em laranja sobre grafite, está publicado como `/gym/apple-touch-icon-v3.png`. O HTML aponta exclusivamente para a nova versão e o manifesto usa `icon-192-v3.png` e `icon-512-v3.png`. Os arquivos antigos são preservados por compatibilidade.
 
 **Ícones de aplicativos já instalados no iPhone não são necessariamente atualizados pelo Safari quando o arquivo do site muda.** Faça primeiro um backup JSON no Perfil. Depois de guardar esse backup, remova apenas a instalação antiga da Tela de Início, abra a versão mais recente do GYM no Safari normal e use **Compartilhar → Adicionar à Tela de Início** novamente. Se os treinos não forem transferidos automaticamente, importe o backup JSON na nova instalação.
+
+## Se o ícone não mudar após reinstalar
+
+Abra **https://pscfredteixeira.github.io/gym/instalar.html** no Safari comum. A página exibe uma prévia da imagem aprovada e define uma identidade de instalação distinta, reduzindo conflito com o atalho anterior. Compartilhe **essa página** para a Tela de Início, mantendo **Abrir como App Web** habilitado. O novo atalho encaminha para o GYM ao ser aberto. Preserve o atalho antigo até confirmar seus dados na nova instalação; os armazenamentos podem ser diferentes. Não é possível mudar à força o ícone de um atalho que o iOS já guardou.
