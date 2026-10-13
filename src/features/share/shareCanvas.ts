@@ -1,5 +1,5 @@
 import type { CardData, ShareFormat, ShareStyle } from "./shareDomain.ts";
-import { SHARE_SIZES } from "./shareDomain";
+import { SHARE_SIZES } from "./shareDomain.ts";
 
 export function drawShareCard(data:CardData,format:ShareFormat,style:ShareStyle,scale=1):HTMLCanvasElement {
  const [width,height]=SHARE_SIZES[format];
