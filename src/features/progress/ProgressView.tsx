@@ -147,7 +147,7 @@ export default function ProgressView({workouts,cardio,units,onOpenStrength,onOpe
      <p className="real-progress-smallnote">Um dia com musculação concluída e cardio conta apenas uma vez. Sessões interrompidas e planos sem execução não entram nesta estatística.</p>
    </section>
    <button type="button" className="real-progress-share" onClick={onOpenSharePreview}>
-     <BarChart3 size={19}/><span><strong>Estúdio de cards</strong><small>Ainda usa dados fictícios, identificados como exemplo.</small></span><ArrowRight size={17}/>
+     <BarChart3 size={19}/><span><strong>Estúdio de cards</strong><small>Gere imagens com suas atividades reais para compartilhar.</small></span><ArrowRight size={17}/>
    </button>
    <Notice>Os dados ficam neste navegador e são recalculados quando você altera ou restaura seu histórico. Faça backup pelo Perfil. O GYM não infere calorias, GPS ou mudanças corporais.</Notice>
  </div>;
