@@ -14,6 +14,8 @@ import { readSettings, writeSettings, saveEntity, saveManualCardio, deleteManual
 import type { CardioSession, Exercise, ScheduledCardio, UserSettings, WorkoutPlan, WorkoutSession } from "./domain/models";
 import CardioView, { CardioHighlights } from "./features/cardio/CardioView";
 import ProgressView from "./features/progress/ProgressView";
+import ShareView from "./features/share/ShareView";
+import type { ShareKind } from "./features/share/shareDomain";
 import { ActiveWorkoutBanner, LiveWorkout, WorkoutHistoryView } from "./features/training/TrainingView";
 import { ExerciseLibrary, ExerciseDetails } from "./features/library/ExerciseLibrary";
 import { isExerciseImageUrl } from "./features/library/exerciseImages";
@@ -29,9 +31,6 @@ import { ensureProgramCatalog, listEntities } from "./data/storage";
 
 type Tab = "home" | "workouts" | "library" | "progress" | "profile";
 type Screen = Tab | "session" | "rest" | "run" | "share" | "program" | "edit-plan" | "edit-schedule" | "live" | "history" | "exercise-info";
-type ShareKind = "strength" | "run";
-type ShareFormat = "story" | "feed" | "square";
-type ShareStyle = "ember" | "minimal";
 const navItems: { screen: Tab; label: string; icon: typeof House }[] = [
   { screen:"home", label:"Hoje", icon:House },
   { screen:"workouts", label:"Treinar", icon:Dumbbell },
@@ -39,61 +38,14 @@ const navItems: { screen: Tab; label: string; icon: typeof House }[] = [
   { screen:"progress", label:"Evolução", icon:BarChart3 },
   { screen:"profile", label:"Perfil", icon:UserRound }
 ];
-const formats: Record<ShareFormat, [number, number]> = {
-  story: [1080, 1920], feed: [1080, 1350], square: [1080, 1080]
-};
 const weekdays = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
 const today = new Date();
 const todayIndex = (today.getDay()+6)%7;
 const monday = new Date(today.getFullYear(),today.getMonth(),today.getDate()-todayIndex);
 const weekDates = weekdays.map((name,i)=>({name,day:new Date(monday.getFullYear(),monday.getMonth(),monday.getDate()+i).getDate()}));
 const fmtTime = (seconds: number) => String(Math.floor(seconds / 60)).padStart(2, "0") + ":" + String(seconds % 60).padStart(2, "0");
-const fmtPace = (durationMinutes: number, distanceKm: number) => {
-  if (distanceKm <= 0 || durationMinutes <= 0) return "—";
-  const seconds = Math.round(durationMinutes * 60 / distanceKm);
-  return Math.floor(seconds/60) + "'" + String(seconds % 60).padStart(2,"0") + "\"/km";
-};
 function DemoImageFallback({label="GYM"}:{label?:string}) {
   return <div className="image-fallback"><Dumbbell size={30} aria-hidden="true"/><span>{label}</span></div>;
-}
-function downloadSampleCard(kind:ShareKind,format:ShareFormat,style:ShareStyle,duration:number,distance:number,showHr:boolean,onResult:(msg:string)=>void) {
-  const [width,height] = formats[format];
-  const canvas=document.createElement("canvas");
-  canvas.width=width; canvas.height=height;
-  const ctx=canvas.getContext("2d");
-  if(!ctx){onResult("Não foi possível preparar a imagem neste navegador.");return;}
-  const dark=style==="ember";
-  const bg=dark?"#101113":"#e9e8e4", ink=dark?"#fbf8f4":"#181818",muted=dark?"#a8aaad":"#686868",accent="#ff6d27";
-  ctx.fillStyle=bg;ctx.fillRect(0,0,width,height);
-  if(dark){
-    const g=ctx.createRadialGradient(width*.78,height*.3,0,width*.78,height*.3,height*.66);
-    g.addColorStop(0,"#562719");g.addColorStop(.55,"#201817");g.addColorStop(1,"#101113");
-    ctx.fillStyle=g;ctx.fillRect(0,0,width,height);
-  }
-  ctx.fillStyle=accent;ctx.fillRect(90,108,80,11);
-  ctx.fillStyle=ink;ctx.font="900 65px system-ui, sans-serif";ctx.fillText("GYM.",90,210);
-  ctx.fillStyle=muted;ctx.font="500 29px system-ui, sans-serif";ctx.fillText("EXEMPLO · DADOS FICTÍCIOS",90,275);
-  const isSquare=height===1080;
-  const middle=height*(isSquare?.34:.46);
-  ctx.fillStyle=ink;ctx.font="800 55px system-ui, sans-serif";
-  ctx.fillText(kind==="strength"?"TREINO CONCLUÍDO":"CORRIDA DE HOJE",90,middle-130);
-  ctx.fillStyle=accent;ctx.font="900 140px system-ui, sans-serif";
-  ctx.fillText(kind==="strength"?"COSTAS":distance.toLocaleString("pt-BR",{maximumFractionDigits:2})+" KM",84,middle+10);
-  ctx.fillStyle=ink;ctx.font="700 50px system-ui, sans-serif";
-  ctx.fillText(kind==="strength"?"+ BÍCEPS":"NO SEU RITMO",90,middle+80);
-  ctx.strokeStyle=muted;ctx.globalAlpha=.4;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(90,middle+155);ctx.lineTo(width-90,middle+155);ctx.stroke();ctx.globalAlpha=1;
-  const lines=kind==="strength"?[["DURAÇÃO","55 MIN"],["EXERCÍCIOS","5"],["SÉRIES","11"]]:[["TEMPO",duration+" MIN"],["RITMO",fmtPace(duration,distance)],["TIPO","ESTEIRA"]];
-  const visibleLines=isSquare?lines.slice(0,2):lines;
-  visibleLines.forEach(([label,value],i)=>{const y=middle+235+i*133;ctx.fillStyle=muted;ctx.font="600 27px system-ui, sans-serif";ctx.fillText(label,92,y);ctx.fillStyle=ink;ctx.font="800 64px system-ui, sans-serif";ctx.fillText(value,90,y+68);});
-  if(showHr){ctx.fillStyle=muted;ctx.font="500 26px system-ui, sans-serif";ctx.fillText("Frequência cardíaca não informada",90,height-230);}
-  ctx.fillStyle=muted;ctx.font="500 28px system-ui, sans-serif";ctx.fillText("Movimento é progresso.",90,height-115);
-  canvas.toBlob(blob=>{
-    if(!blob){onResult("Não foi possível exportar a imagem.");return;}
-    const url=URL.createObjectURL(blob),anchor=document.createElement("a");
-    anchor.href=url;anchor.download="gym-previa-"+kind+"-"+format+".png";anchor.click();
-    window.setTimeout(()=>URL.revokeObjectURL(url),10000);
-    onResult("Imagem de exemplo preparada para download.");
-  },"image/png");
 }
 export default function App(){
   const [screen,setScreen]=useState<Screen>(()=>new URLSearchParams(window.location.search).get("tab")==="library"?"library":new URLSearchParams(window.location.search).get("tab")==="cardio"?"run":new URLSearchParams(window.location.search).get("tab")==="progress"?"progress":"home");
@@ -104,13 +56,7 @@ export default function App(){
   const [reps,setReps]=useState<Record<string,number>>({});
   const [restLeft,setRestLeft]=useState(90);
   const [restRunning,setRestRunning]=useState(false);
-  const [runMinutes,setRunMinutes]=useState(20);
-  const [runDistance,setRunDistance]=useState(3.2);
   const [shareKind,setShareKind]=useState<ShareKind>("strength");
-  const [shareFormat,setShareFormat]=useState<ShareFormat>("story");
-  const [shareStyle,setShareStyle]=useState<ShareStyle>("ember");
-  const [shareHeart,setShareHeart]=useState(false);
-  const [exportStatus,setExportStatus]=useState("");
   const [settings,setSettings]=useState<UserSettings>(DEFAULT_SETTINGS);
   const [storageState,setStorageState]=useState<StorageState>("loading");
   const [storageError,setStorageError]=useState("");
@@ -319,9 +265,9 @@ export default function App(){
   };
   const resetDemo=()=>{
     if(!window.confirm("Reiniciar apenas os valores desta prévia? Nenhum dado real será apagado."))return;
-    setCompleted({});setWeight({});setReps({});setExerciseIndex(0);setSetIndex(0);setRunDistance(3.2);setRunMinutes(20);setExportStatus("");go("home");
+    setCompleted({});setWeight({});setReps({});setExerciseIndex(0);setSetIndex(0);go("home");
   };
-  const viewShare=(kind:ShareKind)=>{setShareKind(kind);setExportStatus("");go("share");};
+  const viewShare=(kind:ShareKind)=>{setShareKind(kind);go("share");};
   const increment=(kind:"weight"|"reps", delta:number)=>{
     if(kind==="weight")setWeight(prev=>({...prev,[currentKey]:Math.min(500,Math.max(0,(prev[currentKey]??mockWeights[sessionEx.id])+delta))}));
     else setReps(prev=>({...prev,[currentKey]:Math.min(100,Math.max(0,(prev[currentKey]??mockReps[sessionEx.id])+delta))}));
@@ -422,16 +368,10 @@ export default function App(){
           workouts={workoutHistory} cardio={cardioHistory} units={settings.units}
           onOpenStrength={()=>go("history")} onOpenCardio={()=>go("run")}
           onOpenSharePreview={()=>viewShare("strength")}/>}
-        {screen==="share"&&<>
-          <BackHeader label="ESTÚDIO DE CARDS" onBack={()=>go("progress")} action={<button className="round-control" type="button" aria-label="Fechar" onClick={()=>go("home")}><X size={19}/></button>}/>
-          <div className="studio-heading"><span className="eyebrow">COMPARTILHE SEU MOVIMENTO</span><h1>Seu treino.<br/>Seu estilo<span className="orange">.</span></h1><p>Teste os modelos de publicação com valores fictícios.</p></div>
-          <div className="share-types" aria-label="Tipo de card"><button type="button" onClick={()=>setShareKind("strength")} className={shareKind==="strength"?"active":""}><Dumbbell size={18}/> Musculação</button><button type="button" onClick={()=>setShareKind("run")} className={shareKind==="run"?"active":""}><Footprints size={18}/> Corrida</button></div>
-          <div className="preview-wrap"><div className={"social-preview "+shareFormat+" "+shareStyle}><div className="social-noise"/><div className="social-top"><span>GYM<span>.</span></span><small>PRÉVIA FICTÍCIA</small></div><div className="social-middle"><small>{shareKind==="strength"?"TREINO CONCLUÍDO":"CORRIDA DE HOJE"}</small><strong>{shareKind==="strength"?"COSTAS":runDistance.toLocaleString("pt-BR",{maximumFractionDigits:2})+" KM"}</strong><span>{shareKind==="strength"?"+ BÍCEPS":"NO SEU RITMO"}</span></div><div className="social-facts">{shareKind==="strength"?<><div><small>DURAÇÃO</small><strong>55 MIN</strong></div><div><small>EXERCÍCIOS</small><strong>05</strong></div></>:<><div><small>TEMPO</small><strong>{runMinutes} MIN</strong></div><div><small>RITMO</small><strong>{fmtPace(runMinutes,runDistance)}</strong></div></>}</div><div className="social-foot">MOVIMENTO É PROGRESSO.</div></div></div>
-          <div className="studio-controls"><div className="control-section"><span>FORMATO</span><div className="choice-row">{[["story","Story · 9:16"],["feed","Feed · 4:5"],["square","Quadrado"]] .map(([id,label])=><button type="button" className={shareFormat===id?"active":""} onClick={()=>setShareFormat(id as ShareFormat)} key={id}>{label}</button>)}</div></div><div className="control-section"><span>ESTILO VISUAL</span><div className="choice-row"><button type="button" className={shareStyle==="ember"?"active":""} onClick={()=>setShareStyle("ember")}>Escuro / Laranja</button><button type="button" className={shareStyle==="minimal"?"active":""} onClick={()=>setShareStyle("minimal")}>Minimalista</button></div></div><label className="privacy-toggle"><span><ShieldCheck size={19}/> Mostrar informação cardíaca não informada</span><input type="checkbox" checked={shareHeart} onChange={e=>setShareHeart(e.target.checked)}/></label></div>
-          <PrimaryButton onClick={()=>downloadSampleCard(shareKind,shareFormat,shareStyle,runMinutes,runDistance,shareHeart,setExportStatus)}>Exportar exemplo em PNG <ArrowDownToLine size={18}/></PrimaryButton>
-          {exportStatus&&<p className="export-status" role="status">{exportStatus}</p>}
-          <Notice>A imagem contém a marca “EXEMPLO · DADOS FICTÍCIOS”. Exportação de dados reais será desenvolvida na Sprint 09.</Notice>
-        </>}
+        {screen==="share"&&<ShareView
+          preferredKind={shareKind} workouts={workoutHistory} cardio={cardioHistory}
+          settings={settings} onBack={()=>go("progress")}
+          onStartStrength={()=>go("workouts")} onStartCardio={()=>go("run")}/>}
         {screen==="profile"&&<ProfilePanel
           settings={settings}
           onChange={setSettings}
