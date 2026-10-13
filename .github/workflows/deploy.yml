@@ -49,6 +49,8 @@ jobs:
           cp -R dist/assets assets
           cp dist/favicon.svg favicon.svg
           cp dist/manifest.webmanifest manifest.webmanifest
+          cp dist/manifest-install.webmanifest manifest-install.webmanifest
+          cp dist/instalar.html instalar.html
           cp dist/apple-touch-icon.png apple-touch-icon.png
           cp dist/apple-touch-icon-v2.png apple-touch-icon-v2.png
           cp dist/apple-touch-icon-v3.png apple-touch-icon-v3.png
@@ -57,7 +59,7 @@ jobs:
           touch .nojekyll
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html assets favicon.svg manifest.webmanifest apple-touch-icon.png apple-touch-icon-v2.png apple-touch-icon-v3.png icons .nojekyll
+          git add index.html assets instalar.html manifest-install.webmanifest favicon.svg manifest.webmanifest apple-touch-icon.png apple-touch-icon-v2.png apple-touch-icon-v3.png icons .nojekyll
           if ! git diff --cached --quiet; then
             git commit -m "build: sync compiled GYM site [skip ci]"
             git push origin HEAD:main

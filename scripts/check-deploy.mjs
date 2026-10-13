@@ -27,6 +27,10 @@ async function check() {
     assert(asset.body.length>100,"Asset vazio: "+dest);
     assert(!asset.type.includes("text/html"),"Asset está servindo HTML (provável fallback/404): "+dest);
   }
+  const install=await retrieve(base+"instalar.html?deploy_check="+stamp);
+  assert(install.status===200 && install.body.includes('Instalar GYM no iPhone') && install.body.includes("/gym/apple-touch-icon-v3.png"),"Página especial de instalação não foi publicada");
+  const installManifest=await retrieve(base+"manifest-install.webmanifest?deploy_check="+stamp);
+  assert(installManifest.status===200 && JSON.parse(installManifest.body).display==="standalone","Manifesto exclusivo de instalação não foi publicado");
   assert(page.body.includes('rel="apple-touch-icon"')&&page.body.includes("/gym/apple-touch-icon-v3.png"),"HTML público não anuncia o ícone iPhone");
   assert(page.body.includes('rel="manifest"')&&page.body.includes("/gym/manifest.webmanifest"),"HTML público não anuncia o manifesto PWA");
   const mr=await retrieve(base+"manifest.webmanifest?deploy_check="+stamp);
