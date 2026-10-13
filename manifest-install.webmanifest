@@ -1,0 +1,26 @@
+{
+  "id": "/gym/install-2026-wordmark/",
+  "name": "GYM",
+  "short_name": "GYM",
+  "description": "Seu treino no seu ritmo",
+  "lang": "pt-BR",
+  "start_url": "/gym/instalar.html?modo=app",
+  "scope": "/gym/",
+  "display": "standalone",
+  "background_color": "#0c0e10",
+  "theme_color": "#0c0e10",
+  "icons": [
+    {
+      "src": "/gym/icons/icon-192-v3.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/gym/icons/icon-512-v3.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
