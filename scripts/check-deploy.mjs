@@ -44,6 +44,18 @@ async function check() {
     console.log("Ícone público:",name,result.status,png.length+" bytes");
     assert(result.status===200&&png.subarray(0,8).equals(signature)&&png.length>3000,"Ícone PNG não foi publicado: "+name);
   }
+
+  const expectedShareImage="https://pscfredteixeira.github.io/gym/icons/icon-512-v3.png?social=20261013";
+  for(const [markup,source] of [[page.body,"GYM"],[install.body,"Instalar GYM"]]){
+    assert(markup.includes('property="og:image" content="'+expectedShareImage+'"'),"A prévia compartilhada de "+source+" não usa o logotipo GYM");
+    assert(markup.includes('name="twitter:image" content="'+expectedShareImage+'"'),"Meta social da imagem não publicada em "+source);
+    assert(markup.includes('property="og:image:alt" content="Logotipo GYM em laranja sobre fundo grafite"'),"A imagem social está sem descrição em "+source);
+  }
+  const socialResponse=await fetch(expectedShareImage,{cache:"no-store",signal:AbortSignal.timeout(20000)});
+  const socialBytes=Buffer.from(await socialResponse.arrayBuffer());
+  assert(socialResponse.ok&&socialBytes.length>3000&&socialBytes.readUInt32BE(16)===512&&socialBytes.readUInt32BE(20)===512,
+    "Logotipo da prévia não é um PNG 512x512 acessível publicamente");
+  console.log("Prévia compartilhada:",socialResponse.status,socialBytes.length,"bytes");
   console.log("PASSOU: GitHub Pages está entregando a aplicação compilada e seus assets.");
 }
 let last;

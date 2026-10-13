@@ -57,3 +57,12 @@ check(installation.includes("apple-touch-icon-v3.png")&&installation.includes("I
 const installManifest=JSON.parse(await readFile("dist/manifest-install.webmanifest","utf-8"));
 check(installManifest.display==="standalone"&&installManifest.id!==manifest.id,"Instalação não tem identidade própria");
 console.log("PASSOU: instalador exclusivo e ícone pronto para iPhone.");
+
+const sharePreview="https://pscfredteixeira.github.io/gym/icons/icon-512-v3.png?social=20261013";
+for(const [markup,source] of [[html,"index.html"],[installation,"instalar.html"]]){
+ check(markup.includes('property="og:image" content="'+sharePreview+'"'),"Prévia de compartilhamento incorreta em "+source);
+ check(markup.includes('name="twitter:image" content="'+sharePreview+'"'),"Meta da imagem de redes sociais ausente em "+source);
+ check(markup.includes('property="og:image:alt" content="Logotipo GYM em laranja sobre fundo grafite"'),"Alt da imagem social ausente em "+source);
+}
+console.log("PASSOU: HTML anuncia imagem GYM para prévia iOS e redes sociais.");
+
