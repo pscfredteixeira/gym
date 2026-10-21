@@ -106,7 +106,7 @@ test("seven-day schedule and cardio survive backup and restore",async()=>{
  assert.equal(configuredCardio(await readSettings())[3]?.label,"Caminhada leve");
  const days=resolveSchedule(await readSettings(),await listEntities("plans"));
  assert.equal(days[0].planId,v3Id("push-a"));
- assert.equal(days[1].planId,planId("push"));
+ assert.equal(days[1].planId,v3Id("pull-a"));
 });
 test("invalid weekly schedule is rejected",()=>{
  assert.throws(()=>validateSettings({...DEFAULT_SETTINGS,weeklyPlanIds:["x"]}),/preferências/);
