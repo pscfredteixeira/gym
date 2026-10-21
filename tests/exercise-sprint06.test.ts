@@ -24,7 +24,7 @@ test("every distinct original Programa 10/10 movement has an individual Portugue
     assert.ok(guide.focus.length>10);
     assert.ok(guide.alternatives.every(id=>id!==exercise.id));
   }
-  assert.equal(Object.keys(EXERCISE_GUIDES).length,31);
+  assert.equal(Object.keys(EXERCISE_GUIDES).length,38);
 });
 test("search is case/accent insensitive across title, muscle and equipment",()=>{
   assert.equal(normalized("TRÍCEPS FRÂNCÊS"),"triceps frances");
