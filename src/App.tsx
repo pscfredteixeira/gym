@@ -24,8 +24,8 @@ import { startStoredWorkout, getActiveWorkout, mutateStoredWorkout } from "./dat
 import { savePlanWithExercises, deleteEntity } from "./data/storage";
 import PlanEditor from "./features/program/PlanEditor";
 import ScheduleEditor from "./features/program/ScheduleEditor";
-import { configuredPlanIds, resolveSchedule } from "./features/program/programSchedule";
-import { PROGRAM_DAYS, PROGRAM_NAME, buildProgramCatalog, planId } from "./data/program1010";
+import { configuredPlanIds, defaultWeeklyPlanIds, defaultWeeklyCardio, upgradeLegacyDefaultSchedule, resolveSchedule } from "./features/program/programSchedule";
+import { PROGRAM_DAYS, PROGRAM_NAME, buildProgramCatalog, planId } from "./data/program6";
 import { ProgramOverview, ProgramDayDetail, type ProgramStatus } from "./features/program/ProgramView";
 import { ensureProgramCatalog, listEntities } from "./data/storage";
 
@@ -66,9 +66,12 @@ export default function App(){
 
   useEffect(()=>{
     let active=true;
-    readSettings().then(value=>{
+    readSettings().then(async value=>{
       if(!active)return;
-      setSettings(value);setStorageState("ready");setSettingsReady(true);
+      const upgraded=upgradeLegacyDefaultSchedule(value);
+      if(upgraded) await writeSettings(upgraded);
+      if(!active)return;
+      setSettings(upgraded??value);setStorageState("ready");setSettingsReady(true);
     }).catch(error=>{
       if(!active)return;
       setStorageError(error instanceof Error?error.message:"Falha no armazenamento.");
@@ -211,6 +214,19 @@ export default function App(){
     await loadProgram(false);
     go("workouts");
   };
+  const activateSixDays=async()=>{
+    const oldIds=configuredPlanIds(settings);
+    const customized=oldIds.some(id=>id!==null&&!id.startsWith("programa-10-10-v2-"));
+    if(customized&&!window.confirm("Substituir sua agenda semanal pela divisão de seis dias? As fichas anteriores e seu histórico serão preservados."))return;
+    try {
+      await ensureProgramCatalog(buildProgramCatalog(new Date().toISOString()));
+      await saveSchedule(defaultWeeklyPlanIds(),defaultWeeklyCardio());
+      await loadProgram(false);
+    }catch(error){
+      setProgramStatus("error");
+      setStorageError(error instanceof Error?error.message:"Não foi possível ativar a nova programação.");
+    }
+  };
   const saveSchedule=async(ids:Array<string|null>,cardio:Array<ScheduledCardio|null>)=>{
     const next={...settings,weeklyPlanIds:ids,weeklyCardio:cardio};
     await flushSettings();
@@ -278,7 +294,7 @@ export default function App(){
     <div className="app-column">
       <header className="app-header">
         <button className="logo" type="button" disabled={screen==="edit-plan"||screen==="edit-schedule"||screen==="live"} onClick={()=>go("home")} aria-label="GYM, voltar ao início">GYM<span>.</span></button>
-        <div className="header-actions">{["home","workouts","program","live","history","library","exercise-info","share"].includes(screen)?<span className="program-header-tag">10/10</span>:<DemoLabel compact/>}<button type="button" className="header-avatar" onClick={()=>go("profile")} aria-label="Abrir perfil"><UserRound size={20}/></button></div>
+        <div className="header-actions">{["home","workouts","program","live","history","library","exercise-info","share"].includes(screen)?<span className="program-header-tag">3.0</span>:<DemoLabel compact/>}<button type="button" className="header-avatar" onClick={()=>go("profile")} aria-label="Abrir perfil"><UserRound size={20}/></button></div>
       </header>
       <main className="app-main" id="main-content">
         {screen==="home"&&<>
@@ -290,13 +306,15 @@ export default function App(){
           <CardioHighlights sessions={cardioHistory} onOpen={()=>go("run")}/>
           {cardioError&&<div className="editor-error" role="alert">{cardioError}</div>}
           <div className="week-strip" aria-label="Escolha um dia da semana">{weekDates.map(({name,day:calendarDay},i)=><button type="button" key={name} onClick={()=>setDay(i)} className={day===i?"day-item selected":"day-item"} aria-pressed={day===i}><span>{name.toUpperCase()}</span><strong>{calendarDay}</strong><i/></button>)}</div>
-          <section className="hero-card"><Photo src={photos.hero} alt="Ambiente de academia" className="hero-photo"/><div className="hero-shade"/><div className="hero-info"><div className="topchip"><Flame size={13}/> {PROGRAM_NAME.toUpperCase()} · VERSÃO 2.0</div><div className="hero-lower"><p>{selectedDay.weekday.toUpperCase()} / {selectedPlan?"MUSCULAÇÃO":"RECUPERAÇÃO"}</p><h2>{selectedDay.title}<span>.</span></h2><div className="hero-stats">{selectedPlan?<><span><Dumbbell size={14}/>{selectedPlan.exercises.length} exercícios</span><span><CheckCircle2 size={14}/>{selectedPlan.exercises.reduce((n,ex)=>n+ex.sets.filter(set=>set.kind==="working").length,0)} séries efetivas</span></>:<span><Activity size={14}/> Descanso / recuperação</span>}{selectedDay.cardio&&<span><Footprints size={14}/>{selectedDay.cardio.label}{selectedDay.cardio.minutes?" · "+selectedDay.cardio.minutes+" min":""}</span>}</div><button type="button" className="hero-cta" onClick={()=>openProgram(day)}>Ver programação do dia <ArrowRight size={20}/></button></div></div></section>
+          <section className="hero-card"><Photo src={photos.hero} alt="Ambiente de academia" className="hero-photo"/><div className="hero-shade"/><div className="hero-info"><div className="topchip"><Flame size={13}/> {PROGRAM_NAME.toUpperCase()} · VERSÃO 3.0</div><div className="hero-lower"><p>{selectedDay.weekday.toUpperCase()} / {selectedPlan?"MUSCULAÇÃO":"RECUPERAÇÃO"}</p><h2>{selectedDay.title}<span>.</span></h2><div className="hero-stats">{selectedPlan?<><span><Dumbbell size={14}/>{selectedPlan.exercises.length} exercícios</span><span><CheckCircle2 size={14}/>{selectedPlan.exercises.reduce((n,ex)=>n+ex.sets.filter(set=>set.kind==="working").length,0)} séries efetivas</span></>:<span><Activity size={14}/> Descanso / recuperação</span>}{selectedDay.cardio&&<span><Footprints size={14}/>{selectedDay.cardio.label}{selectedDay.cardio.minutes?" · "+selectedDay.cardio.minutes+" min":""}</span>}</div><button type="button" className="hero-cta" onClick={()=>openProgram(day)}>Ver programação do dia <ArrowRight size={20}/></button></div></div></section>
           <SectionHead title="Seu espaço" aside="Explorar treinos" onClick={()=>go("workouts")}/>
           <div className="home-cards"><button className="feature-mini" type="button" onClick={()=>go("run")}><div className="feature-icon"><Footprints size={24}/></div><small>CARDIO</small><h3>Corrida & esteira</h3><p>Ritmo, distância e tempo</p><ArrowUpRight className="corner-arrow" size={18}/></button><button className="feature-mini" type="button" onClick={()=>go("progress")}><div className="feature-icon"><TrendingUp size={24}/></div><small>RESULTADOS</small><h3>Sua evolução</h3><p>Gráficos e recordes</p><ArrowUpRight className="corner-arrow" size={18}/></button></div>
-          <div className="callout-line"><Sparkles size={18}/><span>{programStatus==="ready"?"Programa 10/10 salvo. Abra uma ficha para registrar séries e cargas reais.":programStatus==="loading"?"Preparando o Programa 10/10...":"A ficha pode ser consultada, mas ainda não foi confirmada no armazenamento local."}</span></div>
+          <div className="callout-line"><Sparkles size={18}/><span>{programStatus==="ready"?"Treino Fred 3.0 salvo. Abra uma ficha para registrar séries e cargas reais.":programStatus==="loading"?"Preparando o Treino Fred 3.0...":"A ficha pode ser consultada, mas ainda não foi confirmada no armazenamento local."}</span></div>
         </>}
         {screen==="workouts"&&<><ActiveWorkoutBanner session={activeWorkout} onResume={()=>go("live")}/><button className="history-link" type="button" onClick={()=>go("history")}><Clock3 size={18}/> Histórico de musculação <ArrowRight size={18}/></button><ProgramOverview status={programStatus} onOpen={openProgram} onInstall={()=>{void loadProgram(true);}}
           assigned={assignedDays} unassigned={unassignedPlans}
+          needsActivation={defaultWeeklyPlanIds().some(id=>!!id&&!configuredPlanIds(settings).includes(id))}
+          onActivate={()=>{void activateSixDays();}}
           onEdit={id=>editPlan(id)} onNew={()=>editPlan(null)} onEditSchedule={()=>go("edit-schedule")}/></>}
         {screen==="edit-plan"&&<PlanEditor key={editingPlanId??"new-"+editorSerial}
           initial={savedPlans.find(p=>p.id===editingPlanId)} catalog={catalogExercises} units={settings.units}

@@ -3,16 +3,17 @@ import type { Exercise, WorkoutPlan } from "../../domain/models";
 import {
   PROGRAM_DAYS, PROGRAM_FOCUS, PROGRAM_NAME, PROGRAM_PRIORITIES, PROGRAM_SUBTITLE,
   type ProgramDay, exerciseId, repsLabel, rirLabel
-} from "../../data/program1010";
+} from "../../data/program6";
 import { ExercisePhoto } from "../library/ExercisePhoto";
 import { BackHeader, Notice, PrimaryButton, SectionHead } from "../../components/ui";
 
 export type ProgramStatus = "loading" | "ready" | "error" | "not_installed";
 
 export function ProgramOverview({
-  status,onOpen,onInstall,assigned,onEdit,onNew,onEditSchedule,unassigned
+  status,onOpen,onInstall,onActivate,needsActivation,assigned,onEdit,onNew,onEditSchedule,unassigned
 }:{
   status:ProgramStatus;onOpen:(index:number)=>void;onInstall:()=>void;
+  onActivate:()=>void;needsActivation:boolean;
   assigned:Array<{day:ProgramDay;plan?:WorkoutPlan;planId:string|null}>;
   onEdit:(id:string)=>void;onNew:()=>void;onEditSchedule:()=>void;unassigned:WorkoutPlan[]
 }){
@@ -32,13 +33,14 @@ export function ProgramOverview({
     <div className={"program-save-banner "+(status==="ready"?"is-saved":"")} role="status">
       <CircleCheck size={20}/>
       <span>
-        {status==="ready"?"As cinco fichas estão cadastradas no armazenamento local do GYM."
+        {status==="ready"?"As seis fichas estão cadastradas no armazenamento local do GYM."
         :status==="loading"?"Preparando suas fichas no armazenamento local..."
         :status==="not_installed"?"O backup restaurado não contém esta ficha. Você pode adicioná-la novamente."
         :"Não foi possível salvar a ficha neste navegador. Ela ainda está visível como referência."}
       </span>
     </div>
     {(status==="error"||status==="not_installed")&&<button className="program-retry" type="button" onClick={onInstall}><RotateCcw size={17}/> Tentar cadastrar novamente</button>}
+    {needsActivation&&status==="ready"&&<div className="program-action-row"><button type="button" className="program-retry" onClick={onActivate}><RotateCcw size={17}/> Ativar agenda de seis dias</button></div>}
     <div className="program-action-row"><button type="button" onClick={onEditSchedule}><CalendarRange size={18}/> Organizar semana</button><button type="button" onClick={onNew}><Plus size={18}/> Nova ficha</button></div>
     <SectionHead title="Sua semana" aside="Selecione o dia"/>
     <div className="program-week-list">
@@ -55,7 +57,7 @@ export function ProgramOverview({
       <p>{PROGRAM_FOCUS}</p>
       {PROGRAM_PRIORITIES.map((p,i)=><div key={p}><span>{String(i+1).padStart(2,"0")}</span><strong>{p}</strong></div>)}
     </div>
-    <Notice>As fichas contêm apenas as séries efetivas informadas no programa. Aquecimentos, cargas e intervalos de descanso não foram inventados; você poderá personalizá-los no editor de treinos.</Notice>
+    <Notice>As fichas contêm somente séries efetivas, com descansos iniciais de 120–150 segundos ajustáveis. As cargas e as séries de aquecimento não foram presumidas. Registre seu RIR e progrida conforme a recuperação.</Notice>
   </>;
 }
 
@@ -150,7 +152,7 @@ export function ProgramLibrary({
   }));
   const entries=Array.from(unique.values());
   return <section className="program-library">
-    <SectionHead title="Prescrições originais 10/10" aside={entries.length+" exercícios"}/>
+    <SectionHead title="Prescrições do Fred 3.0" aside={entries.length+" exercícios"}/>
     <p>Selecione um exercício para consultar o dia da sua ficha, as repetições e o RIR.</p>
     <div className="program-library-grid">{entries.map(ex=><button key={ex.name} type="button" className="program-library-item" onClick={()=>onOpen(ex.day)}>
       <span><Dumbbell size={19}/></span><div><strong>{ex.name}</strong><small>{ex.muscle} · {ex.equipment}</small></div><ChevronRight size={17}/>
