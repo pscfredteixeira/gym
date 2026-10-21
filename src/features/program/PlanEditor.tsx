@@ -75,7 +75,7 @@ export default function PlanEditor({initial,catalog,units,onSave,onDelete,onCanc
   };
   const remove=async()=>{
     if(!initial)return;
-    if(!initial.id.startsWith("custom-")){setError("As cinco fichas originais do Programa 10/10 podem ser retiradas da agenda, mas não excluídas desta biblioteca.");return;}
+    if(!initial.id.startsWith("custom-")){setError("As fichas originais do programa podem ser retiradas da agenda, mas não excluídas desta biblioteca.");return;}
     if(!window.confirm("Excluir esta ficha personalizada? Seu histórico de treinos concluídos será preservado. Esta ação não pode ser desfeita sem backup."))return;
     setSaving(true);setError("");
     try{await onDelete(initial);setDirty(false);}catch(err){setError(err instanceof Error?err.message:"Não foi possível excluir a ficha.");setSaving(false);}
