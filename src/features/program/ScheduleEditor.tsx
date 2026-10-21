@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { CalendarRange, Check, ChevronDown, Footprints, Info, RotateCcw, Save } from "lucide-react";
 import type { ScheduledCardio, UserSettings, WorkoutPlan } from "../../domain/models";
-import { PROGRAM_DAYS } from "../../data/program1010";
+import { PROGRAM_DAYS } from "../../data/program6";
 import { configuredCardio, configuredPlanIds, swapAssignment } from "./programSchedule";
 import { BackHeader, Notice, PrimaryButton } from "../../components/ui";
 
