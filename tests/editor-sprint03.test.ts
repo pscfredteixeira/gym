@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 (globalThis as typeof globalThis & {window:typeof globalThis}).window=globalThis;
 
 const {buildProgramCatalog,planId} = await import("../src/data/program1010.ts");
+const {planId:v3Id} = await import("../src/data/program6.ts");
 const {
   copyPlan,moveRow,dropRow,duplicatePlan,makeSet,updateSeries,makeExerciseRow
 }=await import("../src/features/program/planEditor.ts");
@@ -78,23 +79,23 @@ test("bad plan fails validation without changing the previously saved plan",asyn
 });
 test("weekly assignments swap without duplicating a workout",()=>{
  const start=defaultWeeklyPlanIds();
- assert.equal(start[0],planId("push"));
- const changed=swapAssignment(start,0,planId("pull"));
- assert.equal(changed[0],planId("pull"));
- assert.equal(changed[1],planId("push"));
- assert.equal(start[0],planId("push"));
- assert.equal(changed.filter(x=>x===planId("pull")).length,1);
+ assert.equal(start[0],v3Id("pull-a"));
+ const changed=swapAssignment(start,0,v3Id("push-a"));
+ assert.equal(changed[0],v3Id("push-a"));
+ assert.equal(changed[1],v3Id("pull-a"));
+ assert.equal(start[0],v3Id("pull-a"));
+ assert.equal(changed.filter(x=>x===v3Id("push-a")).length,1);
  const rest=swapAssignment(changed,4,null);
  assert.equal(rest[4],null);
 });
 test("seven-day schedule and cardio survive backup and restore",async()=>{
  const settings=await readSettings();
- const changed=swapAssignment(defaultWeeklyPlanIds(),0,planId("pull"));
+ const changed=swapAssignment(defaultWeeklyPlanIds(),0,v3Id("push-a"));
  const cardio=defaultWeeklyPlanIds().map(()=>null) as Array<null | {label:string;minutes:number|null;optional:boolean;note:string}>;
  cardio[3]={label:"Caminhada leve",minutes:25,optional:true,note:"Recuperação"};
  const next={...settings,weeklyPlanIds:changed,weeklyCardio:cardio};
  const validated=validateSettings(next);
- assert.equal(validated.weeklyPlanIds?.[0],planId("pull"));
+ assert.equal(validated.weeklyPlanIds?.[0],v3Id("push-a"));
  await writeSettings(next);
  const backup=await createBackup();
  assert.equal(backup.settings.weeklyCardio?.[3]?.minutes,25);
@@ -104,7 +105,7 @@ test("seven-day schedule and cardio survive backup and restore",async()=>{
  assert.deepEqual(configuredPlanIds(await readSettings()),changed);
  assert.equal(configuredCardio(await readSettings())[3]?.label,"Caminhada leve");
  const days=resolveSchedule(await readSettings(),await listEntities("plans"));
- assert.equal(days[0].planId,planId("pull"));
+ assert.equal(days[0].planId,v3Id("push-a"));
  assert.equal(days[1].planId,planId("push"));
 });
 test("invalid weekly schedule is rejected",()=>{
